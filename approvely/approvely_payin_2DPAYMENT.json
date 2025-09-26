@@ -229,7 +229,8 @@
         ]
       }
     }
-  }, {
+  },
+  {
   "requestMapping":{
     "method":"POST",
     "url":{
@@ -311,14 +312,10 @@
           "value":"{{pspResponse1.details}}",
           "operations":[
             {
-              "name":"VALUE_MAPPER",
+              "name":"CONDITIONAL_VALUE_MAPPER",
               "params":{
-                "mappings":[
-                  {
-                    "from":null,
-                    "to":"payment_in_process"
-                  }
-                ],
+                "path":"pspResponse1.details",
+                "mappedValue": "payment_in_process",
                 "defaultValue":"payment_failed"
               }
             }
@@ -329,15 +326,11 @@
           "value":"{{pspResponse1.details}}",
           "operations":[
             {
-              "name":"VALUE_MAPPER",
+              "name":"CONDITIONAL_VALUE_MAPPER",
               "params":{
-                "mappings":[
-                  {
-                    "from":null,
-                    "to":"payment_in_process"
-                  }
-                ],
-                "defaultValue":"failed"
+                "path":"pspResponse1.details",
+                "mappedValue": "payment_in_process",
+                "defaultValue":"payment_failed"
               }
             }
           ]
