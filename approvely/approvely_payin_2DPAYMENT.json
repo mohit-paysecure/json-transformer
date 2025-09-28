@@ -1,355 +1,700 @@
 [
   {
-    "requestMapping":{
-      "method":"POST",
-      "url":{
-        "mappings":[
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
           {
-            "value":"https://api-sandbox.coinflow.cash/api/tokenize",
-            "required":true
+            "value": "https://api-sandbox.coinflow.cash/api/tokenize",
+            "required": true
           }
         ],
-        "operations":[
+        "operations": [
           {
-            "name":"LIST_VALUE_JOIN"
+            "name": "LIST_VALUE_JOIN"
           }
         ]
       },
-      "headers":{
-        "mappings":[
+      "headers": {
+        "mappings": [
           {
-            "key":"Content-Type",
-            "value":"application/json",
-            "required":true
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
           },
           {
-            "key":"Accept",
-            "value":"application/json",
-            "required":true
+            "key": "Accept",
+            "value": "application/json",
+            "required": true
           },
           {
-            "key":"Authorization",
-            "mappings":[
+            "key": "Authorization",
+            "mappings": [
               {
-                "value":"{{bankTransaction.usedAuthKey}}",
-                "required":true,
-                "operations":[
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "required": true,
+                "operations": [
                   {
-                    "name":"SPLIT_STRING",
-                    "params":{
-                      "delimiter":"##"
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
                     }
                   },
                   {
-                    "name":"GET_ELEMENT_AT_INDEX",
-                    "params":{
-                      "index":0
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0
                     }
                   }
                 ]
               }
             ],
-            "operations":[
+            "operations": [
               {
-                "name":"LIST_VALUE_JOIN"
+                "name": "LIST_VALUE_JOIN"
               }
             ],
-            "required":true
+            "required": true
           },
           {
-            "key":"tx-apikey",
-            "mappings":[
+            "key": "tx-apikey",
+            "mappings": [
               {
-                "value":"{{bankTransaction.usedAuthKey}}",
-                "required":true,
-                "operations":[
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "required": true,
+                "operations": [
                   {
-                    "name":"SPLIT_STRING",
-                    "params":{
-                      "delimiter":"##"
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
                     }
                   },
                   {
-                    "name":"GET_ELEMENT_AT_INDEX",
-                    "params":{
-                      "index":1
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 1
                     }
                   }
                 ]
               }
             ],
-            "operations":[
+            "operations": [
               {
-                "name":"LIST_VALUE_JOIN"
+                "name": "LIST_VALUE_JOIN"
               }
             ],
-            "required":true
+            "required": true
           },
           {
-            "key":"tx-token-scheme",
-            "mappings":[
+            "key": "tx-token-scheme",
+            "mappings": [
               {
-                "value":"{{bankTransaction.usedAuthKey}}",
-                "required":true,
-                "operations":[
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "required": true,
+                "operations": [
                   {
-                    "name":"SPLIT_STRING",
-                    "params":{
-                      "delimiter":"##"
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
                     }
                   },
                   {
-                    "name":"GET_ELEMENT_AT_INDEX",
-                    "params":{
-                      "index":2
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 2
                     }
                   }
                 ]
               }
             ],
-            "operations":[
+            "operations": [
               {
-                "name":"LIST_VALUE_JOIN"
+                "name": "LIST_VALUE_JOIN"
               }
             ],
-            "required":true
+            "required": true
           },
           {
-            "key":"tx-tokenex-id",
-            "mappings":[
+            "key": "tx-tokenex-id",
+            "mappings": [
               {
-                "value":"{{bankTransaction.usedAuthKey}}",
-                "required":true,
-                "operations":[
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "required": true,
+                "operations": [
                   {
-                    "name":"SPLIT_STRING",
-                    "params":{
-                      "delimiter":"##"
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
                     }
                   },
                   {
-                    "name":"GET_ELEMENT_AT_INDEX",
-                    "params":{
-                      "index":0
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0
                     }
                   }
                 ]
               }
             ],
-            "operations":[
+            "operations": [
               {
-                "name":"LIST_VALUE_JOIN"
+                "name": "LIST_VALUE_JOIN"
               }
             ],
-            "required":true
+            "required": true
           }
         ],
-        "operations":[
+        "operations": [
           {
-            "name":"KEY_VALUE_LIST_TO_OBJECT"
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
           }
         ]
       },
-      "body":{
-        "mappings":[
+      "body": {
+        "mappings": [
           {
-            "key":"data",
-            "value":"{{cardInfo.number}}",
-            "required":true
+            "key": "data",
+            "value": "{{cardInfo.number}}",
+            "required": true
           },
           {
-            "key":"card_cvv2",
-            "value":"{{cardInfo.cvc}}",
-            "required":true
+            "key": "card_cvv2",
+            "value": "{{cardInfo.cvc}}",
+            "required": true
           }
         ],
-        "operations":[
+        "operations": [
           {
-            "name":"KEY_VALUE_LIST_TO_OBJECT"
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
           }
         ]
       }
     },
-    "responseMapping":{
-      "body":{
-        "mappings":[
+    "responseMapping": {
+      "body": {
+        "mappings": [
           {
-            "key":"status",
-            "value":"{{pspResponse0.success}}",
-            "operations":[
+            "key": "status",
+            "value": "{{pspResponse0.success}}",
+            "operations": [
               {
-                "name":"VALUE_MAPPER",
-                "params":{
-                  "mappings":[
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
                     {
-                      "from":"true",
-                      "to":"payment_in_process"
+                      "from": "true",
+                      "to": "payment_in_process"
                     },
                     {
-                      "from":"false",
-                      "to":"payment_failed"
+                      "from": "false",
+                      "to": "payment_failed"
                     }
                   ],
-                  "defaultValue":"payment_in_process"
+                  "defaultValue": "payment_in_process"
                 }
               }
             ]
           },
           {
-            "key":"code",
-            "value":"{{pspResponse0.result}}",
-            "operations":[
+            "key": "code",
+            "value": "{{pspResponse0.result}}",
+            "operations": [
               {
-                "name":"VALUE_MAPPER",
-                "params":{
-                  "mappings":[
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
                     {
-                      "from":"true",
-                      "to":"success"
+                      "from": "true",
+                      "to": "success"
                     },
                     {
-                      "from":"false",
-                      "to":"fail"
+                      "from": "false",
+                      "to": "fail"
                     }
                   ],
-                  "defaultValue":"success"
+                  "defaultValue": "success"
                 }
               }
             ]
           },
           {
-            "key":"message",
-            "value":"{{pspResponse0.error}}"
+            "key": "message",
+            "value": "{{pspResponse0.error}}"
           }
         ],
-        "operations":[
+        "operations": [
           {
-            "name":"KEY_VALUE_LIST_TO_OBJECT"
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
           }
         ]
       }
     }
   },
   {
-  "requestMapping":{
-    "method":"POST",
-    "url":{
-      "mappings":[
-        {
-          "value":"https://api-sandbox.coinflow.cash/api/auth/session-key",
-          "required":true
-        }
-      ],
-      "operations":[
-        {
-          "name":"LIST_VALUE_JOIN"
-        }
-      ]
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://api-sandbox.coinflow.cash/api/auth/session-key",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "x-coinflow-auth-user-id",
+            "value": "{{purchase.client.email}}",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+        ]
+      }
     },
-    "headers":{
-      "mappings":[
-        {
-          "key":"Content-Type",
-          "value":"application/json",
-          "required":true
-        },
-        {
-          "key":"Accept",
-          "value":"application/json",
-          "required":true
-        },
-        {
-          "key":"Authorization",
-          "mappings":[
-            {
-              "value":"{{bankTransaction.usedAuthKey}}",
-              "required":true,
-              "operations":[
-                {
-                  "name":"SPLIT_STRING",
-                  "params":{
-                    "delimiter":"##"
-                  }
-                },
-                {
-                  "name":"GET_ELEMENT_AT_INDEX",
-                  "params":{
-                    "index":0
-                  }
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "status",
+            "value": "{{pspResponse1.details}}",
+            "operations": [
+              {
+                "name": "CONDITIONAL_VALUE_MAPPER",
+                "params": {
+                  "path": "pspResponse1.details",
+                  "mappedValue": "payment_in_process",
+                  "defaultValue": "payment_failed"
                 }
-              ]
-            }
-          ],
-          "operations":[
-            {
-              "name":"LIST_VALUE_JOIN"
-            }
-          ],
-          "required":true
-        },
-        {
-          "key":"x-coinflow-auth-user-id",
-          "value": "{{purchase.client.email}}",
-          "required":true
-        }
-      ],
-      "operations":[
-        {
-          "name":"KEY_VALUE_LIST_TO_OBJECT"
-        }
-      ]
-    },
-    "body":{
-      "mappings":[
-      ]
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse1.details}}",
+            "operations": [
+              {
+                "name": "CONDITIONAL_VALUE_MAPPER",
+                "params": {
+                  "path": "pspResponse1.details",
+                  "mappedValue": "payment_in_process",
+                  "defaultValue": "payment_failed"
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "value": "{{pspResponse1.details}}"
+          },
+          {
+            "key": "pspToken",
+            "value": "{{pspResponse1.key}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
     }
   },
-  "responseMapping":{
-    "body":{
-      "mappings":[
-        {
-          "key":"status",
-          "value":"{{pspResponse1.details}}",
-          "operations":[
-            {
-              "name":"CONDITIONAL_VALUE_MAPPER",
-              "params":{
-                "path":"pspResponse1.details",
-                "mappedValue": "payment_in_process",
-                "defaultValue":"payment_failed"
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://api-sandbox.coinflow.cash/api/checkout/card/paysecure",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "x-coinflow-auth-session-key",
+            "mappings": [
+              {
+                "value": "{{bankTransaction.token}}",
+                "required": true
               }
-            }
-          ]
-        },
-        {
-          "key":"code",
-          "value":"{{pspResponse1.details}}",
-          "operations":[
-            {
-              "name":"CONDITIONAL_VALUE_MAPPER",
-              "params":{
-                "path":"pspResponse1.details",
-                "mappedValue": "payment_in_process",
-                "defaultValue":"payment_failed"
+            ],
+            "required": true
+          },
+          {
+            "key": "x-device-id",
+            "mappings": [
+              {
+                "value": "{{purchase.userDeviceId}}",
+                "required": true
               }
-            }
-          ]
-        },
-        {
-          "key":"message",
-          "value":"{{pspResponse1.details}}"
-        },
-        {
-          "key":"pspToken",
-          "value":"{{pspResponse1.key}}"
-        }
-      ],
-      "operations":[
-        {
-          "name":"KEY_VALUE_LIST_TO_OBJECT"
-        }
-      ]
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "subtotal",
+            "mappings": [
+              {
+                "key": "cents",
+                "value": "{{purchase.fx_Amount}}",
+                "required": true
+              },
+              {
+                "key": "currency",
+                "value": "{{purchase.fx_Currency}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "STRING_TO_DOUBLE"
+                  },
+                  {
+                    "name": "LIST_VALUE_MULTIPLY",
+                    "parameters": {
+                      "list": [
+                        {
+                          "value": 100.0
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "key": "webhookInfo",
+            "mappings": [
+              {
+                "key": "example",
+                "mappings": [
+                  {
+                    "value": "{{extraParams.baseUrl}}",
+                    "required": true
+                  },
+                  {
+                    "value": "/webhook/",
+                    "required": true
+                  },
+                  {
+                    "value": "{{purchase.bankname}}",
+                    "required": true
+                  },
+                  {
+                    "value": "/",
+                    "required": true
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "key": "threeDsChallengePreference",
+            "value": "no_preference",
+            "required": true
+          },
+          {
+            "key": "saveCard",
+            "value": false
+          },
+          {
+            "key": "card",
+            "mappings": [
+              {
+                "key": "cardToken",
+                "value": "{{pspResponse0.token}}",
+                "required": true
+              },
+              {
+                "key": "expYear",
+                "value": "{{cardInfo.expiryYear}}",
+                "required": true
+              },
+              {
+                "key": "expMonth",
+                "value": "{{cardInfo.expiryMonth}}",
+                "required": true
+              },
+              {
+                "key": "email",
+                "value": "{{purchase.client.email}}",
+                "required": true
+              },
+              {
+                "key": "firstName",
+                "value": "{{cardInfo.cardholder_name}}",
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "\\s+"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0,
+                      "defaultValue": "pay"
+                    }
+                  }
+                ],
+                "required": true
+              },
+              {
+                "key": "lastName",
+                "value": "{{cardInfo.cardholder_name}}",
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "\\s+"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0,
+                      "fromLast": true,
+                      "defaultValue": "secure"
+                    }
+                  }
+                ],
+                "required": true
+              },
+              {
+                "key": "address1",
+                "value": "{{purchase.client.street_address}}",
+                "required": true
+              },
+              {
+                "key": "city",
+                "value": "{{purchase.client.city}}",
+                "required": true
+              },
+              {
+                "key": "zip",
+                "value": "{{purchase.client.zip_code}}",
+                "required": true
+              },
+              {
+                "key": "state",
+                "value": "{{purchase.client.stateCode}}",
+                "required": true
+              },
+              {
+                "key": "country",
+                "value": "{{purchase.client.country}}",
+                "required": true
+              }
+            ]
+          },
+          {
+            "key": "authentication3DS",
+            "mappings": [
+              {
+                "key": "colorDepth",
+                "value": "{{s2s.color_depth}}",
+                "mappings": [
+                  {
+                    "defaultValue": 24
+                  }
+                ],
+                "required": true
+              },
+              {
+                "key": "screenHeight",
+                "value": "{{s2s.screen_height}}",
+                "mappings": [
+                  {
+                    "defaultValue": 1080
+                  }
+                ],
+                "required": true
+              },
+              {
+                "key": "screenWidth",
+                "value": "{{s2s.screen_width}}",
+                "mappings": [
+                  {
+                    "defaultValue": 1920
+                  }
+                ],
+                "required": true
+              },
+              {
+                "key": "timeZone",
+                "value": "{{s2s.color_depth}}",
+                "mappings": [
+                  {
+                    "defaultValue": -330
+                  }
+                ],
+                "required": true
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse3.paymentId}}",
+            "operations": [
+              {
+                "name": "CONDITIONAL_VALUE_MAPPER",
+                "params": {
+                  "path": "pspResponse3.paymentId",
+                  "defaultValue": null
+                }
+              }
+            ]
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse3.transactionId}}",
+            "operations": [
+              {
+                "name": "CONDITIONAL_VALUE_MAPPER",
+                "params": {
+                  "path": "pspResponse3.transactionId"
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse3.details}}",
+            "operations": [
+              {
+                "name": "CONDITIONAL_VALUE_MAPPER",
+                "params": {
+                  "path": "pspResponse3.paymentId",
+                  "mappedValue": "paid",
+                  "defaultValue": null
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse3.details}}",
+            "operations": [
+              {
+                "name": "CONDITIONAL_VALUE_MAPPER",
+                "params": {
+                  "path": "pspResponse3.paymentId",
+                  "mappedValue": "success",
+                  "defaultValue": null
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "value": "{{pspResponse3.details}}",
+            "operations": [
+              {
+                "name": "CONDITIONAL_VALUE_MAPPER",
+                "params": {
+                  "path": "pspResponse3.details",
+                  "mappedValue": "success",
+                  "defaultValue": null
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
     }
   }
-}
 ]
