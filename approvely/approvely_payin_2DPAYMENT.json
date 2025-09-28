@@ -309,12 +309,12 @@
         "mappings": [
           {
             "key": "status",
-            "value": "{{pspResponse1.details}}",
+            "value": "{{pspResponse1}}",
             "operations": [
               {
                 "name": "CONDITIONAL_VALUE_MAPPER",
                 "params": {
-                  "path": "pspResponse1.details",
+                  "path": "key",
                   "mappedValue": "payment_in_process",
                   "defaultValue": "payment_failed"
                 }
@@ -323,13 +323,13 @@
           },
           {
             "key": "code",
-            "value": "{{pspResponse1.details}}",
+            "value": "{{pspResponse1}}",
             "operations": [
               {
                 "name": "CONDITIONAL_VALUE_MAPPER",
                 "params": {
-                  "path": "pspResponse1.details",
-                  "mappedValue": "payment_in_process",
+                  "path": "key",
+                  "mappedValue": "success",
                   "defaultValue": "payment_failed"
                 }
               }
@@ -415,11 +415,6 @@
               {
                 "key": "cents",
                 "value": "{{purchase.fx_Amount}}",
-                "required": true
-              },
-              {
-                "key": "currency",
-                "value": "{{purchase.fx_Currency}}",
                 "required": true,
                 "operations": [
                   {
@@ -436,8 +431,19 @@
                     }
                   }
                 ]
+              },
+              {
+                "key": "currency",
+                "value": "{{purchase.fx_Currency}}",
+                "required": true
               }
-            ]
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ],
+            "required": true
           },
           {
             "key": "webhookInfo",
@@ -468,7 +474,13 @@
                   }
                 ]
               }
-            ]
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ],
+            "required": true
           },
           {
             "key": "threeDsChallengePreference",
@@ -568,7 +580,13 @@
                 "value": "{{purchase.client.country}}",
                 "required": true
               }
-            ]
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ],
+            "required": true
           },
           {
             "key": "authentication3DS",
@@ -613,9 +631,67 @@
                 ],
                 "required": true
               }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "chargebackProtectionData",
+            "mappings": [
+              {
+                "key" :"productName",
+                "value": "test product",
+                "required": true
+              },
+              {
+                "key": "productType",
+                "value": "inGameProduct",
+                "required": true
+              },
+              {
+                "key": "quantity",
+                "value": "1",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "STRING_TO_INTEGER"
+                  }
+                ]
+              },
+              {
+                "key": "rawProductData",
+                "mappings": [
+                  {
+                    "key": "orderId",
+                    "value": "{{purchase.transactionId}}",
+                    "required": true
+                  }
+                ],
+                "required": true,
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
             ]
           }
-        ]
+        ],
+        "operations": [
+          {
+            "name": "LIST_OBJECT_VALUE_TO_LIST_VALUE"
+          }
+        ],
+        "required": true
       }
     },
     "responseMapping": {
@@ -623,12 +699,12 @@
         "mappings": [
           {
             "key": "pspTransactionId",
-            "value": "{{pspResponse3.paymentId}}",
+            "value": "{{pspResponse3}}",
             "operations": [
               {
                 "name": "CONDITIONAL_VALUE_MAPPER",
                 "params": {
-                  "path": "pspResponse3.paymentId",
+                  "path": "paymentId",
                   "defaultValue": null
                 }
               }
@@ -636,24 +712,25 @@
           },
           {
             "key": "pspTransactionId",
-            "value": "{{pspResponse3.transactionId}}",
+            "value": "{{pspResponse3}}",
             "operations": [
               {
                 "name": "CONDITIONAL_VALUE_MAPPER",
                 "params": {
-                  "path": "pspResponse3.transactionId"
+                  "path": "transactionId",
+                  "defaultValue": null
                 }
               }
             ]
           },
           {
             "key": "status",
-            "value": "{{pspResponse3.details}}",
+            "value": "{{pspResponse3}}",
             "operations": [
               {
                 "name": "CONDITIONAL_VALUE_MAPPER",
                 "params": {
-                  "path": "pspResponse3.paymentId",
+                  "path": "paymentId",
                   "mappedValue": "paid",
                   "defaultValue": null
                 }
@@ -662,12 +739,12 @@
           },
           {
             "key": "code",
-            "value": "{{pspResponse3.details}}",
+            "value": "{{pspResponse3}}",
             "operations": [
               {
                 "name": "CONDITIONAL_VALUE_MAPPER",
                 "params": {
-                  "path": "pspResponse3.paymentId",
+                  "path": "paymentId",
                   "mappedValue": "success",
                   "defaultValue": null
                 }
@@ -681,8 +758,7 @@
               {
                 "name": "CONDITIONAL_VALUE_MAPPER",
                 "params": {
-                  "path": "pspResponse3.details",
-                  "mappedValue": "success",
+                  "path": "details",
                   "defaultValue": null
                 }
               }
