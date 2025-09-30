@@ -5,7 +5,7 @@
       "url": {
         "mappings": [
           {
-            "value": "https://api-sandbox.coinflow.cash/api/tokenize",
+            "value": "https://test-api.tokenex.com/v2/Pci/Tokenize",
             "required": true
           }
         ],
@@ -130,7 +130,7 @@
                   {
                     "name": "GET_ELEMENT_AT_INDEX",
                     "params": {
-                      "index": 0
+                      "index": 3
                     }
                   }
                 ]
@@ -158,7 +158,7 @@
             "required": true
           },
           {
-            "key": "card_cvv2",
+            "key": "cvv",
             "value": "{{cardInfo.cvc}}",
             "required": true
           }
@@ -182,37 +182,37 @@
                 "params": {
                   "mappings": [
                     {
-                      "from": "true",
+                      "from": true,
                       "to": "payment_in_process"
                     },
                     {
-                      "from": "false",
+                      "from": false,
                       "to": "payment_failed"
                     }
                   ],
-                  "defaultValue": "payment_in_process"
+                  "defaultValue": "payment_failed"
                 }
               }
             ]
           },
           {
             "key": "code",
-            "value": "{{pspResponse0.result}}",
+            "value": "{{pspResponse0.success}}",
             "operations": [
               {
                 "name": "VALUE_MAPPER",
                 "params": {
                   "mappings": [
                     {
-                      "from": "true",
+                      "from": true,
                       "to": "success"
                     },
                     {
-                      "from": "false",
+                      "from": false,
                       "to": "fail"
                     }
                   ],
-                  "defaultValue": "success"
+                  "defaultValue": "fail"
                 }
               }
             ]
@@ -382,22 +382,12 @@
           },
           {
             "key": "x-coinflow-auth-session-key",
-            "mappings": [
-              {
-                "value": "{{bankTransaction.token}}",
-                "required": true
-              }
-            ],
+            "value": "{{bankTransaction.token}}",
             "required": true
           },
           {
             "key": "x-device-id",
-            "mappings": [
-              {
-                "value": "{{purchase.userDeviceId}}",
-                "required": true
-              }
-            ],
+            "value": "{{purchase.userDeviceId}}",
             "required": true
           }
         ],
@@ -414,21 +404,36 @@
             "mappings": [
               {
                 "key": "cents",
-                "value": "{{purchase.fx_Amount}}",
+                "mappings": [
+                  {
+                    "value": "{{purchase.fx_Amount}}",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "STRING_TO_DOUBLE"
+                      }
+                    ]
+                  },
+                  {
+                    "value": "100",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "STRING_TO_DOUBLE"
+                      }
+                    ]
+                  }
+                ],
                 "required": true,
                 "operations": [
                   {
-                    "name": "STRING_TO_DOUBLE"
+                    "name": "LIST_VALUE_MULTIPLY"
                   },
                   {
-                    "name": "LIST_VALUE_MULTIPLY",
-                    "parameters": {
-                      "list": [
-                        {
-                          "value": 100.0
-                        }
-                      ]
-                    }
+                    "name": "DOUBLE_TO_FLOOR"
+                  },
+                  {
+                    "name": "INTEGER_TO_STRING"
                   }
                 ]
               },
@@ -501,12 +506,12 @@
               },
               {
                 "key": "expYear",
-                "value": "{{cardInfo.expiryYear}}",
+                "value": "{{cardInfo.expireYear}}",
                 "required": true
               },
               {
                 "key": "expMonth",
-                "value": "{{cardInfo.expiryMonth}}",
+                "value": "{{cardInfo.expireMonth}}",
                 "required": true
               },
               {
@@ -593,40 +598,62 @@
             "mappings": [
               {
                 "key": "colorDepth",
-                "value": "{{s2s.color_depth}}",
                 "mappings": [
+                  {"value": "{{s2s.color_depth}}"},
                   {
-                    "defaultValue": 24
+                    "value": 24
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
                   }
                 ],
                 "required": true
               },
               {
                 "key": "screenHeight",
-                "value": "{{s2s.screen_height}}",
                 "mappings": [
+                  { "value": "{{s2s.screen_height}}"},
                   {
-                    "defaultValue": 1080
+                    "value": 1080
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
                   }
                 ],
                 "required": true
               },
               {
                 "key": "screenWidth",
-                "value": "{{s2s.screen_width}}",
                 "mappings": [
+                  {"value": "{{s2s.screen_width}}"},
                   {
-                    "defaultValue": 1920
+                    "value": 1920
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
                   }
                 ],
                 "required": true
               },
               {
                 "key": "timeZone",
-                "value": "{{s2s.color_depth}}",
                 "mappings": [
                   {
-                    "defaultValue": -330
+                    "value": "{{s2s.time_zone}}"
+                  },
+                  {
+                    "value": -330
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
                   }
                 ],
                 "required": true
