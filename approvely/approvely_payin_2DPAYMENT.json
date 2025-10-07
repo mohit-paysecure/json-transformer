@@ -5,7 +5,7 @@
       "url": {
         "mappings": [
           {
-            "value": "https://test-api.tokenex.com/v2/Pci/Tokenize",
+            "value": "https://api-sandbox.coinflow.cash/api/tokenize",
             "required": true
           }
         ],
@@ -175,7 +175,198 @@
         "mappings": [
           {
             "key": "status",
-            "value": "{{pspResponse0.success}}",
+            "value": "payment_in_process"
+          },
+          {
+            "key": "code",
+            "value": "success"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "{{pspResponseHeader0.location}}",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "tx-apikey",
+            "mappings": [
+              {
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "tx-token-scheme",
+            "mappings": [
+              {
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 2
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "tx-tokenex-id",
+            "mappings": [
+              {
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 3
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "data",
+            "value": "{{cardInfo.number}}",
+            "required": true
+          },
+          {
+            "key": "cvv",
+            "value": "{{cardInfo.cvc}}",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "status",
+            "value": "{{pspResponse1.success}}",
             "operations": [
               {
                 "name": "VALUE_MAPPER",
@@ -197,7 +388,7 @@
           },
           {
             "key": "code",
-            "value": "{{pspResponse0.success}}",
+            "value": "{{pspResponse1.success}}",
             "operations": [
               {
                 "name": "VALUE_MAPPER",
@@ -219,7 +410,7 @@
           },
           {
             "key": "message",
-            "value": "{{pspResponse0.error}}"
+            "value": "{{pspResponse1.error}}"
           }
         ],
         "operations": [
@@ -309,39 +500,52 @@
         "mappings": [
           {
             "key": "status",
-            "value": "{{pspResponse1}}",
+            "value": "{{pspResponse2.key}}",
             "operations": [
               {
-                "name": "CONDITIONAL_VALUE_MAPPER",
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
                 "params": {
-                  "path": "key",
-                  "mappedValue": "payment_in_process",
-                  "defaultValue": "payment_failed"
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "payment_in_process"
+                    }
+                  ],
+                  "defaultValue": "fail"
                 }
               }
-            ]
-          },
+            ]}
+        ,
           {
             "key": "code",
-            "value": "{{pspResponse1}}",
+            "value": "{{pspResponse2.key}}",
             "operations": [
               {
-                "name": "CONDITIONAL_VALUE_MAPPER",
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
                 "params": {
-                  "path": "key",
-                  "mappedValue": "success",
-                  "defaultValue": "payment_failed"
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
                 }
               }
-            ]
-          },
+            ]},
           {
             "key": "message",
-            "value": "{{pspResponse1.details}}"
+            "value": "{{pspResponse2.details}}"
           },
           {
             "key": "pspToken",
-            "value": "{{pspResponse1.key}}"
+            "value": "{{pspResponse2.key}}"
           }
         ],
         "operations": [
@@ -489,7 +693,7 @@
           },
           {
             "key": "threeDsChallengePreference",
-            "value": "no_preference",
+            "value": "NoPreference",
             "required": true
           },
           {
@@ -501,7 +705,7 @@
             "mappings": [
               {
                 "key": "cardToken",
-                "value": "{{pspResponse0.token}}",
+                "value": "{{pspResponse1.token}}",
                 "required": true
               },
               {
@@ -670,35 +874,43 @@
             "key": "chargebackProtectionData",
             "mappings": [
               {
-                "key" :"productName",
-                "value": "test product",
-                "required": true
-              },
-              {
-                "key": "productType",
-                "value": "inGameProduct",
-                "required": true
-              },
-              {
-                "key": "quantity",
-                "value": "1",
-                "required": true,
-                "operations": [
-                  {
-                    "name": "STRING_TO_INTEGER"
-                  }
-                ]
-              },
-              {
-                "key": "rawProductData",
                 "mappings": [
                   {
-                    "key": "orderId",
-                    "value": "{{purchase.transactionId}}",
+                    "key" :"productName",
+                    "value": "test product",
                     "required": true
+                  },
+                  {
+                    "key": "productType",
+                    "value": "inGameProduct",
+                    "required": true
+                  },
+                  {
+                    "key": "quantity",
+                    "value": "1",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "STRING_TO_INTEGER"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "rawProductData",
+                    "mappings": [
+                      {
+                        "key": "orderId",
+                        "value": "{{purchase.purchaseId}}",
+                        "required": true
+                      }
+                    ],
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }]
                   }
                 ],
-                "required": true,
                 "operations": [
                   {
                     "name": "KEY_VALUE_LIST_TO_OBJECT"
@@ -708,14 +920,14 @@
             ],
             "operations": [
               {
-                "name": "LIST_VALUE_JOIN"
+                "name": "LIST_OBJECT_VALUE_TO_LIST_VALUE"
               }
             ]
           }
         ],
         "operations": [
           {
-            "name": "LIST_OBJECT_VALUE_TO_LIST_VALUE"
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
           }
         ],
         "required": true
@@ -726,70 +938,117 @@
         "mappings": [
           {
             "key": "pspTransactionId",
-            "value": "{{pspResponse3}}",
-            "operations": [
-              {
-                "name": "CONDITIONAL_VALUE_MAPPER",
-                "params": {
-                  "path": "paymentId",
-                  "defaultValue": null
-                }
-              }
-            ]
+            "value": "{{pspResponse3.paymentId}}"
           },
           {
             "key": "pspTransactionId",
-            "value": "{{pspResponse3}}",
-            "operations": [
-              {
-                "name": "CONDITIONAL_VALUE_MAPPER",
-                "params": {
-                  "path": "transactionId",
-                  "defaultValue": null
-                }
-              }
-            ]
+            "value": "{{pspResponse3.transactionId}}"
           },
           {
             "key": "status",
-            "value": "{{pspResponse3}}",
+            "value": "{{pspResponse3.paymentId}}",
             "operations": [
               {
-                "name": "CONDITIONAL_VALUE_MAPPER",
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
                 "params": {
-                  "path": "paymentId",
-                  "mappedValue": "paid",
-                  "defaultValue": null
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "paid"
+                    }
+                  ],
+                  "defaultValue": "fail"
                 }
               }
             ]
           },
           {
             "key": "code",
-            "value": "{{pspResponse3}}",
+            "value": "{{pspResponse3.paymentId}}",
             "operations": [
               {
-                "name": "CONDITIONAL_VALUE_MAPPER",
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
                 "params": {
-                  "path": "paymentId",
-                  "mappedValue": "success",
-                  "defaultValue": null
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "error"
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse3.transactionId}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "payment_in_process"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse3.transactionId}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "success"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "redirectUrl",
+            "value": "{{pspResponse3.transactionId}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "success"
+                    }
+                  ]
                 }
               }
             ]
           },
           {
             "key": "message",
-            "value": "{{pspResponse3.details}}",
-            "operations": [
-              {
-                "name": "CONDITIONAL_VALUE_MAPPER",
-                "params": {
-                  "path": "details",
-                  "defaultValue": null
-                }
-              }
-            ]
+            "value": "{{pspResponse3.details}}"
           }
         ],
         "operations": [
