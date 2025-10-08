@@ -517,8 +517,8 @@
                   "defaultValue": "fail"
                 }
               }
-            ]}
-        ,
+            ]
+          },
           {
             "key": "code",
             "value": "{{pspResponse2.key}}",
@@ -538,7 +538,8 @@
                   "defaultValue": "fail"
                 }
               }
-            ]},
+            ]
+          },
           {
             "key": "message",
             "value": "{{pspResponse2.details}}"
@@ -803,7 +804,9 @@
               {
                 "key": "colorDepth",
                 "mappings": [
-                  {"value": "{{s2s.color_depth}}"},
+                  {
+                    "value": "{{s2s.color_depth}}"
+                  },
                   {
                     "value": 24
                   }
@@ -818,7 +821,9 @@
               {
                 "key": "screenHeight",
                 "mappings": [
-                  { "value": "{{s2s.screen_height}}"},
+                  {
+                    "value": "{{s2s.screen_height}}"
+                  },
                   {
                     "value": 1080
                   }
@@ -833,7 +838,9 @@
               {
                 "key": "screenWidth",
                 "mappings": [
-                  {"value": "{{s2s.screen_width}}"},
+                  {
+                    "value": "{{s2s.screen_width}}"
+                  },
                   {
                     "value": 1920
                   }
@@ -876,7 +883,7 @@
               {
                 "mappings": [
                   {
-                    "key" :"productName",
+                    "key": "productName",
                     "value": "test product",
                     "required": true
                   },
@@ -908,7 +915,8 @@
                     "operations": [
                       {
                         "name": "KEY_VALUE_LIST_TO_OBJECT"
-                      }]
+                      }
+                    ]
                   }
                 ],
                 "operations": [
@@ -938,111 +946,115 @@
         "mappings": [
           {
             "key": "pspTransactionId",
-            "value": "{{pspResponse3.paymentId}}"
-          },
-          {
-            "key": "pspTransactionId",
-            "value": "{{pspResponse3.transactionId}}"
-          },
-          {
-            "key": "status",
-            "value": "{{pspResponse3.paymentId}}",
-            "operations": [
+            "mappings": [
               {
-                "name": "CHECK_IF_NULL"
+                "value": "{{pspResponse3.paymentId}}"
               },
               {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "mappings": [
-                    {
-                      "from": false,
-                      "to": "paid"
-                    }
-                  ],
-                  "defaultValue": "fail"
-                }
+                "value": "{{pspResponse3.transactionId}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
               }
             ]
           },
           {
             "key": "code",
-            "value": "{{pspResponse3.paymentId}}",
-            "operations": [
+            "mappings": [
               {
-                "name": "CHECK_IF_NULL"
+                "value": "{{pspResponse3.paymentId}}",
+                "operations": [
+                  {
+                    "name": "CHECK_IF_NULL"
+                  },
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": false,
+                          "to": "success"
+                        }
+                      ]
+                    }
+                  }
+                ]
               },
               {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "mappings": [
-                    {
-                      "from": false,
-                      "to": "success"
+                "value": "{{pspResponse3.transactionId}}",
+                "operations": [
+                  {
+                    "name": "CHECK_IF_NULL"
+                  },
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": false,
+                          "to": "success"
+                        }
+                      ]
                     }
-                  ],
-                  "defaultValue": "error"
-                }
+                  }
+                ]
+              },
+              {"value" : "error"}
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
               }
             ]
           },
           {
             "key": "status",
-            "value": "{{pspResponse3.transactionId}}",
-            "operations": [
+            "mappings": [
               {
-                "name": "CHECK_IF_NULL"
+                "value": "{{pspResponse3.paymentId}}",
+                "operations": [
+                  {
+                    "name": "CHECK_IF_NULL"
+                  },
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": false,
+                          "to": "payment_in_process"
+                        }
+                      ]
+                    }
+                  }
+                ]
               },
               {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "mappings": [
-                    {
-                      "from": false,
-                      "to": "payment_in_process"
+                "value": "{{pspResponse3.transactionId}}",
+                "operations": [
+                  {
+                    "name": "CHECK_IF_NULL"
+                  },
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": false,
+                          "to": "payment_in_process"
+                        }
+                      ]
                     }
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "key": "code",
-            "value": "{{pspResponse3.transactionId}}",
+                  }
+                ]
+              },
+              {"value" : "fail"}
+            ],
             "operations": [
               {
-                "name": "CHECK_IF_NULL"
-              },
-              {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "mappings": [
-                    {
-                      "from": false,
-                      "to": "success"
-                    }
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "key": "redirectUrl",
-            "value": "{{pspResponse3.transactionId}}",
-            "operations": [
-              {
-                "name": "CHECK_IF_NULL"
-              },
-              {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "mappings": [
-                    {
-                      "from": false,
-                      "to": "success"
-                    }
-                  ]
-                }
+                "name": "GET_FIRST_NON_EMPTY_STRING"
               }
             ]
           },
