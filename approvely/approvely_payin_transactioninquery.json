@@ -103,7 +103,7 @@
           },
           {
             "key": "code",
-            "value": "{{pspResponse0.payments.0.status}}",
+            "value": "{{pspResponse0.cardInfo.status}}",
             "operations": [
               {
                 "name": "VALUE_MAPPER",
@@ -137,10 +137,6 @@
           },
           {
             "key": "pspTransactionId",
-            "value": "{{pspResponse0.paymentId}}"
-          },
-          {
-            "key": "refundTransId",
             "value": "{{pspResponse0.paymentId}}"
           }
         ],

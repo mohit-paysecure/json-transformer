@@ -1,0 +1,440 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://api-sandbox.coinflow.cash/api/checkout/card/paysecure",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "x-coinflow-auth-session-key",
+            "value": "{{bankTransaction.token}}",
+            "required": true
+          },
+          {
+            "key": "x-device-id",
+            "value": "{{purchase.userDeviceId}}",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "subtotal",
+            "mappings": [
+              {
+                "key": "cents",
+                "mappings": [
+                  {
+                    "value": "{{purchase.fx_Amount}}",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "STRING_TO_DOUBLE"
+                      }
+                    ]
+                  },
+                  {
+                    "value": "100",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "STRING_TO_DOUBLE"
+                      }
+                    ]
+                  }
+                ],
+                "required": true,
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_MULTIPLY"
+                  },
+                  {
+                    "name": "DOUBLE_TO_FLOOR"
+                  },
+                  {
+                    "name": "INTEGER_TO_STRING"
+                  }
+                ]
+              },
+              {
+                "key": "currency",
+                "value": "{{purchase.fx_Currency}}",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "saveCard",
+            "value": false
+          },
+          {
+            "key": "card",
+            "mappings": [
+              {
+                "key": "cardToken",
+                "value": "{{bankTransaction.tempObject.token}}",
+                "required": true
+              },
+              {
+                "key": "expYear",
+                "value": "{{cardInfo.expireYear}}",
+                "required": true
+              },
+              {
+                "key": "expMonth",
+                "value": "{{cardInfo.expireMonth}}",
+                "required": true
+              },
+              {
+                "key": "email",
+                "value": "{{purchase.client.email}}",
+                "required": true
+              },
+              {
+                "key": "firstName",
+                "mappings": [
+                  {
+                    "value": "{{purchase.client.full_name}}"
+                  },
+                  {
+                    "value": "{{cardInfo.cardholder_name}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  },
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "\\s+"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0
+                    }
+                  }
+                ]
+              },
+              {
+                "key": "lastName",
+                "mappings": [
+                  {
+                    "value": "{{purchase.client.full_name}}"
+                  },
+                  {
+                    "value": "{{cardInfo.cardholder_name}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  },
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "\\s+"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0,
+                      "fromLast": true
+                    }
+                  }
+                ]
+              },
+              {
+                "key": "address1",
+                "value": "{{purchase.client.street_address}}",
+                "required": true
+              },
+              {
+                "key": "city",
+                "value": "{{purchase.client.city}}",
+                "required": true
+              },
+              {
+                "key": "zip",
+                "value": "{{purchase.client.zip_code}}",
+                "required": true
+              },
+              {
+                "key": "state",
+                "value": "{{purchase.client.stateCode}}",
+                "required": true
+              },
+              {
+                "key": "country",
+                "value": "{{purchase.client.country}}",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "authentication3DS",
+            "mappings": [
+              {
+                "key": "transactionId",
+                "mappings": [
+                  {
+                    "value": "{{bankTransaction.paymentTransId}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ],
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "chargebackProtectionData",
+            "mappings": [
+              {
+                "mappings": [
+                  {
+                    "key": "productName",
+                    "value": "test product",
+                    "required": true
+                  },
+                  {
+                    "key": "productType",
+                    "value": "inGameProduct",
+                    "required": true
+                  },
+                  {
+                    "key": "quantity",
+                    "value": "1",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "STRING_TO_INTEGER"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "rawProductData",
+                    "mappings": [
+                      {
+                        "key": "orderId",
+                        "value": "{{purchase.purchaseId}}",
+                        "required": true
+                      }
+                    ],
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_OBJECT_VALUE_TO_LIST_VALUE"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ],
+        "required": true
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "pspTransactionId",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.paymentId}}"
+              },
+              {
+                "value": "{{bankTransaction.paymentTransId}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.paymentId}}",
+                "operations": [
+                  {
+                    "name": "CHECK_IF_NULL"
+                  },
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": false,
+                          "to": "success"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "{{pspResponse0.transactionId}}",
+                "operations": [
+                  {
+                    "name": "CHECK_IF_NULL"
+                  },
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": false,
+                          "to": "success"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "error"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.paymentId}}",
+                "operations": [
+                  {
+                    "name": "CHECK_IF_NULL"
+                  },
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": false,
+                          "to": "payment_in_process"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "{{pspResponse0.transactionId}}",
+                "operations": [
+                  {
+                    "name": "CHECK_IF_NULL"
+                  },
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": false,
+                          "to": "payment_in_process"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "fail"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "value": "{{pspResponse0.details}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]

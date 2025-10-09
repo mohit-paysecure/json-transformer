@@ -411,6 +411,20 @@
           {
             "key": "message",
             "value": "{{pspResponse1.error}}"
+          },
+          {
+            "key": "tempObject",
+            "mappings": [
+              {
+                "key": "token",
+                "value": "{{pspResponse1.token}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
           }
         ],
         "operations": [
@@ -726,8 +740,18 @@
               },
               {
                 "key": "firstName",
-                "value": "{{cardInfo.cardholder_name}}",
+                "mappings": [
+                  {
+                    "value": "{{purchase.client.full_name}}"
+                  },
+                  {
+                    "value": "{{cardInfo.cardholder_name}}"
+                  }
+                ],
                 "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  },
                   {
                     "name": "SPLIT_STRING",
                     "params": {
@@ -737,17 +761,25 @@
                   {
                     "name": "GET_ELEMENT_AT_INDEX",
                     "params": {
-                      "index": 0,
-                      "defaultValue": "pay"
+                      "index": 0
                     }
                   }
-                ],
-                "required": true
+                ]
               },
               {
                 "key": "lastName",
-                "value": "{{cardInfo.cardholder_name}}",
+                "mappings": [
+                  {
+                    "value": "{{purchase.client.full_name}}"
+                  },
+                  {
+                    "value": "{{cardInfo.cardholder_name}}"
+                  }
+                ],
                 "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  },
                   {
                     "name": "SPLIT_STRING",
                     "params": {
@@ -758,12 +790,10 @@
                     "name": "GET_ELEMENT_AT_INDEX",
                     "params": {
                       "index": 0,
-                      "fromLast": true,
-                      "defaultValue": "secure"
+                      "fromLast": true
                     }
                   }
-                ],
-                "required": true
+                ]
               },
               {
                 "key": "address1",
@@ -1061,6 +1091,69 @@
           {
             "key": "message",
             "value": "{{pspResponse3.details}}"
+          },
+          {
+            "key": "creq",
+            "value": "{{pspResponse3.creq}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              }
+            ],
+            "isHidden": true,
+            "storeIn": "iframe"
+          },
+          {
+            "key": "redirectUrl",
+            "mappings": [
+              {
+                "key": "postUrl",
+                "value": "{{pspResponse3.url}}"
+              },
+              {
+                "key": "creq",
+                "value": "{{pspResponse3.creq}}"
+              },
+              {
+                "key": "returnUrl",
+                "mappings": [
+                  {
+                    "value": "{{extraParams.baseUrl}}",
+                    "required": true
+                  },
+                  {
+                    "value": "/custRedirect/",
+                    "required": true
+                  },
+                  {
+                    "value": "{{purchase.bankid}}",
+                    "required": true
+                  },
+                  {
+                    "value": "/",
+                    "required": true
+                  },
+                  {
+                    "value": "{{purchase.purchaseId}}",
+                    "required": true
+                  },
+                  {
+                    "value": "/",
+                    "required": true
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "GENERATE_IFRAME_POST_HTML"
+              }
+            ]
           }
         ],
         "operations": [

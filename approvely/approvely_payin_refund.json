@@ -1,7 +1,7 @@
 [
   {
     "requestMapping": {
-      "method": "PUT",
+      "method": "GET",
       "url": {
         "mappings": [
           {
@@ -10,10 +10,6 @@
           },
           {
             "value": "{{bankTransaction.paymentTransId}}",
-            "required": true
-          },
-          {
-            "value": "/refund",
             "required": true
           }
         ],
@@ -77,15 +73,71 @@
         "mappings": [
           {
             "key": "status",
-            "value": "refund_in_process"
+            "value": "{{pspResponse0.cardInfo.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "DEPOSITED",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "SETTLED",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "INITIATED",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "REFUNDED",
+                      "to": "refunded"
+                    }
+                  ],
+                  "defaultValue": "payment_failed"
+                }
+              }
+            ]
           },
           {
             "key": "code",
-            "value": "success"
+            "value": "{{pspResponse0.cardInfo.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "DEPOSITED",
+                      "to": "success"
+                    },
+                    {
+                      "from": "SETTLED",
+                      "to": "success"
+                    },
+                    {
+                      "from": "INITIATED",
+                      "to": "success"
+                    },
+                    {
+                      "from": "REFUNDED",
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
           },
           {
             "key": "message",
             "value": "{{pspResponse0.details}}"
+          },
+          {
+            "key": "refundTransId",
+            "value": "{{pspResponse0.paymentId}}"
           }
         ],
         "operations": [
