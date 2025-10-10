@@ -1153,7 +1153,8 @@
               {
                 "name": "GENERATE_IFRAME_POST_HTML"
               }
-            ]
+            ],
+            "skipIf": "{{store.iframe.creq}}"
           }
         ],
         "operations": [

@@ -70,6 +70,20 @@
             "name": "KEY_VALUE_LIST_TO_OBJECT"
           }
         ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "refundReason",
+            "value": "other",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
       }
     },
     "responseMapping": {
