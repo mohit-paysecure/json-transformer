@@ -251,7 +251,31 @@
                   },
                   {
                     "key": "productType",
-                    "value": "inGameProduct",
+                    "mappings": [
+                      {
+                        "value": "{{bankTransaction.usedAuthKey}}",
+                        "required": true,
+                        "operations": [
+                          {
+                            "name": "SPLIT_STRING",
+                            "params": {
+                              "delimiter": "##"
+                            }
+                          },
+                          {
+                            "name": "GET_ELEMENT_AT_INDEX",
+                            "params": {
+                              "index": 4
+                            }
+                          }
+                        ]
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "LIST_VALUE_JOIN"
+                      }
+                    ],
                     "required": true
                   },
                   {
@@ -426,7 +450,28 @@
           },
           {
             "key": "message",
-            "value": "{{pspResponse0.details}}"
+            "mappings": [
+              {
+                "value": "{{pspResponse0.action}}"
+              },
+              {
+                "value": "{{pspResponse0.title}}"
+              },
+              {
+                "value": "{{pspResponse0.message}}"
+              },
+              {
+                "value": "{{pspResponse0.details}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
           }
         ],
         "operations": [

@@ -410,7 +410,28 @@
           },
           {
             "key": "message",
-            "value": "{{pspResponse1.error}}"
+            "mappings": [
+              {
+                "value": "{{pspResponse1.action}}"
+              },
+              {
+                "value": "{{pspResponse1.title}}"
+              },
+              {
+                "value": "{{pspResponse1.message}}"
+              },
+              {
+                "value": "{{pspResponse1.error}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
           },
           {
             "key": "tempObject",
@@ -556,7 +577,28 @@
           },
           {
             "key": "message",
-            "value": "{{pspResponse2.details}}"
+            "mappings": [
+              {
+                "value": "{{pspResponse2.action}}"
+              },
+              {
+                "value": "{{pspResponse2.title}}"
+              },
+              {
+                "value": "{{pspResponse2.message}}"
+              },
+              {
+                "value": "{{pspResponse2.details}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
           },
           {
             "key": "pspToken",
@@ -919,7 +961,31 @@
                   },
                   {
                     "key": "productType",
-                    "value": "inGameProduct",
+                    "mappings": [
+                      {
+                        "value": "{{bankTransaction.usedAuthKey}}",
+                        "required": true,
+                        "operations": [
+                          {
+                            "name": "SPLIT_STRING",
+                            "params": {
+                              "delimiter": "##"
+                            }
+                          },
+                          {
+                            "name": "GET_ELEMENT_AT_INDEX",
+                            "params": {
+                              "index": 4
+                            }
+                          }
+                        ]
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "LIST_VALUE_JOIN"
+                      }
+                    ],
                     "required": true
                   },
                   {
@@ -1090,11 +1156,32 @@
           },
           {
             "key": "message",
-            "value": "{{pspResponse3.details}}"
+            "mappings": [
+              {
+                "value": "{{pspResponse3.action}}"
+              },
+              {
+                "value": "{{pspResponse3.title}}"
+              },
+              {
+                "value": "{{pspResponse3.message}}"
+              },
+              {
+                "value": "{{pspResponse3.details}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
           },
           {
-            "key": "creq",
-            "value": "{{pspResponse3.creq}}",
+            "key": "url",
+            "value": "{{pspResponse3.url}}",
             "operations": [
               {
                 "name": "CHECK_IF_NULL"
@@ -1151,10 +1238,13 @@
             ],
             "operations": [
               {
-                "name": "GENERATE_IFRAME_POST_HTML"
+                "name": "GENERATE_HTML",
+                "params": {
+                  "htmlRenderMode": "IFRAME_SUBMISSION"
+                }
               }
             ],
-            "skipIf": "{{store.iframe.creq}}"
+            "skipIf": "{{store.iframe.url}}"
           }
         ],
         "operations": [

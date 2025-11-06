@@ -94,6 +94,10 @@
                     {
                       "from": "REFUNDED",
                       "to": "refunded"
+                    },
+                    {
+                     "from": "AUTHORIZED",
+                      "to": "paid"
                     }
                   ],
                   "defaultValue": "payment_failed"
@@ -133,7 +137,28 @@
           },
           {
             "key": "message",
-            "value": "{{pspResponse0.details}}"
+            "mappings": [
+              {
+                "value": "{{pspResponse0.action}}"
+              },
+              {
+                "value": "{{pspResponse0.title}}"
+              },
+              {
+                "value": "{{pspResponse0.message}}"
+              },
+              {
+                "value": "{{pspResponse0.details}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
           },
           {
             "key": "pspTransactionId",
