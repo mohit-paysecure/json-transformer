@@ -1164,10 +1164,10 @@
                 "value": "{{pspResponse3.title}}"
               },
               {
-                "value": "{{pspResponse3.message}}"
+                "value": "{{pspResponse3.details}}"
               },
               {
-                "value": "{{pspResponse3.details}}"
+                "value": "{{pspResponse3.message}}"
               },
               {
                 "value": ""
