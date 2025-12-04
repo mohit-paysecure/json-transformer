@@ -150,10 +150,24 @@
       "body": {
         "mappings": [
           {
+            "key": "response",
+            "value": "{{pspResponse0}}",
+            "storeIn": "addData",
+            "operations": [
+              {
+                "name": "EXTRACT_INNER_DATA_WITHOUT_KEY"
+              }
+            ],
+            "hidden": true
+          },
+          {
             "key": "status",
             "mappings": [
               {
-                "value": "{{pspResponse0.transaction_details.{{purchase.purchaseId}}.status}}"
+                "value": "{{store.addData.response.status}}"
+              },
+              {
+                "value": "{{store.addData.response.unmappedstatus}}"
               }
             ],
             "operations": [
@@ -169,7 +183,15 @@
                       "to": "paid"
                     },
                     {
+                      "from": "captured",
+                      "to": "paid"
+                    },
+                    {
                       "from": "failure",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "failed",
                       "to": "fail"
                     },
                     {
@@ -184,22 +206,41 @@
           },
           {
             "key": "code",
-            "value": "{{pspResponse0.status}}",
+            "mappings": [
+              {
+                "value": "{{store.addData.response.status}}"
+              }
+            ],
             "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              },
               {
                 "name": "VALUE_MAPPER",
                 "params": {
                   "mappings": [
                     {
-                      "from": 1,
+                      "from": "success",
                       "to": "success"
                     },
                     {
-                      "from": 0,
+                      "from": "captured",
+                      "to": "success"
+                    },
+                    {
+                      "from": "failure",
                       "to": "fail"
+                    },
+                    {
+                      "from": "failed",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "pending",
+                      "to": "payment_in_process"
                     }
                   ],
-                  "defaultValue": "fail"
+                  "defaultValue": "payment_in_process"
                 }
               }
             ]
@@ -208,10 +249,10 @@
             "key": "message",
             "mappings": [
               {
-                "value": "{{pspResponse0.transaction_details.{{purchase.purchaseId}}.error_Message}}"
+                "value": "{{store.addData.response.error_Message}}"
               },
               {
-                "value": "{{pspResponse0.transaction_details.{{purchase.purchaseId}}.field9}}"
+                "value": "{{store.addData.response.field9}}"
               },
               {
                 "value": "{{pspResponse0.msg}}"
@@ -222,6 +263,14 @@
                 "name": "GET_FIRST_NON_EMPTY_STRING"
               }
             ]
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{store.addData.response.mihpayid}}"
+          },
+          {
+            "key": "paysecureId",
+            "value": "{{store.addData.response.txnid}}"
           }
         ],
         "operations": [
