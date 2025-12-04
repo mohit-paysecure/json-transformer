@@ -1,0 +1,23 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": []
+      },
+      "headers": {
+        "mappings": []
+      },
+      "body": {
+        "mappings": []
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+
+        ]
+      }
+    }
+  }
+]
