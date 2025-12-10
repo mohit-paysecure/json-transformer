@@ -57,12 +57,12 @@
           },
           {
             "key": "command",
-            "value": "verify_payment",
+            "value": "check_action_status",
             "required": true
           },
           {
             "key": "var1",
-            "value": "{{purchase.purchaseId}}",
+            "value": "{{bankTransaction.refundTransId}}",
             "required": true
           },
           {
@@ -91,7 +91,7 @@
                 "required": true
               },
               {
-                "value": "verify_payment",
+                "value": "check_action_status",
                 "required": true
               },
               {
@@ -99,7 +99,7 @@
                 "required": true
               },
               {
-                "value": "{{purchase.purchaseId}}",
+                "value": "{{bankTransaction.refundTransId}}",
                 "required": true
               },
               {
@@ -151,7 +151,7 @@
         "mappings": [
           {
             "key": "response",
-            "value": "{{pspResponse0}}",
+            "value": "{{pspResponse0.transaction_details}}",
             "storeIn": "addData",
             "operations": [
               {
@@ -165,9 +165,6 @@
             "mappings": [
               {
                 "value": "{{store.addData.response.status}}"
-              },
-              {
-                "value": "{{store.addData.response.unmappedstatus}}"
               }
             ],
             "operations": [
@@ -180,26 +177,21 @@
                   "mappings": [
                     {
                       "from": "success",
-                      "to": "paid"
+                      "to": "refunded"
                     },
                     {
                       "from": "captured",
-                      "to": "paid"
-                    },
-                    {
-                      "from": "failure",
-                      "to": "fail"
-                    },
-                    {
-                      "from": "failed",
-                      "to": "fail"
+                      "to": "refunded"
                     },
                     {
                       "from": "pending",
                       "to": "payment_in_process"
+                    },
+                    {
+                      "from": "queued",
+                      "to": "payment_in_process"
                     }
-                  ],
-                  "defaultValue": "payment_in_process"
+                  ]
                 }
               }
             ]
@@ -228,6 +220,14 @@
                       "to": "success"
                     },
                     {
+                      "from": "pending",
+                      "to": "success"
+                    },
+                    {
+                      "from": "queued",
+                      "to": "success"
+                    },
+                    {
                       "from": "failure",
                       "to": "fail"
                     },
@@ -239,8 +239,7 @@
                       "from": "pending",
                       "to": "success"
                     }
-                  ],
-                  "defaultValue": "success"
+                  ]
                 }
               }
             ]
