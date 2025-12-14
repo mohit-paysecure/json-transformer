@@ -32,68 +32,6 @@
       "body": {
         "mappings": [
           {
-            "key": "isNetbankingCodePresent",
-            "value": "{{purchase.payInBankDetails.swiftCode}}",
-            "operations": [
-              {
-                "name": "CHECK_IF_NULL"
-              },
-              {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "mappings": [
-                    {
-                      "from": true,
-                      "to": false
-                    },
-                    {
-                      "from": false,
-                      "to": true
-                    }
-                  ]
-                }
-              }
-            ],
-            "hidden": true,
-            "storeIn": "pspCall"
-          },
-          {
-            "key": "skipPspCall",
-            "skipIf": "{{store.pspCall.isNetbankingCodePresent}}",
-            "value": true
-          },
-          {
-            "key": "flowReturnData",
-            "skipIf": "{{store.pspCall.isNetbankingCodePresent}}",
-            "mappings": [
-              {
-                "key": "providerBankDetails",
-                "value": "[\n  { \"code\": \"TESTPGNB\", \"name\": \"Testing bank\" },\n  { \"code\": \"AIRNB\", \"name\": \"Airtel Payments Bank\" },\n  { \"code\": \"AUSFNB\", \"name\": \"AU Small Finance Bank\" },\n  { \"code\": \"AUSFCNB\", \"name\": \"AU Small Finance Bank - Corporate\" },\n  { \"code\": \"AXIB\", \"name\": \"AXIS Bank\" },\n  { \"code\": \"AXISCNB\", \"name\": \"Axis Corporate Netbanking\" },\n  { \"code\": \"BANDNB\", \"name\": \"Bandhan Bank\" },\n  { \"code\": \"BBRB\", \"name\": \"Bank of Baroda\" },\n  { \"code\": \"BOIB\", \"name\": \"Bank of India\" },\n  { \"code\": \"BOMB\", \"name\": \"Bank of Maharashtra\" },\n  { \"code\": \"CABB\", \"name\": \"Canara Bank\" },\n  { \"code\": \"SYNDB\", \"name\": \"Canara Bank (Erstwhile - Syndicate Bank)\" },\n  { \"code\": \"CSFBC\", \"name\": \"Capital Small Finance Bank Corporate\" },\n  { \"code\": \"CSFBR\", \"name\": \"Capital Small Finance Bank Retail\" },\n  { \"code\": \"CSBN\", \"name\": \"Catholic Syrian Bank\" },\n  { \"code\": \"CBIB\", \"name\": \"Central Bank Of India\" },\n  { \"code\": \"CUBB\", \"name\": \"City Union Bank\" },\n  { \"code\": \"CSMSNB\", \"name\": \"Cosmos Bank\" },\n  { \"code\": \"DCBB\", \"name\": \"DCB Bank\" },\n  { \"code\": \"DSHB\", \"name\": \"Deutsche Bank\" },\n  { \"code\": \"DLNBCORP\", \"name\": \"Dhanlaxmi Bank - Corporate\" },\n  { \"code\": \"DLSB\", \"name\": \"Dhanlaxmi Bank - Retail\" },\n  { \"code\": \"FEDB\", \"name\": \"Federal Bank\" },\n  { \"code\": \"FEDCORP\", \"name\": \"Federal Bank Corporate\" },\n  { \"code\": \"HDFB\", \"name\": \"HDFC Bank\" },\n  { \"code\": \"HDFCCONB\", \"name\": \"HDFC Bank - Corporate Banking\" },\n  { \"code\": \"ICIB\", \"name\": \"ICICI Bank\" },\n  { \"code\": \"ICICICNB\", \"name\": \"ICICI Corporate Netbanking\" },\n  { \"code\": \"IDBB\", \"name\": \"IDBI Bank\" },\n  { \"code\": \"IDBICORP\", \"name\": \"IDBI Corp Netbanking\" },\n  { \"code\": \"IDFCNB\", \"name\": \"IDFC FIRST Bank\" },\n  { \"code\": \"INDB\", \"name\": \"Indian Bank\" },\n  { \"code\": \"ALLB\", \"name\": \"Indian Bank (Erstwhile Allahabad Bank)\" },\n  { \"code\": \"INOB\", \"name\": \"Indian Overseas Bank\" },\n  { \"code\": \"INIB\", \"name\": \"IndusInd Bank\" },\n  { \"code\": \"JAKB\", \"name\": \"Jammu & Kashmir Bank\" },\n  { \"code\": \"JANANB\", \"name\": \"Jana Small Finance Bank\" },\n  { \"code\": \"JSBNB\", \"name\": \"Janata Sahakari Bank Pune\" },\n  { \"code\": \"KRKB\", \"name\": \"Karnataka Bank\" },\n  { \"code\": \"KGBNB\", \"name\": \"Karnataka Gramin Bank\" },\n  { \"code\": \"KRVBC\", \"name\": \"Karur Vysya - Corporate Banking\" },\n  { \"code\": \"KRVB\", \"name\": \"Karur Vysya Bank\" },\n  { \"code\": \"162B\", \"name\": \"Kotak Mahindra Bank\" },\n  { \"code\": \"KTKBCORP\", \"name\": \"Kotak Mahindra Bank - Corp Net Banking\" },\n  { \"code\": \"KVBNBTPV\", \"name\": \"KVB NB TPV\" },\n  { \"code\": \"PAYTMNB\", \"name\": \"Paytm Payments Bank\" },\n  { \"code\": \"OBCB\", \"name\": \"PNB (Erstwhile - Oriental Bank of Commerce)\" },\n  { \"code\": \"UNIB\", \"name\": \"PNB (Erstwhile - United Bank of India)\" },\n  { \"code\": \"INDPOST\", \"name\": \"Post Office Savings Bank (POSB)\" },\n  { \"code\": \"PMEC\", \"name\": \"Prime Co Op Bank Ltd\" },\n  { \"code\": \"PSBNB\", \"name\": \"Punjab & Sind Bank\" },\n  { \"code\": \"PNBB\", \"name\": \"Punjab National Bank\" },\n  { \"code\": \"CPNB\", \"name\": \"Punjab National Bank - Corporate Banking\" },\n  { \"code\": \"RBLNB\", \"name\": \"RBL Bank\" },\n  { \"code\": \"RBLCNB\", \"name\": \"RBL Corporate Netbanking\" },\n  { \"code\": \"SRSWT\", \"name\": \"Saraswat Bank\" },\n  { \"code\": \"SHIVANB\", \"name\": \"Shivalik Small Finance Bank\" },\n  { \"code\": \"SOIB\", \"name\": \"South Indian Bank\" },\n  { \"code\": \"SCBNB\", \"name\": \"Standard Chartered Bank\" },\n  { \"code\": \"SBIB\", \"name\": \"State Bank of India\" },\n  { \"code\": \"SBNCORP\", \"name\": \"State Bank of India (Corporate)\" },\n  { \"code\": \"SVCNB\", \"name\": \"SVC Co-operative Bank Ltd.\" },\n  { \"code\": \"TMBB\", \"name\": \"Tamilnad Mercantile Bank\" },\n  { \"code\": \"UCOB\", \"name\": \"UCO Bank\" },\n  { \"code\": \"YESB\", \"name\": \"Yes Bank\" }\n]\n"
-              },
-              {
-                "key": "returnUrl",
-                "mappings": [
-                  {
-                    "value": "/showProvider/"
-                  },
-                  {
-                    "value": "{{purchase.purchaseId}}"
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "LIST_VALUE_JOIN"
-                  }
-                ]
-              }
-            ],
-            "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              }
-            ]
-          },
-          {
             "key": "key",
             "value": "{{bankTransaction.usedAuthKey}}",
             "operations": [
@@ -181,7 +119,7 @@
           },
           {
             "key": "bankcode",
-            "value": "{{purchase.payInBankDetails.swiftCode}}"
+            "value": "{{extraParams.providerBankCode}}"
           },
           {
             "key": "surl",
@@ -405,7 +343,7 @@
           },
           {
             "key": "redirectUrl",
-            "value": "{{pspResponse0.value}}"
+            "value": "{{pspResponse1.value}}"
           }
         ],
         "operations": [
