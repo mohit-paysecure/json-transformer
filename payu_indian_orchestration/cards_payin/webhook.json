@@ -11,8 +11,20 @@
       "body": {
         "mappings": [
           {
-            "key": "pspTransactionId",
-            "value": "{{webhookRequest.txnid}}",
+            "key": "webhookRequest",
+            "value": "{{webhookRequest.value}}",
+            "operations": [
+              {
+                "name": "URL_ENCODED_STRING_TO_JSON"
+              }
+            ],
+            "required": true,
+            "hidden": true,
+            "storeIn": "pspCall"
+          },
+          {
+            "key": "purchaseId",
+            "value": "{{store.pspCall.webhookRequest.txnid}}",
             "required": true
           }
         ],
