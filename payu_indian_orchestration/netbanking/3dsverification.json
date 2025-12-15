@@ -343,7 +343,7 @@
           },
           {
             "key": "redirectUrl",
-            "value": "{{pspResponse1.value}}"
+            "value": "{{pspResponse0.value}}"
           }
         ],
         "operations": [

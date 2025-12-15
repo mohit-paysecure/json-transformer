@@ -33,7 +33,7 @@
         "mappings": [
           {
             "key": "isNetbankingCodePresent",
-            "value": "{{purchase.payInBankDetails.swiftCode}}",
+            "value": "{{purchase.client.bankCode}}",
             "operations": [
               {
                 "name": "CHECK_IF_NULL"
@@ -181,7 +181,7 @@
           },
           {
             "key": "bankcode",
-            "value": "{{purchase.payInBankDetails.swiftCode}}"
+            "value": "{{purchase.client.bankCode}}"
           },
           {
             "key": "surl",
