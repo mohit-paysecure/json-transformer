@@ -113,19 +113,129 @@
           {
             "key": "merchant",
             "mappings": [
-              {
-                "key": "entity",
-                "value": "default",
+{
+                    "key": "cvc",
+                    "value": "{{cardInfo.cvc}}",
+                    "required": true
+                  },
+                  {
+                    "key": "billingAddress",
+                    "mappings": [
+                      {
+                        "key": "address1",
+                        "mappings": [
+                          {
+                            "value": "{{purchase.billingAddress.address1}}"
+                          },
+                          {
+                            "value": "{{purchase.client.address}}"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "GET_FIRST_NON_EMPTY_STRING"
+                          }
+                        ]
+                      },
+                      {
+                        "key": "address2",
+                        "value": "{{purchase.billingAddress.address2}}",
+                        "operations": [
+                          {
+                            "name": "CHECK_IF_NULL",
+                            "params": {
+                              "defaultValue": ""
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "key": "address3",
+                        "value": "{{purchase.billingAddress.address3}}",
+                        "operations": [
+                          {
+                            "name": "CHECK_IF_NULL",
+                            "params": {
+                              "defaultValue": ""
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "key": "postalCode",
+                        "mappings": [
+                          {
+                            "value": "{{purchase.billingAddress.postalCode}}"
+                          },
+                          {
+                            "value": "{{purchase.client.postcode}}"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "GET_FIRST_NON_EMPTY_STRING"
+                          }
+                        ]
+                      },
+                      {
+                        "key": "city",
+                        "mappings": [
+                          {
+                            "value": "{{purchase.billingAddress.city}}"
+                          },
+                          {
+                            "value": "{{purchase.client.city}}"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "GET_FIRST_NON_EMPTY_STRING"
+                          }
+                        ]
+                      },
+                      {
+                        "key": "state",
+                        "value": "{{purchase.billingAddress.state}}",
+                        "operations": [
+                          {
+                            "name": "CHECK_IF_NULL",
+                            "params": {
+                              "defaultValue": ""
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "key": "countryCode",
+                        "mappings": [
+                          {
+                            "value": "{{purchase.billingAddress.countryCode}}"
+                          },
+                          {
+                            "value": "{{purchase.client.countryCode}}"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "GET_FIRST_NON_EMPTY_STRING"
+                          }
+                        ]
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ],
                 "required": true
-              }
-            ],
-            "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              }
-            ],
-            "required": true
-          },
+              },
           {
             "key": "instruction",
             "mappings": [
@@ -197,8 +307,7 @@
                   },
                   {
                     "key": "cvc",
-                    "value": "{{cardInfo.cvc}}",
-                    "required": true
+                    "value": "{{cardInfo.cvc}}"
                   }
                 ],
                 "operations": [
@@ -221,15 +330,14 @@
                   {
                     "name": "KEY_VALUE_LIST_TO_OBJECT"
                   }
-                ],
-                "required": true
+                ]
               },
               {
                 "key": "customerAgreement",
                 "mappings": [
                   {
                     "key": "type",
-                    "value": "subscription",
+                    "value": "{{subscription}}",
                     "required": true
                   },
                   {
