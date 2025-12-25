@@ -1,0 +1,189 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://api-gateway.sandbox.ngenius-payments.com/transactions/outlets/",
+            "required": true
+          },
+          {
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 2
+                }
+              }
+            ]
+          },
+          {
+            "value": "/orders/",
+            "required": true
+          },
+          {
+            "value": "{{tempObject.order_id}}",
+            "required": true
+          },
+          {
+            "value": "/payments/",
+            "required": true
+          },
+          {
+            "value": "{{tempObject.payment_id}}",
+            "required": true
+          },
+          {
+            "value": "/captures",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "Bearer ",
+                "required": true
+              },
+              {
+                "value": "{{tempObject.access_token}}",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/vnd.ni-payment.v2+json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.ni-payment.v2+json",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "amount",
+            "mappings": [
+              {
+                "key": "currencyCode",
+                "value": "{{purchase.fx_Currency}}",
+                "required": true
+              },
+              {
+                "key": "value",
+                "value": "{{purchase.fx_Amount}}",
+                "operations": [
+                  {
+                    "name": "STRING_TO_INTEGER"
+                  }
+                ],
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "status",
+            "value": "{{pspResponse5.state}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "CAPTURED",
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse5.state}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "CAPTURED",
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse5.reference}}"
+          },
+          {
+            "key": "refundTransId",
+            "value": "{{pspResponse5.reference}}"
+          },
+          {
+            "key": "message",
+            "value": "Refund processed successfully"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]

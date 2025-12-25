@@ -1,0 +1,178 @@
+[
+  {
+    "requestMapping": {
+      "method": "GET",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://api-gateway.sandbox.ngenius-payments.com/transactions/outlets/",
+            "required": true
+          },
+          {
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 2
+                }
+              }
+            ]
+          },
+          {
+            "value": "/orders/",
+            "required": true
+          },
+          {
+            "value": "{{tempObject.order_id}}",
+            "required": true
+          },
+          {
+            "value": "/payments/",
+            "required": true
+          },
+          {
+            "value": "{{tempObject.payment_id}}",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "Bearer ",
+                "required": true
+              },
+              {
+                "value": "{{tempObject.access_token}}",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.ni-payment.v2+json",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "status",
+            "value": "{{pspResponse4._embedded.payment[0].state}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "AUTHORISED",
+                      "to": "success"
+                    },
+                    {
+                      "from": "AUTHORIZED",
+                      "to": "success"
+                    },
+                    {
+                      "from": "CAPTURED",
+                      "to": "success"
+                    },
+                    {
+                      "from": "STARTED",
+                      "to": "payment_in_process"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse4._embedded.payment[0].state}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "AUTHORISED",
+                      "to": "success"
+                    },
+                    {
+                      "from": "AUTHORIZED",
+                      "to": "success"
+                    },
+                    {
+                      "from": "CAPTURED",
+                      "to": "success"
+                    },
+                    {
+                      "from": "STARTED",
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse4._embedded.payment[0].reference}}"
+          },
+          {
+            "key": "message",
+            "value": "{{pspResponse4._embedded.payment[0].state}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]
