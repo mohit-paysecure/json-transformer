@@ -66,17 +66,67 @@
       "body": {
         "mappings": [
           {
-            "key": "access_token",
+            "key": "pspToken",
             "value": "{{pspResponse0.access_token}}",
             "required": true
           },
           {
-            "key": "expires_in",
-            "value": "{{pspResponse0.expires_in}}"
+            "key": "status",
+            "value": "{{pspResponse0.message}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "payment_in_process"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
           },
           {
-            "key": "token_type",
-            "value": "{{pspResponse0.token_type}}"
+            "key": "code",
+            "value": "{{pspResponse0.message}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.errors0.message}}"
+              },
+              {
+                "value": "{{pspResponse0.message}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
           }
         ],
         "operations": [
