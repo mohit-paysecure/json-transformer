@@ -234,7 +234,15 @@
                     "value": "{{purchase.fx_Amount}}",
                     "operations": [
                       {
-                        "name": "STRING_TO_INTEGER"
+                        "name": "STRING_TO_BIGDECIMAL"
+                      },
+                      {
+                        "name": "LIST_VALUE_MULTIPLY_BIGDECIMAL",
+                        "params": [
+                          {
+                            "value": 100
+                          }
+                        ]
                       }
                     ]
                   }
