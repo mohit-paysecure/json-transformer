@@ -123,7 +123,7 @@
           },
           {
             "key": "txn_s2s_flow",
-            "value": 1
+            "value": 4
           },
           {
             "key": "surl",
@@ -345,6 +345,9 @@
               },
               {
                 "value": "{{pspResponse0.message}}"
+              },
+              {
+                "value": " "
               }
             ],
             "operations": [
@@ -352,12 +355,11 @@
                 "name": "GET_FIRST_NON_EMPTY_STRING"
               }
             ],
-            "required": true,
-            "storeIn": "message"
+            "storeIn": "payu"
           },
           {
             "key": "code",
-            "value": "{{storeIn.message.message}}",
+            "value": "{{store.payu.message}}",
             "operations": [
               {
                 "name": "CHECK_IF_NULL"
@@ -381,7 +383,7 @@
           },
           {
             "key": "status",
-            "value": "{{storeIn.message.message}}",
+            "value": "{{store.payu.message}}",
             "operations": [
               {
                 "name": "CHECK_IF_NULL"
@@ -418,7 +420,7 @@
                 "name": "LIST_VALUE_JOIN"
               }
             ],
-            "storeIn": "qrCodeData"
+            "storeIn": "payu"
           },
           {
             "key": "isQrCodeNotPresent",
@@ -428,7 +430,7 @@
                 "name": "CHECK_IF_NULL"
               }
             ],
-            "storeIn": "isQrCodeNotPresent"
+            "storeIn": "payu"
           },
           {
             "key": "message",
@@ -442,7 +444,7 @@
                 "mappings": [
                   {
                     "key": "qrCodeImage",
-                    "value": "{{storeIn.qrCodeData.qrCodeData}}",
+                    "value": "{{store.payu.qrCodeData}}",
                     "operations": [
                       {
                         "name": "GENERATE_QR_CODE_IMAGE"
@@ -516,7 +518,29 @@
                 "name": "LIST_VALUE_JOIN"
               }
             ],
-            "skipIf": "{{storeIn.isQrCodeNotPresent.isQrCodeNotPresent}}"
+            "skipIf": "{{store.payu.isQrCodeNotPresent}}"
+          },
+          {
+            "key": "qrCode",
+            "value": "{{store.payu.qrCodeImage}}"
+          },
+          {
+            "key": "redirectUrl",
+            "mappings": [
+              {
+                "value": "/depositdetail/",
+                "required": true
+              },
+              {
+                "value": "{{purchase.purchaseId}}",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
           },
           {
             "key": "pspTransactionId",
