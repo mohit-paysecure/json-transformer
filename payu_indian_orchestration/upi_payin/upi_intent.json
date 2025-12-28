@@ -1,0 +1,444 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://test.payu.in/_payment",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "key",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 0
+                }
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "txnid",
+            "value": "{{purchase.purchaseId}}",
+            "required": true
+          },
+          {
+            "key": "amount",
+            "value": "{{purchase.fx_Amount}}",
+            "required": true
+          },
+          {
+            "key": "productinfo",
+            "mappings": [
+              {
+                "value": "{{bankTransaction.product_info}}"
+              },
+              {
+                "value": "iPhone"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "firstname",
+            "mappings": [
+              {
+                "value": "{{purchase.client.full_name}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              },
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "\\s+"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 0
+                }
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "email",
+            "value": "{{purchase.client.email}}",
+            "required": true
+          },
+          {
+            "key": "phone",
+            "value": "{{purchase.client.phone}}",
+            "required": true
+          },
+          {
+            "key": "pg",
+            "value": "UPI"
+          },
+          {
+            "key": "bankcode",
+            "value": "INTENT"
+          },
+          {
+            "key": "txn_s2s_flow",
+            "value": 4
+          },
+          {
+            "key": "surl",
+            "mappings": [
+              {
+                "value": "{{extraParams.baseUrl}}",
+                "required": true
+              },
+              {
+                "value": "/custRedirect/",
+                "required": true
+              },
+              {
+                "value": "{{purchase.bankid}}",
+                "required": true
+              },
+              {
+                "value": "/",
+                "required": true
+              },
+              {
+                "value": "{{purchase.purchaseId}}",
+                "required": true
+              },
+              {
+                "value": "/",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "furl",
+            "mappings": [
+              {
+                "value": "{{extraParams.baseUrl}}",
+                "required": true
+              },
+              {
+                "value": "/custRedirect/",
+                "required": true
+              },
+              {
+                "value": "{{purchase.bankid}}",
+                "required": true
+              },
+              {
+                "value": "/",
+                "required": true
+              },
+              {
+                "value": "{{purchase.purchaseId}}",
+                "required": true
+              },
+              {
+                "value": "/",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "hash",
+            "mappings": [
+              {
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0
+                    }
+                  }
+                ],
+                "required": true
+              },
+              {
+                "value": "|",
+                "required": true
+              },
+              {
+                "value": "{{purchase.purchaseId}}",
+                "required": true
+              },
+              {
+                "value": "|",
+                "required": true
+              },
+              {
+                "value": "{{purchase.fx_Amount}}",
+                "required": true
+              },
+              {
+                "value": "|",
+                "required": true
+              },
+              {
+                "value": "{{bankTransaction.product_info}}",
+                "mappings": [
+                  {
+                    "value": "{{bankTransaction.product_info}}"
+                  },
+                  {
+                    "value": "iPhone"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ],
+                "required": true
+              },
+              {
+                "value": "|",
+                "required": true
+              },
+              {
+                "mappings": [
+                  {
+                    "value": "{{purchase.client.full_name}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  },
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "\\s+"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0
+                    }
+                  }
+                ],
+                "required": true
+              },
+              {
+                "value": "|",
+                "required": true
+              },
+              {
+                "value": "{{purchase.client.email}}",
+                "required": true
+              },
+              {
+                "value": "|||||||||||",
+                "required": true
+              },
+              {
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 1
+                    }
+                  }
+                ],
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              },
+              {
+                "name": "COMPUTE_SHA_HASH",
+                "params": {
+                  "algorithm": "SHA512"
+                }
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.metaData.message}}"
+              },
+              {
+                "value": "{{pspResponse0.message}}"
+              },
+              {
+                "value": " "
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "storeIn": "payu"
+          },
+          {
+            "key": "code",
+            "value": "{{store.payu.message}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "fail"
+                    },
+                    {
+                      "from": true,
+                      "to": "success"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{store.payu.message}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "failed"
+                    },
+                    {
+                      "from": true,
+                      "to": "payment_in_process"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "isAcsTemplateNotPresent",
+            "value": "{{pspResponse0.result.acsTemplate}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              }
+            ],
+            "storeIn": "payu"
+          },
+          {
+            "key": "redirectUrl",
+            "value": "{{pspResponse0.result.acsTemplate}}",
+            "operations": [
+              {
+                "name": "BASE64_TRANSFORM",
+                "params": {
+                  "mode": "DECODE"
+                }
+              }
+            ],
+            "skipIf": "{{store.payu.isAcsTemplateNotPresent}}"
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse0.metaData.txnId}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]
