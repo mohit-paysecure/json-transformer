@@ -1,0 +1,383 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://smart-capital.auth.us-east-1.amazoncognito.com/oauth/token",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "grant_type",
+            "value": "client_credentials",
+            "required": true
+          },
+          {
+            "key": "client_id",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 0
+                }
+              }
+            ]
+          },
+          {
+            "key": "client_secret",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 1
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "status",
+            "value": "{{pspResponse0.access_token}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "payment_failed"
+                    }
+                  ],
+                  "defaultValue": "payment_in_process"
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse0.access_token}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "fail"
+                    }
+                  ],
+                  "defaultValue": "success"
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.error_description}}"
+              },
+              {
+                "value": "{{pspResponse0.error}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "pspToken",
+            "value": "{{pspResponse0.access_token}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://core-manager.a55.tech/api/v2/wallet",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "Bearer "
+              },
+              {
+                "value": "{{bankTransaction.token}}",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "isWalletIdAvailable",
+            "value": "{{purchase.tempObject.wallet_uuid}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": true
+                    },
+                    {
+                      "from": true,
+                      "to": false
+                    }
+                  ]
+                }
+              }
+            ],
+            "hidden": true,
+            "storeIn": "pspCall"
+          },
+          {
+            "key": "tempObject",
+            "mappings": [
+              {
+                "key": "wallet_uuid",
+                "value": "{{pspResponse1.wallet_uuid}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "skipPspCall",
+            "skipIf": "{{store.pspCall.isWalletIdAvailable}}",
+            "value": true
+          },
+          {
+            "key": "customer_id",
+            "value": "{{bankTransaction.midName}}",
+            "required": true
+          },
+          {
+            "key": "email",
+            "mappings": [
+              {
+                "value": "{{bankTransaction.midName}}"
+              },
+              {
+                "value": "@choicepay.ca"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "entity_uuid",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 2
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "status",
+            "value": "{{pspResponse0.wallet_uuid}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "payment_failed"
+                    }
+                  ],
+                  "defaultValue": "payment_in_process"
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse0.wallet_uuid}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "fail"
+                    }
+                  ],
+                  "defaultValue": "success"
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse1.error}}"
+              },
+              {
+                "value": "{{pspResponse1.code}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]

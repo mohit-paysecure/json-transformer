@@ -82,7 +82,7 @@
                 "params": {
                   "mappings": [
                     {
-                      "from": false,
+                      "from": true,
                       "to": "payment_in_process"
                     }
                   ],
@@ -103,7 +103,7 @@
                 "params": {
                   "mappings": [
                     {
-                      "from": false,
+                      "from": true,
                       "to": "success"
                     }
                   ],
@@ -120,6 +120,9 @@
               },
               {
                 "value": "{{pspResponse0.message}}"
+              },
+              {
+                "value": " "
               }
             ],
             "operations": [
@@ -158,7 +161,7 @@
               {
                 "name": "GET_ELEMENT_AT_INDEX",
                 "params": {
-                  "index": 2
+                  "index": 1
                 }
               }
             ]
@@ -235,16 +238,16 @@
                     "operations": [
                       {
                         "name": "STRING_TO_BIGDECIMAL"
-                      },
-                      {
-                        "name": "LIST_VALUE_MULTIPLY_BIGDECIMAL",
-                        "params": [
-                          {
-                            "value": 100
-                          }
-                        ]
                       }
                     ]
+                  },
+                  {
+                    "value": 100
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_MULTIPLY_BIGDECIMAL"
                   }
                 ],
                 "required": true
@@ -270,79 +273,19 @@
       "body": {
         "mappings": [
           {
-            "key": "order_id",
-            "value": "{{pspResponse1.reference}}",
-            "required": true
-          },
-          {
-            "key": "payment_id",
-            "value": "{{pspResponse1._embedded.payment[0].reference}}",
-            "required": true
-          },
-          {
-            "key": "outlet_id",
-            "value": "{{pspResponse1.outletId}}",
-            "required": true
-          },
-          {
-            "key": "payment_authorization_href",
-            "value": "{{pspResponse1._links.payment-authorization.href}}",
-            "required": true
-          },
-          {
-            "key": "payment_code",
-            "mappings": [
-              {
-                "value": "{{pspResponse1._embedded.payment[0]._links.self.href}}",
-                "operations": [
-                  {
-                    "name": "SPLIT_STRING",
-                    "params": {
-                      "delimiter": "/"
-                    }
-                  },
-                  {
-                    "name": "GET_LAST_ELEMENT"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "key": "payment_link",
-            "value": "{{pspResponse1._links.payment.href}}",
-            "operations": [
-              {
-                "name": "EXTRACT_QUERY_PARAM",
-                "params": {
-                  "param": "code"
-                }
-              }
-            ]
+            "key": "pspTransactionId",
+            "value": "{{pspResponse1.reference}}"
           },
           {
             "key": "tempObject",
             "mappings": [
               {
                 "key": "access_token",
-                "value": "{{pspResponse0.access_token}}",
-                "required": true
+                "value": "{{pspResponse0.access_token}}"
               },
               {
                 "key": "order_id",
                 "value": "{{pspResponse1.reference}}"
-              },
-              {
-                "key": "payment_id",
-                "value": "{{pspResponse1._embedded.payment[0].reference}}"
-              },
-              {
-                "key": "outlet_id",
-                "value": "{{pspResponse1.outletId}}"
-              },
-              {
-                "key": "payment_authorization_href",
-                "value": "{{pspResponse1._links.payment-authorization.href}}"
               },
               {
                 "key": "payment_link",
@@ -356,6 +299,74 @@
             "operations": [
               {
                 "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse1.errors0.message}}"
+              },
+              {
+                "value": "{{pspResponse1.message}}"
+              },
+              {
+                "value": " "
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "storeIn": "ni"
+          },
+          {
+            "key": "code",
+            "value": "{{store.ni.message}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "fail"
+                    },
+                    {
+                      "from": true,
+                      "to": "success"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{store.ni.message}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "failed"
+                    },
+                    {
+                      "from": true,
+                      "to": "payment_in_process"
+                    }
+                  ]
+                }
               }
             ]
           }
