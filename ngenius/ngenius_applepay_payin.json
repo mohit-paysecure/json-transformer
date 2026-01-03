@@ -277,6 +277,37 @@
             "value": "{{pspResponse1.reference}}"
           },
           {
+            "key": "paymentCode",
+            "value": "{{pspResponse1._links.payment.href}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "code="
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 1
+                }
+              },
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "&"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 0
+                }
+              }
+            ],
+            "storeIn": "ni"
+          },
+          {
             "key": "tempObject",
             "mappings": [
               {
@@ -288,8 +319,12 @@
                 "value": "{{pspResponse1.reference}}"
               },
               {
-                "key": "payment_link",
-                "value": "{{pspResponse1._links.payment.href}}"
+                "key": "paymentCode",
+                "value": "{{store.ni.paymentCode}}"
+              },
+              {
+                "key": "payment-authorization",
+                "value": "{{pspResponse1._links.payment-authorization.href}}"
               },
               {
                 "key": "apple_pay_link",
@@ -383,7 +418,7 @@
     "requestMapping": {
       "method": "POST",
       "url": {
-        "value": "{{tempObject.payment_authorization_href}}",
+        "value": "{{bankTransaction.tempObject.payment-authorization}}",
         "required": true
       },
       "headers": {
@@ -395,6 +430,11 @@
           },
           {
             "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded",
+            "required": true
+          },
+          {
+            "key": "Media-Type",
             "value": "application/x-www-form-urlencoded",
             "required": true
           }
@@ -409,228 +449,7 @@
         "mappings": [
           {
             "key": "code",
-            "mappings": [
-              {
-                "value": "{{tempObject.payment_code}}",
-                "required": true
-              }
-            ],
-            "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              }
-            ],
-            "required": true
-          }
-        ],
-        "operations": [
-          {
-            "name": "KEY_VALUE_LIST_TO_OBJECT"
-          }
-        ],
-        "required": true
-      }
-    },
-    "responseMapping": {
-      "headers": {
-        "mappings": [
-          {
-            "key": "payment-token",
-            "mappings": [
-              {
-                "value": "{{pspResponse2.headers.Set-Cookie}}",
-                "operations": [
-                  {
-                    "name": "EXTRACT_COOKIE_VALUE",
-                    "params": {
-                      "cookie": "payment-token"
-                    }
-                  }
-                ]
-              }
-            ],
-            "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              }
-            ]
-          }
-        ],
-        "operations": [
-          {
-            "name": "KEY_VALUE_LIST_TO_OBJECT"
-          }
-        ]
-      },
-      "body": {
-        "mappings": [
-          {
-            "key": "tempObject",
-            "mappings": [
-              {
-                "key": "payment_token",
-                "value": "{{pspResponse2.headers.payment-token}}",
-                "required": true
-              },
-              {
-                "key": "access_token",
-                "value": "{{tempObject.access_token}}"
-              },
-              {
-                "key": "order_id",
-                "value": "{{tempObject.order_id}}"
-              },
-              {
-                "key": "payment_id",
-                "value": "{{tempObject.payment_id}}"
-              },
-              {
-                "key": "outlet_id",
-                "value": "{{tempObject.outlet_id}}"
-              },
-              {
-                "key": "apple_pay_link",
-                "value": "{{tempObject.apple_pay_link}}"
-              }
-            ],
-            "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              }
-            ]
-          }
-        ],
-        "operations": [
-          {
-            "name": "KEY_VALUE_LIST_TO_OBJECT"
-          }
-        ]
-      }
-    }
-  },
-  {
-    "requestMapping": {
-      "method": "PUT",
-      "url": {
-        "value": "{{tempObject.apple_pay_link}}",
-        "required": true
-      },
-      "headers": {
-        "mappings": [
-          {
-            "key": "Authorization",
-            "mappings": [
-              {
-                "value": "Bearer ",
-                "required": true
-              },
-              {
-                "value": "{{tempObject.payment_token}}",
-                "required": true
-              }
-            ],
-            "operations": [
-              {
-                "name": "LIST_VALUE_JOIN"
-              }
-            ],
-            "required": true
-          },
-          {
-            "key": "Content-Type",
-            "value": "application/vnd.ni-payment.v2+json",
-            "required": true
-          }
-        ],
-        "operations": [
-          {
-            "name": "KEY_VALUE_LIST_TO_OBJECT"
-          }
-        ]
-      },
-      "body": {
-        "mappings": [
-          {
-            "key": "applePayPaymentResponse",
-            "mappings": [
-              {
-                "key": "token",
-                "mappings": [
-                  {
-                    "key": "paymentData",
-                    "mappings": [
-                      {
-                        "key": "data",
-                        "value": "{{purchase.applePayPaymentData}}",
-                        "required": true
-                      },
-                      {
-                        "key": "signature",
-                        "value": "{{purchase.applePaySignature}}",
-                        "required": true
-                      },
-                      {
-                        "key": "version",
-                        "value": "{{purchase.applePayVersion}}",
-                        "required": true
-                      },
-                      {
-                        "key": "header",
-                        "mappings": [
-                          {
-                            "key": "applicationData",
-                            "value": "{{purchase.applePayApplicationData}}",
-                            "required": true
-                          },
-                          {
-                            "key": "ephemeralPublicKey",
-                            "value": "{{purchase.applePayEphemeralPublicKey}}",
-                            "required": true
-                          },
-                          {
-                            "key": "wrappedKey",
-                            "value": "{{purchase.applePayWrappedKey}}",
-                            "required": true
-                          },
-                          {
-                            "key": "publicKeyHash",
-                            "value": "{{purchase.applePayPublicKeyHash}}",
-                            "required": true
-                          },
-                          {
-                            "key": "transactionId",
-                            "value": "{{purchase.applePayTransactionId}}",
-                            "required": true
-                          }
-                        ],
-                        "operations": [
-                          {
-                            "name": "KEY_VALUE_LIST_TO_OBJECT"
-                          }
-                        ]
-                      }
-                    ],
-                    "operations": [
-                      {
-                        "name": "KEY_VALUE_LIST_TO_OBJECT"
-                      }
-                    ],
-                    "required": true
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "KEY_VALUE_LIST_TO_OBJECT"
-                  }
-                ],
-                "required": true
-              }
-            ],
-            "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              }
-            ],
+            "value": "{{bankTransaction.tempObject.paymentCode}}",
             "required": true
           }
         ],
@@ -647,115 +466,43 @@
         "mappings": [
           {
             "key": "status",
-            "value": "{{pspResponse3._embedded.payment[0].state}}",
+            "value": "{{pspResponse2.orderRef}}",
             "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
               {
                 "name": "VALUE_MAPPER",
                 "params": {
                   "mappings": [
                     {
-                      "from": "AUTHORISED",
-                      "to": "success"
-                    },
-                    {
-                      "from": "AUTHORIZED",
-                      "to": "success"
-                    },
-                    {
-                      "from": "CAPTURED",
-                      "to": "success"
+                      "from": false,
+                      "to": "payment_in_process"
                     }
                   ],
                   "defaultValue": "fail"
                 }
-              }
-            ],
-            "operations": [
-              {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
               }
             ]
           },
           {
             "key": "code",
-            "value": "{{pspResponse3._embedded.payment[0].state}}",
+            "value": "{{pspResponse2.orderRef}}",
             "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
               {
                 "name": "VALUE_MAPPER",
                 "params": {
                   "mappings": [
                     {
-                      "from": "AUTHORISED",
-                      "to": "success"
-                    },
-                    {
-                      "from": "AUTHORIZED",
-                      "to": "success"
-                    },
-                    {
-                      "from": "CAPTURED",
+                      "from": false,
                       "to": "success"
                     }
                   ],
                   "defaultValue": "fail"
                 }
-              }
-            ]
-          },
-          {
-            "key": "pspTransactionId",
-            "value": "{{pspResponse3._embedded.payment[0].reference}}"
-          },
-          {
-            "key": "message",
-            "mappings": [
-              {
-                "value": "{{pspResponse3._embedded.payment[0].state}}",
-                "operations": [
-                  {
-                    "name": "VALUE_MAPPER",
-                    "params": {
-                      "mappings": [
-                        {
-                          "from": "AUTHORISED",
-                          "to": "Payment successful"
-                        },
-                        {
-                          "from": "AUTHORIZED",
-                          "to": "Payment successful"
-                        },
-                        {
-                          "from": "CAPTURED",
-                          "to": "Payment successful"
-                        }
-                      ],
-                      "defaultValue": "Payment failed"
-                    }
-                  }
-                ]
-              }
-            ],
-            "operations": [
-              {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
-              }
-            ]
-          },
-          {
-            "key": "tempObject",
-            "mappings": [
-              {
-                "key": "final_state",
-                "value": "{{pspResponse3._embedded.payment[0].state}}"
-              },
-              {
-                "key": "payment_reference",
-                "value": "{{pspResponse3._embedded.payment[0].reference}}"
-              }
-            ],
-            "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
               }
             ]
           }
