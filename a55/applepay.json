@@ -379,5 +379,581 @@
         ]
       }
     }
+  },
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://core-manager.a55.tech/api/v2/bank/wallet/charge",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "Bearer "
+              },
+              {
+                "value": "{{bankTransaction.token}}",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "wallet_uuid",
+            "value": "{{purchase.tempObject.wallet_uuid}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "-"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 1
+                }
+              }
+            ]
+          },
+          {
+            "key": "merchant_id",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 4
+                }
+              }
+            ]
+          },
+          {
+            "key": "payer_name",
+            "mappings": [
+              {
+                "value": "{{purchase.client.full_name}}"
+              },
+              {
+                "value": "{{cardInfo.cardholder_name}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "payer_email",
+            "value": "{{purchase.client.email}}",
+            "required": true
+          },
+          {
+            "key": "payer_address",
+            "mappings": [
+              {
+                "key": "street",
+                "value": "{{purchase.client.street_address}}",
+                "required": true
+              },
+              {
+                "key": "address_number",
+                "mappings": [
+                  {
+                    "value": "{{purchase.client.street_address}}"
+                  },
+                  {
+                    "value": "0"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  },
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "\\s+"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0
+                    }
+                  }
+                ],
+                "required": true
+              },
+              {
+                "key": "complement",
+                "value": ""
+              },
+              {
+                "key": "neighborhood",
+                "value": ""
+              },
+              {
+                "key": "city",
+                "value": "{{purchase.client.city}}",
+                "required": true
+              },
+              {
+                "key": "state",
+                "value": "{{purchase.client.stateCode}}",
+                "required": true
+              },
+              {
+                "key": "postal_code",
+                "value": "{{purchase.client.zip_code}}",
+                "required": true
+              },
+              {
+                "key": "country",
+                "value": "{{purchase.client.country}}",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "currency",
+            "value": "{{purchase.fx_Currency}}",
+            "required": true
+          },
+          {
+            "key": "installment_value",
+            "value": "{{purchase.fx_Amount}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "STRING_TO_DOUBLE"
+              }
+            ]
+          },
+          {
+            "key": "installment_count",
+            "value": "1",
+            "required": true,
+            "operations": [
+              {
+                "name": "STRING_TO_INTEGER"
+              }
+            ]
+          },
+          {
+            "key": "due_date",
+            "value": "{{purchase.dueDate}}",
+            "required": true
+          },
+          {
+            "key": "description",
+            "mappings": [
+              {
+                "value": "{{bankTransaction.product_info}}"
+              },
+              {
+                "value": "Order #{{purchase.purchaseId}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "items",
+            "mappings": [
+              {
+                "key": "name",
+                "mappings": [
+                  {
+                    "value": "{{bankTransaction.product_info}}"
+                  },
+                  {
+                    "value": "Premium Plan"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ],
+                "required": true
+              },
+              {
+                "key": "description",
+                "mappings": [
+                  {
+                    "value": "{{bankTransaction.product_info}}"
+                  },
+                  {
+                    "value": "Payment for order #{{purchase.purchaseId}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ],
+                "required": true
+              },
+              {
+                "key": "quantity",
+                "value": "1",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "STRING_TO_INTEGER"
+                  }
+                ]
+              },
+              {
+                "key": "total_amount",
+                "value": "{{purchase.fx_Amount}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "STRING_TO_DOUBLE"
+                  }
+                ]
+              },
+              {
+                "key": "unit_amount",
+                "value": "{{purchase.fx_Amount}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "STRING_TO_DOUBLE"
+                  }
+                ]
+              },
+              {
+                "key": "sku",
+                "value": "PLAN-{{purchase.purchaseId}}",
+                "required": true
+              },
+              {
+                "key": "code",
+                "value": "ORDER-{{purchase.purchaseId}}",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "LIST_OBJECT_VALUE_TO_LIST_VALUE"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "type_charge",
+            "value": "applepay",
+            "required": true
+          },
+          {
+            "key": "card_number",
+            "value": "{{cardInfo.number}}",
+            "required": true
+          },
+          {
+            "key": "card_expiry_month",
+            "value": "{{cardInfo.expireMonth}}",
+            "required": true
+          },
+          {
+            "key": "card_expiry_year",
+            "value": "{{cardInfo.expireYear}}",
+            "required": true
+          },
+          {
+            "key": "card_cvv",
+            "value": "{{cardInfo.cvc}}",
+            "required": true
+          },
+          {
+            "key": "googlepay",
+            "mappings": [
+              {
+                "key": "eci",
+                "value": "{{s2s.threeDSecureResponse.eci}}",
+                "required": true
+              },
+              {
+                "key": "cavv",
+                "value": "{{s2s.threeDSecureResponse.cavv}}",
+                "required": true
+              },
+              {
+                "key": "type",
+                "value": "credit_card",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "device_info",
+            "mappings": [
+              {
+                "key": "ip_address",
+                "mappings": [
+                  {
+                    "value": "{{s2s.remote_ip}}"
+                  },
+                  {
+                    "value": "{{purchase.clientIp}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ],
+                "required": true
+              },
+              {
+                "key": "user_agent",
+                "value": "{{s2s.user_agent}}",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "webhook_url",
+            "mappings": [
+              {
+                "value": "{{extraParams.baseUrl}}",
+                "required": true
+              },
+              {
+                "value": "/webhook/",
+                "required": true
+              },
+              {
+                "value": "{{purchase.bankid}}",
+                "required": true
+              },
+              {
+                "value": "/",
+                "required": true
+              },
+              {
+                "value": "{{purchase.purchaseId}}",
+                "required": true
+              },
+              {
+                "value": "/",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "redirect_url",
+            "mappings": [
+              {
+                "value": "{{extraParams.baseUrl}}",
+                "required": true
+              },
+              {
+                "value": "/custRedirect/",
+                "required": true
+              },
+              {
+                "value": "{{purchase.bankid}}",
+                "required": true
+              },
+              {
+                "value": "/",
+                "required": true
+              },
+              {
+                "value": "{{purchase.purchaseId}}",
+                "required": true
+              },
+              {
+                "value": "/",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "status",
+            "value": "{{pspResponse3.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "confirmed",
+                      "to": "success"
+                    },
+                    {
+                      "from": "paid",
+                      "to": "success"
+                    },
+                    {
+                      "from": "pending",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "failed",
+                      "to": "payment_failed"
+                    }
+                  ],
+                  "defaultValue": "payment_failed"
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse3.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "confirmed",
+                      "to": "success"
+                    },
+                    {
+                      "from": "pending",
+                      "to": "success"
+                    },
+                    {
+                      "from": "failed",
+                      "to": "fail"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse3.message}}"
+              },
+              {
+                "value": "{{pspResponse3.error}}"
+              },
+              {
+                "value": "{{pspResponse3.description}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse3.charge_uuid}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
   }
 ]
