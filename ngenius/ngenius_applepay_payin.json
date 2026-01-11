@@ -465,6 +465,20 @@
       "body": {
         "mappings": [
           {
+            "key": "tempObject",
+            "value": "{{pspResponseHeader2.set-cookie}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING_TO_MAP_ELEMENTS",
+                "params": {
+                  "entrySeparator": ";",
+                  "keyValueSeparator": "=",
+                  "splitType": "key_value"
+                }
+              }
+            ],
+          },
+          {
             "key": "status",
             "value": "{{pspResponse2.orderRef}}",
             "operations": [
