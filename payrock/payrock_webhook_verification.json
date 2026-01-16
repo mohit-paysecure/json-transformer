@@ -1,0 +1,258 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": []
+      },
+      "headers": {
+        "mappings": []
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "webhookVerified",
+            "mappings": [
+              {
+                "key": "input",
+                "mappings": [
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 0
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": "3.0",
+                    "required": true
+                  },
+                  {
+                    "value": "{{webhookBody.cartId}}",
+                    "required": true
+                  },
+                  {
+                    "value": "{{bankTransaction.amt}}",
+                    "required": true
+                  },
+                  {
+                    "value": "{{bankTransaction.currency}}",
+                    "required": true
+                  },
+                  {
+                    "value": "{{webhookBody.status}}",
+                    "required": true
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 1
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "JOIN_MAP_ELEMENTS",
+                    "params": {
+                      "delimiter": ";"
+                    }
+                  },
+                  {
+                    "name": "COMPUTE_SHA_HASH",
+                    "params": {
+                      "algorithm": "SHA256",
+                      "outputFormat": "HEX"
+                    }
+                  }
+                ],
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "COMPUTE_SHA_HASH",
+                "params": {
+                  "algorithm": "SHA256",
+                  "outputFormat": "HEX"
+                }
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "signatureMatch",
+            "value": "{{webhookBody.signature}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "false",
+                  "mappings": [
+                    {
+                      "from": "{{requestBody.webhookVerified}}",
+                      "to": "true"
+                    }
+                  ]
+                }
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "code",
+            "value": "{{requestBody.signatureMatch}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "fail",
+                  "mappings": [
+                    {
+                      "from": "true",
+                      "to": "success"
+                    },
+                    {
+                      "from": "false",
+                      "to": "fail"
+                    }
+                  ]
+                }
+              }
+            ],
+            "isHidden": false
+          },
+          {
+            "key": "status",
+            "value": "{{requestBody.signatureMatch}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "fail",
+                  "mappings": [
+                    {
+                      "from": "true",
+                      "to": "verified"
+                    },
+                    {
+                      "from": "false",
+                      "to": "verification_failed"
+                    }
+                  ]
+                }
+              }
+            ],
+            "isHidden": false
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{requestBody.signatureMatch}}",
+                "operations": [
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "defaultValue": "Signature verification failed",
+                      "mappings": [
+                        {
+                          "from": "true",
+                          "to": "Webhook signature verified successfully"
+                        },
+                        {
+                          "from": "false",
+                          "to": "Webhook signature verification failed"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "Webhook signature processed"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "isHidden": false
+          },
+          {
+            "key": "webhookStatus",
+            "value": "{{webhookBody.status}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              }
+            ],
+            "isHidden": true
+          },
+          {
+            "key": "cartId",
+            "value": "{{webhookBody.cartId}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              }
+            ],
+            "isHidden": true
+          },
+          {
+            "key": "reference",
+            "value": "{{webhookBody.reference}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              }
+            ],
+            "isHidden": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]
