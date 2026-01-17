@@ -97,11 +97,23 @@
                 ]
               },
               {
+                "value": ";",
+                "required": true
+              },
+              {
                 "value": "{{purchase.purchaseId}}",
                 "required": true
               },
               {
+                "value": ";",
+                "required": true
+              },
+              {
                 "value": "3.0",
+                "required": true
+              },
+              {
+                "value": ";",
                 "required": true
               },
               {
@@ -125,11 +137,7 @@
             ],
             "operations": [
               {
-                "name": "JOIN_MAP_ELEMENTS",
-                "params": {
-                  "entrySeparator": ";",
-                  "joinType": "value"
-                }
+                "name": "LIST_VALUE_JOIN"
               },
               {
                 "name": "COMPUTE_SHA_HASH",
@@ -155,12 +163,7 @@
         "mappings": [
           {
             "key": "pspTransactionId",
-            "value": "{{pspResponse0.reference}}",
-            "operations": [
-              {
-                "name": "CHECK_IF_NULL"
-              }
-            ]
+            "value": "{{pspResponse0.reference}}"
           },
           {
             "key": "code",
@@ -178,6 +181,10 @@
                     {
                       "from": "FAILED",
                       "to": "fail"
+                    },
+                    {
+                      "from": "PENDING",
+                      "to": "success"
                     },
                     {
                       "from": "IN_PROGRESS",
@@ -204,6 +211,10 @@
                     {
                       "from": "FAILED",
                       "to": "fail"
+                    },
+                    {
+                      "from": "PENDING",
+                      "to": "payment_in_process"
                     },
                     {
                       "from": "IN_PROGRESS",

@@ -234,6 +234,11 @@
             "key": "map",
             "mappings": [
               {
+                "key": "clientType",
+                "value": "FTD",
+                "required": true
+              },
+              {
                 "key": "city",
                 "value": "{{purchase.client.city}}",
                 "required": true
@@ -416,6 +421,10 @@
                       "to": "success"
                     },
                     {
+                      "from": "PENDING",
+                      "to": "success"
+                    },
+                    {
                       "from": "SUCCESS",
                       "to": "success"
                     },
@@ -443,6 +452,10 @@
                   "mappings": [
                     {
                       "from": "IN_PROGRESS",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "PENDING",
                       "to": "payment_in_process"
                     },
                     {

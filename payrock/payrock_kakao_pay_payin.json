@@ -405,6 +405,10 @@
                       "to": "success"
                     },
                     {
+                      "from": "PENDING",
+                      "to": "success"
+                    },
+                    {
                       "from": "FAILED",
                       "to": "fail"
                     },
@@ -428,6 +432,10 @@
                   "mappings": [
                     {
                       "from": "IN_PROGRESS",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "PENDING",
                       "to": "payment_in_process"
                     },
                     {
