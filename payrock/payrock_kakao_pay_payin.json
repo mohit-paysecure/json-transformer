@@ -72,38 +72,8 @@
           },
           {
             "key": "amount",
-            "mappings": [
-              {
-                "value": "{{purchase.fx_Amount}}",
-                "required": true,
-                "operations": [
-                  {
-                    "name": "STRING_TO_DOUBLE"
-                  }
-                ]
-              },
-              {
-                "value": "1.00",
-                "required": true,
-                "operations": [
-                  {
-                    "name": "STRING_TO_DOUBLE"
-                  }
-                ]
-              }
-            ],
-            "required": true,
-            "operations": [
-              {
-                "name": "LIST_VALUE_MULTIPLY"
-              },
-              {
-                "name": "DOUBLE_TO_CEIL"
-              },
-              {
-                "name": "DOUBLE_TO_STRING"
-              }
-            ]
+            "value": "{{purchase.fx_Amount}}",
+            "required": true
           },
           {
             "key": "ip",
@@ -302,89 +272,95 @@
             "key": "hash",
             "mappings": [
               {
-                "key": "input",
-                "mappings": [
-                  {
-                    "value": "{{bankTransaction.usedAuthKey}}",
-                    "required": true,
-                    "operations": [
-                      {
-                        "name": "SPLIT_STRING",
-                        "params": {
-                          "delimiter": "##"
-                        }
-                      },
-                      {
-                        "name": "GET_ELEMENT_AT_INDEX",
-                        "params": {
-                          "index": 0
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "value": "{{bankTransaction.usedAuthKey}}",
-                    "required": true,
-                    "operations": [
-                      {
-                        "name": "SPLIT_STRING",
-                        "params": {
-                          "delimiter": "##"
-                        }
-                      },
-                      {
-                        "name": "GET_ELEMENT_AT_INDEX",
-                        "params": {
-                          "index": 1
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "value": "{{purchase.purchaseId}}",
-                    "required": true
-                  },
-                  {
-                    "value": "KAKAO_PAY",
-                    "required": true
-                  },
-                  {
-                    "value": "{{requestBody.amount}}",
-                    "required": true
-                  },
-                  {
-                    "value": "{{purchase.fx_Currency}}",
-                    "required": true
-                  },
-                  {
-                    "value": "{{purchase.client.country}}",
-                    "required": true,
-                    "operations": [
-                      {
-                        "name": "STRING_TO_UPPERCASE"
-                      }
-                    ]
-                  }
-                ],
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "required": true,
                 "operations": [
                   {
-                    "name": "JOIN_MAP_ELEMENTS",
+                    "name": "SPLIT_STRING",
                     "params": {
-                      "delimiter": ";"
+                      "delimiter": "##"
                     }
                   },
                   {
-                    "name": "COMPUTE_SHA_HASH",
+                    "name": "GET_ELEMENT_AT_INDEX",
                     "params": {
-                      "algorithm": "SHA256",
-                      "outputFormat": "HEX"
+                      "index": 0
                     }
                   }
-                ],
+                ]
+              },
+              {
+                "value": ";",
                 "required": true
+              },
+              {
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "value": ";",
+                "required": true
+              },
+              {
+                "value": "{{purchase.purchaseId}}",
+                "required": true
+              },
+              {
+                "value": ";",
+                "required": true
+              },
+              {
+                "value": "VIRTUAL_ACCOUNT",
+                "required": true
+              },
+              {
+                "value": ";",
+                "required": true
+              },
+              {
+                "value": "{{purchase.fx_Amount}}",
+                "required": true
+              },
+              {
+                "value": ";",
+                "required": true
+              },
+              {
+                "value": "{{purchase.fx_Currency}}",
+                "required": true
+              },
+              {
+                "value": ";",
+                "required": true
+              },
+              {
+                "value": "{{purchase.client.country}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "STRING_TO_UPPERCASE"
+                  }
+                ]
               }
             ],
             "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              },
               {
                 "name": "COMPUTE_SHA_HASH",
                 "params": {
@@ -409,13 +385,7 @@
         "mappings": [
           {
             "key": "pspTransactionId",
-            "value": "{{pspResponse0.reference}}",
-            "operations": [
-              {
-                "name": "CHECK_IF_NULL"
-              }
-            ],
-            "isHidden": false
+            "value": "{{pspResponse0.reference}}"
           },
           {
             "key": "code",
@@ -445,8 +415,7 @@
                   ]
                 }
               }
-            ],
-            "isHidden": false
+            ]
           },
           {
             "key": "status",
@@ -462,10 +431,6 @@
                       "to": "payment_in_process"
                     },
                     {
-                      "from": "SUCCESS",
-                      "to": "paid"
-                    },
-                    {
                       "from": "FAILED",
                       "to": "fail"
                     },
@@ -476,64 +441,15 @@
                   ]
                 }
               }
-            ],
-            "isHidden": false
+            ]
           },
           {
             "key": "message",
-            "mappings": [
-              {
-                "value": "{{pspResponse0.message}}",
-                "operations": [
-                  {
-                    "name": "CHECK_IF_NULL"
-                  }
-                ]
-              },
-              {
-                "value": "Payment with reference id {{pspResponse0.reference}} and cart id {{pspResponse0.cartId}} is {{pspResponse0.status}}"
-              },
-              {
-                "value": ""
-              }
-            ],
-            "operations": [
-              {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
-              }
-            ],
-            "isHidden": false
+            "value": "{{pspResponse0.message}}"
           },
           {
-            "key": "url",
-            "value": "{{pspResponse0.paymentUrl}}",
-            "operations": [
-              {
-                "name": "CHECK_IF_NULL"
-              }
-            ],
-            "isHidden": true,
-            "storeIn": "redirect"
-          },
-          {
-            "key": "cartId",
-            "value": "{{pspResponse0.cartId}}",
-            "operations": [
-              {
-                "name": "CHECK_IF_NULL"
-              }
-            ],
-            "isHidden": true
-          },
-          {
-            "key": "reference",
-            "value": "{{pspResponse0.reference}}",
-            "operations": [
-              {
-                "name": "CHECK_IF_NULL"
-              }
-            ],
-            "isHidden": true
+            "key": "redirectUrl",
+            "value": "{{pspResponse0.paymentUrl}}"
           }
         ],
         "operations": [

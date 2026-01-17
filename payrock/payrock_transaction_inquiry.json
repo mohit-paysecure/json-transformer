@@ -5,7 +5,7 @@
       "url": {
         "mappings": [
           {
-            "value": "{{pspEndpoint}}",
+            "value": "https://gateway-dev.payrock.io/api/v1/payin/status",
             "required": true
           }
         ],
@@ -79,72 +79,58 @@
             "key": "hash",
             "mappings": [
               {
-                "key": "input",
-                "mappings": [
-                  {
-                    "value": "{{bankTransaction.usedAuthKey}}",
-                    "required": true,
-                    "operations": [
-                      {
-                        "name": "SPLIT_STRING",
-                        "params": {
-                          "delimiter": "##"
-                        }
-                      },
-                      {
-                        "name": "GET_ELEMENT_AT_INDEX",
-                        "params": {
-                          "index": 1
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "value": "{{purchase.purchaseId}}",
-                    "required": true
-                  },
-                  {
-                    "value": "3.0",
-                    "required": true
-                  },
-                  {
-                    "value": "{{bankTransaction.usedAuthKey}}",
-                    "required": true,
-                    "operations": [
-                      {
-                        "name": "SPLIT_STRING",
-                        "params": {
-                          "delimiter": "##"
-                        }
-                      },
-                      {
-                        "name": "GET_ELEMENT_AT_INDEX",
-                        "params": {
-                          "index": 0
-                        }
-                      }
-                    ]
-                  }
-                ],
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "required": true,
                 "operations": [
                   {
-                    "name": "JOIN_MAP_ELEMENTS",
+                    "name": "SPLIT_STRING",
                     "params": {
-                      "delimiter": ";"
+                      "delimiter": "##"
                     }
                   },
                   {
-                    "name": "COMPUTE_SHA_HASH",
+                    "name": "GET_ELEMENT_AT_INDEX",
                     "params": {
-                      "algorithm": "SHA256",
-                      "outputFormat": "HEX"
+                      "index": 1
                     }
                   }
-                ],
+                ]
+              },
+              {
+                "value": "{{purchase.purchaseId}}",
                 "required": true
+              },
+              {
+                "value": "3.0",
+                "required": true
+              },
+              {
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0
+                    }
+                  }
+                ]
               }
             ],
             "operations": [
+              {
+                "name": "JOIN_MAP_ELEMENTS",
+                "params": {
+                  "entrySeparator": ";",
+                  "joinType": "value"
+                }
+              },
               {
                 "name": "COMPUTE_SHA_HASH",
                 "params": {
@@ -174,8 +160,7 @@
               {
                 "name": "CHECK_IF_NULL"
               }
-            ],
-            "isHidden": false
+            ]
           },
           {
             "key": "code",
@@ -201,8 +186,7 @@
                   ]
                 }
               }
-            ],
-            "isHidden": false
+            ]
           },
           {
             "key": "status",
@@ -233,68 +217,7 @@
           },
           {
             "key": "message",
-            "mappings": [
-              {
-                "value": "{{pspResponse0.message}}",
-                "operations": [
-                  {
-                    "name": "CHECK_IF_NULL"
-                  }
-                ]
-              },
-              {
-                "value": "Transaction status for cart id {{pspResponse0.cartId}} is {{pspResponse0.status}}"
-              },
-              {
-                "value": ""
-              }
-            ],
-            "operations": [
-              {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
-              }
-            ],
-            "isHidden": false
-          },
-          {
-            "key": "cartId",
-            "value": "{{pspResponse0.cartId}}",
-            "operations": [
-              {
-                "name": "CHECK_IF_NULL"
-              }
-            ],
-            "isHidden": true
-          },
-          {
-            "key": "reference",
-            "value": "{{pspResponse0.reference}}",
-            "operations": [
-              {
-                "name": "CHECK_IF_NULL"
-              }
-            ],
-            "isHidden": true
-          },
-          {
-            "key": "orderAmount",
-            "value": "{{pspResponse0.orderAmount}}",
-            "operations": [
-              {
-                "name": "CHECK_IF_NULL"
-              }
-            ],
-            "isHidden": true
-          },
-          {
-            "key": "originalAmount",
-            "value": "{{pspResponse0.originalAmount}}",
-            "operations": [
-              {
-                "name": "CHECK_IF_NULL"
-              }
-            ],
-            "isHidden": true
+            "value": "{{pspResponse0.message}}"
           }
         ],
         "operations": [
