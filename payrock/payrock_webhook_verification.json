@@ -11,87 +11,140 @@
       "body": {
         "mappings": [
           {
-            "key": "webhookVerified",
+            "key": "webhookResponse",
+            "value": "{{webhookRequest.value}}",
+            "operations": [
+              {
+                "name": "URL_ENCODED_STRING_TO_JSON"
+              }
+            ],
+            "storeIn": "payrock",
+            "hidden": true
+          },
+          {
+            "key": "transactionContext",
             "mappings": [
               {
-                "key": "input",
-                "mappings": [
-                  {
-                    "value": "{{bankTransaction.usedAuthKey}}",
-                    "required": true,
-                    "operations": [
-                      {
-                        "name": "SPLIT_STRING",
-                        "params": {
-                          "delimiter": "##"
-                        }
-                      },
-                      {
-                        "name": "GET_ELEMENT_AT_INDEX",
-                        "params": {
-                          "index": 0
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "value": "3.0",
-                    "required": true
-                  },
-                  {
-                    "value": "{{webhookBody.cartId}}",
-                    "required": true
-                  },
-                  {
-                    "value": "{{bankTransaction.amt}}",
-                    "required": true
-                  },
-                  {
-                    "value": "{{bankTransaction.currency}}",
-                    "required": true
-                  },
-                  {
-                    "value": "{{webhookBody.status}}",
-                    "required": true
-                  },
-                  {
-                    "value": "{{bankTransaction.usedAuthKey}}",
-                    "required": true,
-                    "operations": [
-                      {
-                        "name": "SPLIT_STRING",
-                        "params": {
-                          "delimiter": "##"
-                        }
-                      },
-                      {
-                        "name": "GET_ELEMENT_AT_INDEX",
-                        "params": {
-                          "index": 1
-                        }
-                      }
-                    ]
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "JOIN_MAP_ELEMENTS",
-                    "params": {
-                      "delimiter": ";"
-                    }
-                  },
-                  {
-                    "name": "COMPUTE_SHA_HASH",
-                    "params": {
-                      "algorithm": "SHA256",
-                      "outputFormat": "HEX"
-                    }
-                  }
-                ],
+                "key": "id",
+                "value": "{{store.payrock.webhookResponse.cartId}}",
+                "required": true
+              },
+              {
+                "key": "idType",
+                "value": "purchaseId",
                 "required": true
               }
             ],
             "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "GET_TRANSACTION_CONTEXT_BY_ID",
+                "params": {}
+              }
+            ],
+            "storeIn": "contextStore",
+            "hidden": true
+          },
+          {
+            "key": "purchaseId",
+            "value": "{{store.payrock.webhookResponse.cartId}}",
+            "required": true
+          },
+          {
+            "key": "receivedSignature",
+            "value": "{{store.payrock.webhookResponse.signature}}",
+            "required": true
+          },
+          {
+            "key": "generatedSignature",
+            "mappings": [
+              {
+                "value": "3.0",
+                "required": true
+              },
+              {
+                "value": ";",
+                "required": true
+              },
+              {
+                "value": "{{store.contextStore.transactionContext.bankTransaction.usedAuthKey}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0
+                    }
+                  }
+                ]
+              },
+              {
+                "value": ";",
+                "required": true
+              },
+              {
+                "value": "{{store.contextStore.transactionContext.purchase.purchaseId}}",
+                "required": true
+              },
+              {
+                "value": ";",
+                "required": true
+              },
+              {
+                "value": "{{store.contextStore.transactionContext.bankTransaction.amt}}",
+                "required": true
+              },
+              {
+                "value": ";",
+                "required": true
+              },
+              {
+                "value": "{{store.contextStore.transactionContext.bankTransaction.currency}}",
+                "required": true
+              },
+              {
+                "value": ";",
+                "required": true
+              },
+              {
+                "value": "{{store.payrock.webhookResponse.status}}",
+                "required": true
+              },
+              {
+                "value": ";",
+                "required": true
+              },
+              {
+                "value": "{{store.contextStore.transactionContext.bankTransaction.usedAuthKey}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              },
               {
                 "name": "COMPUTE_SHA_HASH",
                 "params": {
@@ -99,30 +152,47 @@
                   "outputFormat": "HEX"
                 }
               }
-            ],
-            "required": true
+            ]
           },
           {
-            "key": "signatureMatch",
-            "value": "{{webhookBody.signature}}",
+            "key": "status",
+            "value": "{{store.payrock.webhookResponse.status}}",
             "operations": [
-              {
-                "name": "CHECK_IF_NULL"
-              },
               {
                 "name": "VALUE_MAPPER",
                 "params": {
-                  "defaultValue": "false",
+                  "defaultValue": "fail",
                   "mappings": [
                     {
-                      "from": "{{requestBody.webhookVerified}}",
-                      "to": "true"
+                      "from": "IN_PROGRESS",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "PENDING",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "FAILED",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "FAILURE",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "SUCCESS",
+                      "to": "paid"
                     }
                   ]
                 }
               }
             ],
             "required": true
+          },
+          {
+            "key": "message",
+            "value": "{{store.payrock.webhookResponse.statusMessage}}",
+            "required": false
           }
         ],
         "operations": [
@@ -134,119 +204,7 @@
     },
     "responseMapping": {
       "body": {
-        "mappings": [
-          {
-            "key": "code",
-            "value": "{{requestBody.signatureMatch}}",
-            "operations": [
-              {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "defaultValue": "fail",
-                  "mappings": [
-                    {
-                      "from": "true",
-                      "to": "success"
-                    },
-                    {
-                      "from": "false",
-                      "to": "fail"
-                    }
-                  ]
-                }
-              }
-            ],
-            "isHidden": false
-          },
-          {
-            "key": "status",
-            "value": "{{requestBody.signatureMatch}}",
-            "operations": [
-              {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "defaultValue": "fail",
-                  "mappings": [
-                    {
-                      "from": "true",
-                      "to": "verified"
-                    },
-                    {
-                      "from": "false",
-                      "to": "verification_failed"
-                    }
-                  ]
-                }
-              }
-            ],
-            "isHidden": false
-          },
-          {
-            "key": "message",
-            "mappings": [
-              {
-                "value": "{{requestBody.signatureMatch}}",
-                "operations": [
-                  {
-                    "name": "VALUE_MAPPER",
-                    "params": {
-                      "defaultValue": "Signature verification failed",
-                      "mappings": [
-                        {
-                          "from": "true",
-                          "to": "Webhook signature verified successfully"
-                        },
-                        {
-                          "from": "false",
-                          "to": "Webhook signature verification failed"
-                        }
-                      ]
-                    }
-                  }
-                ]
-              },
-              {
-                "value": "Webhook signature processed"
-              }
-            ],
-            "operations": [
-              {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
-              }
-            ],
-            "isHidden": false
-          },
-          {
-            "key": "webhookStatus",
-            "value": "{{webhookBody.status}}",
-            "operations": [
-              {
-                "name": "CHECK_IF_NULL"
-              }
-            ],
-            "isHidden": true
-          },
-          {
-            "key": "cartId",
-            "value": "{{webhookBody.cartId}}",
-            "operations": [
-              {
-                "name": "CHECK_IF_NULL"
-              }
-            ],
-            "isHidden": true
-          },
-          {
-            "key": "reference",
-            "value": "{{webhookBody.reference}}",
-            "operations": [
-              {
-                "name": "CHECK_IF_NULL"
-              }
-            ],
-            "isHidden": true
-          }
-        ],
+        "mappings": [],
         "operations": [
           {
             "name": "KEY_VALUE_LIST_TO_OBJECT"
