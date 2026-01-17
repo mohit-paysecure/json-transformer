@@ -339,7 +339,7 @@
                 "required": true
               },
               {
-                "value": "PAY_ID",
+                "value": "VIRTUAL_ACCOUNT",
                 "required": true
               },
               {
@@ -446,10 +446,6 @@
                       "to": "payment_in_process"
                     },
                     {
-                      "from": "SUCCESS",
-                      "to": "paid"
-                    },
-                    {
                       "from": "FAILED",
                       "to": "fail"
                     },
@@ -465,6 +461,10 @@
           {
             "key": "message",
             "value": "{{pspResponse0.message}}"
+          },
+          {
+            "key": "redirectUrl",
+            "value": "{{pspResponse0.paymentUrl}}"
           }
         ],
         "operations": [
