@@ -234,8 +234,47 @@
             "key": "map",
             "mappings": [
               {
+                "key": "city",
+                "value": "{{purchase.client.city}}",
+                "required": true
+              },
+              {
+                "key": "address",
+                "value": "{{purchase.client.street_address}}",
+                "required": true
+              },
+              {
+                "key": "postalCode",
+                "value": "{{purchase.client.zip_code}}",
+                "required": true
+              },
+              {
+                "key": "mobileNumber",
+                "value": "{{purchase.client.phone}}",
+                "required": true
+              },
+              {
+                "key": "dob",
+                "value": "{{purchase.client.date_of_birth}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "STRING_DATE_TO_EPOCH",
+                    "params": {
+                      "dateFormat": "yyyy-dd-MM"
+                    }
+                  },
+                  {
+                    "name": "EPOCH_TO_STRING_DATE",
+                    "params": {
+                      "dateFormat": "yyyy-MM-dd"
+                    }
+                  }
+                ]
+              },
+              {
                 "key": "virtualAccountId",
-                "value": "{{extraParams.virtualAccountId}}",
+                "value": "{{purchase.extraParam.virtualAccountId}}",
                 "required": true
               }
             ],
@@ -324,7 +363,7 @@
                 "required": true
               },
               {
-                "value": "VIRTUAL_ACCOUNT",
+                "value": "KAKAO_PAY",
                 "required": true
               },
               {

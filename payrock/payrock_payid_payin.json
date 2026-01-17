@@ -344,7 +344,7 @@
                 "required": true
               },
               {
-                "value": "VIRTUAL_ACCOUNT",
+                "value": "PAY_ID",
                 "required": true
               },
               {
