@@ -404,6 +404,22 @@
       "body": {
         "mappings": [
           {
+            "key": "expireInMin",
+            "mappings": [
+              {
+                "value": "{{purchase.purchase.expireInMin}}"
+              },
+              {
+                "value": "43200"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
             "key": "pspTransactionId",
             "value": "{{pspResponse0.reference}}"
           },

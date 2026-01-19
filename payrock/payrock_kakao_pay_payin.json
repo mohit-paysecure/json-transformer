@@ -540,6 +540,22 @@
             ]
           },
           {
+            "key": "expireInMin",
+            "mappings": [
+              {
+                "value": "{{purchase.purchase.expireInMin}}"
+              },
+              {
+                "value": "7200"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
             "key": "message",
             "value": "{{pspResponse0.message}}"
           },
