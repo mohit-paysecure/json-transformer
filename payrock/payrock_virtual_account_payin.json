@@ -72,7 +72,31 @@
           },
           {
             "key": "amount",
-            "value": "{{purchase.fx_Amount}}",
+            "mappings": [
+              {
+                "value": "{{purchase.fx_Amount}}",
+                "operations": [
+                  {
+                    "name": "STRING_TO_BIGDECIMAL"
+                  },
+                  {
+                    "name": "DOUBLE_TO_CEIL"
+                  },
+                  {
+                    "name": "DOUBLE_TO_STRING"
+                  }
+                ]
+              },
+              {
+                "value": "0",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
             "required": true
           },
           {
@@ -366,7 +390,31 @@
                 "required": true
               },
               {
-                "value": "{{purchase.fx_Amount}}",
+                "mappings": [
+                  {
+                    "value": "{{purchase.fx_Amount}}",
+                    "operations": [
+                      {
+                        "name": "STRING_TO_BIGDECIMAL"
+                      },
+                      {
+                        "name": "DOUBLE_TO_CEIL"
+                      },
+                      {
+                        "name": "DOUBLE_TO_STRING"
+                      }
+                    ]
+                  },
+                  {
+                    "value": "0",
+                    "required": true
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  }
+                ],
                 "required": true
               },
               {
