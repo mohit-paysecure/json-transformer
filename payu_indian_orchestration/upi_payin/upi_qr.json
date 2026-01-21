@@ -522,7 +522,29 @@
           },
           {
             "key": "qrCode",
-            "value": "{{store.payu.qrCodeImage}}"
+            "value": "{{store.payu.qrCodeData}}",
+            "operations": [
+              {
+                "name": "GENERATE_QR_CODE_IMAGE"
+              }
+            ],
+            "skipIf": "{{store.payu.isQrCodeNotPresent}}"
+          },
+          {
+            "key": "expireInMin",
+            "mappings": [
+              {
+                "value": "{{purchase.purchase.expireInMin}}"
+              },
+              {
+                "value": "1440"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
           },
           {
             "key": "redirectUrl",

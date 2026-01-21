@@ -416,6 +416,23 @@
             "storeIn": "payu"
           },
           {
+            "key": "intentUri",
+            "mappings": [
+              {
+                "value": "upi://pay?"
+              },
+              {
+                "value": "{{pspResponse0.result.intentURIData}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "skipIf": "{{store.payu.isAcsTemplateNotPresent}}"
+          },
+          {
             "key": "redirectUrl",
             "value": "{{pspResponse0.result.acsTemplate}}",
             "operations": [
