@@ -358,7 +358,7 @@
                 "required": true
               },
               {
-                "value": "UPI",
+                "value": "OFFLINE_UPI",
                 "required": true
               },
               {
