@@ -423,7 +423,7 @@
                 "value": "{{purchase.purchase.expireInMin}}"
               },
               {
-                "value": "7200"
+                "value": "10080"
               }
             ],
             "operations": [

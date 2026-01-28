@@ -1,0 +1,534 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://gateway-dev.payrock.io/api/v1/payout",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "version",
+            "value": "2.0",
+            "required": true
+          },
+          {
+            "key": "merchantCode",
+            "mappings": [
+              {
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "amount",
+            "value": "{{payout.fx_Amount}}",
+            "required": true
+          },
+          {
+            "key": "ipAddress",
+            "value": "{{s2s.remote_ip}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": ","
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 0
+                }
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "paymentMethod",
+            "value": "BANK_TRANSFER",
+            "required": true
+          },
+          {
+            "key": "cartId",
+            "value": "{{payout.payoutId}}",
+            "required": true
+          },
+          {
+            "key": "country",
+            "value": "{{payout.client.country}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "STRING_TO_UPPERCASE"
+              }
+            ]
+          },
+          {
+            "key": "currency",
+            "value": "{{payout.fx_Currency}}",
+            "required": true
+          },
+          {
+            "key": "callbackUrl",
+            "mappings": [
+              {
+                "value": "{{extraParams.baseUrl}}",
+                "required": true
+              },
+              {
+                "value": "/webhook/",
+                "required": true
+              },
+              {
+                "value": "{{purchase.bankname}}",
+                "required": true
+              },
+              {
+                "value": "/",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "email",
+            "value": "{{payout.client.email}}",
+            "required": true
+          },
+          {
+            "key": "isIfscPresent",
+            "value": "{{payout.beneficiaryDetail.ifscCode}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": false
+                    },
+                    {
+                      "from": false,
+                      "to": true
+                    }
+                  ]
+                }
+              }
+            ],
+            "hidden": true,
+            "storeIn": "pspCall"
+          },
+          {
+            "key": "isSwiftCodePresent",
+            "value": "{{payout.beneficiaryDetail.swiftCode}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": false
+                    },
+                    {
+                      "from": false,
+                      "to": true
+                    }
+                  ]
+                }
+              }
+            ],
+            "hidden": true,
+            "storeIn": "pspCall"
+          },
+          {
+            "key": "skipPspCall",
+            "skipIf": "{{store.pspCall.isSwiftCodePresent}}",
+            "value": true
+          },
+          {
+            "key": "flowReturnData",
+            "skipIf": "{{store.pspCall.isSwiftCodePresent}}",
+            "mappings": [
+              {
+                "key": "providerBankDetails",
+                "value": "[\n  {\"providerBankCode\":\"ICBB_INR\",\"providerBankName\":\"ICICI Bank\"},\n  {\"providerBankCode\":\"AU_INR\",\"providerBankName\":\"AU Small Finance Bank\"},\n  {\"providerBankCode\":\"ABPB_INR\",\"providerBankName\":\"Aditya Birla Payments Bank\"},\n  {\"providerBankCode\":\"AIRPB_INR\",\"providerBankName\":\"Airtel Payments Bank\"},\n  {\"providerBankCode\":\"ALHB_INR\",\"providerBankName\":\"Allahabad Bank\"},\n  {\"providerBankCode\":\"ADRB_INR\",\"providerBankName\":\"Andhra Bank\"},\n  {\"providerBankCode\":\"APGVB_INR\",\"providerBankName\":\"Andhra Pradesh Grameena Vikas Bank\"},\n  {\"providerBankCode\":\"APGB_INR\",\"providerBankName\":\"Andhra Pragathi Grameena Bank\"},\n  {\"providerBankCode\":\"APRB_INR\",\"providerBankName\":\"Arunachal Pradesh Rural Bank\"},\n  {\"providerBankCode\":\"ARYAVB_INR\",\"providerBankName\":\"Aryavart Bank\"},\n  {\"providerBankCode\":\"AGVB_INR\",\"providerBankName\":\"Assam Gramin Vikash Bank\"},\n  {\"providerBankCode\":\"AXSB_INR\",\"providerBankName\":\"Axis Bank\"},\n  {\"providerBankCode\":\"BBK_INR\",\"providerBankName\":\"BANK OF BAHRAIN AND KUWAIT\"},\n  {\"providerBankCode\":\"BHARATB_INR\",\"providerBankName\":\"BHARAT BANK\"},\n  {\"providerBankCode\":\"BDHN_INR\",\"providerBankName\":\"Bandhan Bank\"},\n  {\"providerBankCode\":\"BGVB_INR\",\"providerBankName\":\"Bangiya Gramin Vikash Bank\"},\n  {\"providerBankCode\":\"DBSI_INR\",\"providerBankName\":\"Bank DBS Indonesia\"},\n  {\"providerBankCode\":\"BOBB_INR\",\"providerBankName\":\"Bank Of Baroda\"},\n  {\"providerBankCode\":\"BOIB_INR\",\"providerBankName\":\"Bank of India\"},\n  {\"providerBankCode\":\"BOMB_INR\",\"providerBankName\":\"Bank of Maharashtra\"},\n  {\"providerBankCode\":\"BGGB_INR\",\"providerBankName\":\"Baroda Gujarat Gramin Bank\"},\n  {\"providerBankCode\":\"BRKGB_INR\",\"providerBankName\":\"Baroda Rajasthan Kshetriya Gramin Bank\"},\n  {\"providerBankCode\":\"BUPGB_INR\",\"providerBankName\":\"Baroda Uttar Pradesh Gramin Bank\"},\n  {\"providerBankCode\":\"BCCB_INR\",\"providerBankName\":\"Bassein Catholic Co-operative Bank\"},\n  {\"providerBankCode\":\"CSFB_INR\",\"providerBankName\":\"CAPITAL SMALL FINANCE BANK LTD\"},\n  {\"providerBankCode\":\"COSMB_INR\",\"providerBankName\":\"COSMOS BANK\"},\n  {\"providerBankCode\":\"CSBB_INR\",\"providerBankName\":\"CSB Bank\"},\n  {\"providerBankCode\":\"CNRB_INR\",\"providerBankName\":\"Canara Bank\"},\n  {\"providerBankCode\":\"CSB_INR\",\"providerBankName\":\"Catholic Syrian Bank\"},\n  {\"providerBankCode\":\"CBIB_INR\",\"providerBankName\":\"Central Bank of India\"},\n  {\"providerBankCode\":\"CGGB_INR\",\"providerBankName\":\"Chaitanya Godavari Grameena Bank\"},\n  {\"providerBankCode\":\"CRGB_INR\",\"providerBankName\":\"Chhattisgarh Rajya Gramin Bank\"},\n  {\"providerBankCode\":\"CITI_INR\",\"providerBankName\":\"Citi Bank\"},\n  {\"providerBankCode\":\"CUBL_INR\",\"providerBankName\":\"City Union Bank\"},\n  {\"providerBankCode\":\"CLABL_INR\",\"providerBankName\":\"Coastal Local Area Bank Limited\"},\n  {\"providerBankCode\":\"CORP_INR\",\"providerBankName\":\"Corporation Bank\"},\n  {\"providerBankCode\":\"DCBB_INR\",\"providerBankName\":\"DCB Bank\"},\n  {\"providerBankCode\":\"DBS_INR\",\"providerBankName\":\"DEVELOPMENT BANK OF SINGAPORE\"},\n  {\"providerBankCode\":\"DNLM_INR\",\"providerBankName\":\"DNLM\"},\n  {\"providerBankCode\":\"DBGB_INR\",\"providerBankName\":\"Dakshin Bihar Gramin Bank\"},\n  {\"providerBankCode\":\"DENAB_INR\",\"providerBankName\":\"Dena Bank\"},\n  {\"providerBankCode\":\"DSHB_INR\",\"providerBankName\":\"Deutsche Bank\"},\n  {\"providerBankCode\":\"DHLXM_INR\",\"providerBankName\":\"Dhanlaxmi Bank\"},\n  {\"providerBankCode\":\"ESAFF_INR\",\"providerBankName\":\"ESAF Small Finance Bank\"},\n  {\"providerBankCode\":\"EDB_INR\",\"providerBankName\":\"Ellaquai Dehati Bank\"},\n  {\"providerBankCode\":\"EQSF_INR\",\"providerBankName\":\"Equitas Small Finance Bank\"},\n  {\"providerBankCode\":\"EQB_INR\",\"providerBankName\":\"Equitas Bank\"},\n  {\"providerBankCode\":\"EXIM_INR\",\"providerBankName\":\"Exim Bank\"},\n  {\"providerBankCode\":\"FNPB_INR\",\"providerBankName\":\"FINO PAYMENT BANK\"},\n  {\"providerBankCode\":\"FEDB_INR\",\"providerBankName\":\"Federal Bank LTD\"},\n  {\"providerBankCode\":\"FCSF_INR\",\"providerBankName\":\"Fincare Small Finance Bank\"},\n  {\"providerBankCode\":\"GPPJSB_INR\",\"providerBankName\":\"GOPINATH PATIL PARSIK JANATA SAHAKARI BANK LTD\"},\n  {\"providerBankCode\":\"HDFC_INR\",\"providerBankName\":\"HDFC Bank\"},\n  {\"providerBankCode\":\"HPGB_INR\",\"providerBankName\":\"Himachal Pradesh Gramin Bank\"},\n  {\"providerBankCode\":\"IDBI_INR\",\"providerBankName\":\"IDBI Bank\"},\n  {\"providerBankCode\":\"IDFC_INR\",\"providerBankName\":\"IDFC Bank\"},\n  {\"providerBankCode\":\"IPPB_INR\",\"providerBankName\":\"India Post Payment Bank\"},\n  {\"providerBankCode\":\"IB_INR\",\"providerBankName\":\"Indian Bank\"},\n  {\"providerBankCode\":\"IDSB_INR\",\"providerBankName\":\"IndusInd Bank\"},\n  {\"providerBankCode\":\"JKGB_INR\",\"providerBankName\":\"J&K Grameen Bank\"},\n  {\"providerBankCode\":\"JSBP_INR\",\"providerBankName\":\"JANATA SAHAKARI BANK LTD PUNE\"},\n  {\"providerBankCode\":\"JAKB_INR\",\"providerBankName\":\"Jammu and Kashmir Bank Limited\"},\n  {\"providerBankCode\":\"JSFB_INR\",\"providerBankName\":\"Jana Small Finance Bank\"},\n  {\"providerBankCode\":\"JRGB_INR\",\"providerBankName\":\"Jharkhand Rajya Gramin Bank\"},\n  {\"providerBankCode\":\"JPB_INR\",\"providerBankName\":\"Jio Payments Bank\"},\n  {\"providerBankCode\":\"KBLB_INR\",\"providerBankName\":\"Karnataka Bank Limited\"},\n  {\"providerBankCode\":\"KRGB_INR\",\"providerBankName\":\"Karnataka Gramin Bank\"},\n  {\"providerBankCode\":\"KVGB_INR\",\"providerBankName\":\"Karnataka Vikas Grameena Bank\"},\n  {\"providerBankCode\":\"KVB_INR\",\"providerBankName\":\"Karur Vysya Bank\"},\n  {\"providerBankCode\":\"KGSG_INR\",\"providerBankName\":\"Kashi Gomti Samyut Gramin Bank\"},\n  {\"providerBankCode\":\"KGB_INR\",\"providerBankName\":\"Kerala Gramin Bank\"},\n  {\"providerBankCode\":\"KTKB_INR\",\"providerBankName\":\"Kotak Mahindra Bank\"},\n  {\"providerBankCode\":\"LXVB_INR\",\"providerBankName\":\"Lakshmi Vilas Bank\"},\n  {\"providerBankCode\":\"MBGB_INR\",\"providerBankName\":\"Madhya Bihar Gramin Bank\"},\n  {\"providerBankCode\":\"MRB_INR\",\"providerBankName\":\"MEGHALAYA RURAL BANK\"},\n  {\"providerBankCode\":\"MPGB_INR\",\"providerBankName\":\"Madhya Pradesh Gramin Bank\"},\n  {\"providerBankCode\":\"MGGB_INR\",\"providerBankName\":\"Madhyanchal Gramin Bank\"},\n  {\"providerBankCode\":\"MAHGB_INR\",\"providerBankName\":\"Maharashtra Gramin Bank\"},\n  {\"providerBankCode\":\"MRB_INR\",\"providerBankName\":\"Manipur Rural Bank\"},\n  {\"providerBankCode\":\"MRB_INR\",\"providerBankName\":\"Mizoram Rural Bank\"},\n  {\"providerBankCode\":\"NHB_INR\",\"providerBankName\":\"NHB\"},\n  {\"providerBankCode\":\"NSDLB_INR\",\"providerBankName\":\"NSDL Payments Bank Limited\"},\n  {\"providerBankCode\":\"NGRB_INR\",\"providerBankName\":\"Nagaland Rural Bank\"},\n  {\"providerBankCode\":\"NAINB_INR\",\"providerBankName\":\"Nainital Bank\"},\n  {\"providerBankCode\":\"NESFB_INR\",\"providerBankName\":\"North East Small Finance Bank\"},\n  {\"providerBankCode\":\"OGB_INR\",\"providerBankName\":\"Odisha Gramya Bank\"},\n  {\"providerBankCode\":\"OBC_INR\",\"providerBankName\":\"Oriental Bank of Commerce\"},\n  {\"providerBankCode\":\"PTMB_INR\",\"providerBankName\":\"PAYTM Payments Bank LTD\"},\n  {\"providerBankCode\":\"PGB_INR\",\"providerBankName\":\"PUNJAB GRAMIN BANK\"},\n  {\"providerBankCode\":\"PBGB_INR\",\"providerBankName\":\"Paschim Banga Gramin Bank\"},\n  {\"providerBankCode\":\"PKGB_INR\",\"providerBankName\":\"Pragathi Krishna Gramin Bank\"},\n  {\"providerBankCode\":\"PKGB1_INR\",\"providerBankName\":\"Pragati Krushna Gramina Bank\"},\n  {\"providerBankCode\":\"PUGB_INR\",\"providerBankName\":\"Prathama UP Gramin Bank\"},\n  {\"providerBankCode\":\"PBGGB_INR\",\"providerBankName\":\"Puduvai Bharathiar Grama Bank\"},\n  {\"providerBankCode\":\"PNB_INR\",\"providerBankName\":\"Punjab National Bank\"},\n  {\"providerBankCode\":\"PSB_INR\",\"providerBankName\":\"Punjab and Sind Bank\"},\n  {\"providerBankCode\":\"PB_INR\",\"providerBankName\":\"Purvanchal Bank\"},\n  {\"providerBankCode\":\"RBL_INR\",\"providerBankName\":\"RBL BANK LTD\"},\n  {\"providerBankCode\":\"RBS_INR\",\"providerBankName\":\"ROYAL BANK OF SCOTLAND\"},\n  {\"providerBankCode\":\"RMGB_INR\",\"providerBankName\":\"Rajasthan Marudhara Gramin Bank\"},\n  {\"providerBankCode\":\"RBI_INR\",\"providerBankName\":\"Reserve Bank of India\"},\n  {\"providerBankCode\":\"SCBT_INR\",\"providerBankName\":\"STANDARD CHARTERED BANK THAI PCL\"},\n  {\"providerBankCode\":\"SVCB_INR\",\"providerBankName\":\"SVC COOPERATIVE BANK LTD\"},\n  {\"providerBankCode\":\"SGGB_INR\",\"providerBankName\":\"Saptagiri Grameena Bank\"},\n  {\"providerBankCode\":\"SHGB_INR\",\"providerBankName\":\"Sarva Haryana Gramin Bank\"},\n  {\"providerBankCode\":\"SGB_INR\",\"providerBankName\":\"Saurashtra Gramin Bank\"},\n  {\"providerBankCode\":\"SIDBI_INR\",\"providerBankName\":\"Small Industries Development Bank of India\"},\n  {\"providerBankCode\":\"SINB_INR\",\"providerBankName\":\"South Indian Bank\"},\n  {\"providerBankCode\":\"SBH_INR\",\"providerBankName\":\"State Bank of Hyderabad\"},\n  {\"providerBankCode\":\"SLABL_INR\",\"providerBankName\":\"Subhadra Local Area Bank Ltd\"},\n  {\"providerBankCode\":\"SSSB_INR\",\"providerBankName\":\"Suco Souharda Sahakari Bank\"},\n  {\"providerBankCode\":\"SSFBL_INR\",\"providerBankName\":\"Suryoday Small Finance Bank Ltd\"},\n  {\"providerBankCode\":\"SYNB_INR\",\"providerBankName\":\"Syndicate Bank\"},\n  {\"providerBankCode\":\"TNGB_INR\",\"providerBankName\":\"Tamil Nadu Grama Bank\"},\n  {\"providerBankCode\":\"TMBL_INR\",\"providerBankName\":\"Tamilnad Mercantile Bank Limited\"},\n  {\"providerBankCode\":\"TGB_INR\",\"providerBankName\":\"Tripura Gramin Bank\"},\n  {\"providerBankCode\":\"UCOB_INR\",\"providerBankName\":\"UCO Bank\"},\n  {\"providerBankCode\":\"UBGB_INR\",\"providerBankName\":\"UTTAR BIHAR GRAMIN BANK\"},\n  {\"providerBankCode\":\"UJVB_INR\",\"providerBankName\":\"Ujjivan Small Finance Bank\"},\n  {\"providerBankCode\":\"UBOI_INR\",\"providerBankName\":\"Union Bank of India\"},\n  {\"providerBankCode\":\"UKGB_INR\",\"providerBankName\":\"Uttarakhand Gramin Bank\"},\n  {\"providerBankCode\":\"VGB_INR\",\"providerBankName\":\"Vananchal Gramin Bank\"},\n  {\"providerBankCode\":\"VKGB_INR\",\"providerBankName\":\"Vidharbha Konkan Gramin Bank\"},\n  {\"providerBankCode\":\"VIJB_INR\",\"providerBankName\":\"Vijaya Bank\"},\n  {\"providerBankCode\":\"YES_INR\",\"providerBankName\":\"YES BANK\"},\n  {\"providerBankCode\":\"SARASWAT_INR\",\"providerBankName\":\"Saraswat Bank\"},\n  {\"providerBankCode\":\"HSBC_INR\",\"providerBankName\":\"HSBC Bank\"},\n  {\"providerBankCode\":\"IOB_INR\",\"providerBankName\":\"Indian Overseas Bank\"},\n  {\"providerBankCode\":\"SBOI_INR\",\"providerBankName\":\"State Bank of India\"},\n  {\"providerBankCode\":\"UBI_INR\",\"providerBankName\":\"United Bank of India\"},\n  {\"providerBankCode\":\"UGB_INR\",\"providerBankName\":\"Utkal Grameen Bank\"},\n  {\"providerBankCode\":\"USFB_INR\",\"providerBankName\":\"Utkarsh Small Finance Bank\"},\n  {\"providerBankCode\":\"UBKGB_INR\",\"providerBankName\":\"Uttar Banga Kshetriya Gramin Bank\"},\n  {\"providerBankCode\":\"TSGB_INR\",\"providerBankName\":\"Telangana grameena bank\"}\n]\n"
+              },
+              {
+                "key": "providerBankDetails",
+              "value": "{{pspConfig.payrock}}"
+              },
+              {
+                "key": "returnUrl",
+                "mappings": [
+                  {
+                    "value": "/showProvider/payout/"
+                  },
+                  {
+                    "value": "{{payout.payoutId}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "data",
+            "mappings": [
+              {
+                "key": "accountName",
+                "value": "{{payout.beneficiaryDetail.bankAccountName}}"
+              },
+              {
+                "key": "accountNumber",
+                "value": "{{payout.beneficiaryDetail.bankAccountNumber}}"
+              },
+              {
+                "key": "bankCode",
+                "value": "{{payout.beneficiaryDetail.swiftCode}}"
+              },
+              {
+                "key": "bankName",
+                "value": "{{payout.beneficiaryDetail.bankName}}"
+              },
+              {
+                "key": "ifsc",
+                "value": "{{payout.beneficiaryDetail.ifscCode}}"
+              },
+              {
+                "key": "city",
+                "value": "{{payout.client.city}}",
+                "required": false
+              },
+              {
+                "key": "state",
+                "value": "{{payout.client.stateCode}}",
+                "required": false
+              },
+              {
+                "key": "street",
+                "value": "{{payout.client.street_address}}",
+                "required": false
+              },
+              {
+                "key": "address",
+                "value": "{{payout.client.street_address}}",
+                "required": false
+              },
+              {
+                "key": "postalCode",
+                "value": "{{payout.client.zip_code}}",
+                "required": false
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "hash",
+            "mappings": [
+              {
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0
+                    }
+                  }
+                ]
+              },
+              {
+                "value": ";",
+                "required": true
+              },
+              {
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "value": ";",
+                "required": true
+              },
+              {
+                "value": "{{payout.payoutId}}",
+                "required": true
+              },
+              {
+                "value": ";",
+                "required": true
+              },
+              {
+                "value": "{{purchase.fx_Amount}}",
+                "mappings": [
+                  {
+                    "value": "{{purchase.fx_Amount}}",
+                    "operations": [
+                      {
+                        "name": "STRING_TO_BIGDECIMAL"
+                      },
+                      {
+                        "name": "DOUBLE_TO_CEIL"
+                      },
+                      {
+                        "name": "DOUBLE_TO_STRING"
+                      }
+                    ]
+                  },
+                  {
+                    "value": "0",
+                    "required": true
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  }
+                ],
+                "required": true
+              },
+              {
+                "value": ";",
+                "required": true
+              },
+              {
+                "value": "{{purchase.fx_Currency}}",
+                "required": true
+              },
+              {
+                "value": ";",
+                "required": true
+              },
+              {
+                "value": "{{purchase.client.country}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "STRING_TO_UPPERCASE"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              },
+              {
+                "name": "COMPUTE_SHA_HASH",
+                "params": {
+                  "algorithm": "SHA256",
+                  "outputFormat": "HEX"
+                }
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse0.reference}}"
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse0.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "fail",
+                  "mappings": [
+                    {
+                      "from": "IN_PROGRESS",
+                      "to": "success"
+                    },
+                    {
+                      "from": "SUCCESS",
+                      "to": "success"
+                    },
+                    {
+                      "from": "PENDING",
+                      "to": "success"
+                    },
+                    {
+                      "from": "FAILED",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "FAILURE",
+                      "to": "fail"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse0.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "fail",
+                  "mappings": [
+                    {
+                      "from": "IN_PROGRESS",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "PENDING",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "FAILED",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "FAILURE",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "SUCCESS",
+                      "to": "paid"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "expireInMin",
+            "mappings": [
+              {
+                "value": "{{purchase.purchase.expireInMin}}"
+              },
+              {
+                "value": "7200"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "value": "{{pspResponse0.message}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]
