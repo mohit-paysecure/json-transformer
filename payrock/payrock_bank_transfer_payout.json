@@ -77,7 +77,7 @@
           },
           {
             "key": "ipAddress",
-            "value": "{{s2s.remote_ip}}",
+            "value": "{{payout.clientIp}}",
             "operations": [
               {
                 "name": "SPLIT_STRING",
@@ -127,11 +127,11 @@
                 "required": true
               },
               {
-                "value": "/webhook/",
+                "value": "/webhook/payout/",
                 "required": true
               },
               {
-                "value": "{{purchase.bankname}}",
+                "value": "{{payout.bankname}}",
                 "required": true
               },
               {
@@ -290,6 +290,11 @@
                 "key": "postalCode",
                 "value": "{{payout.client.zip_code}}",
                 "required": false
+              },
+              {
+                "key": "mobile",
+                "value": "{{payout.client.phone}}",
+                "required": false
               }
             ],
             "operations": [
@@ -355,32 +360,7 @@
                 "required": true
               },
               {
-                "value": "{{purchase.fx_Amount}}",
-                "mappings": [
-                  {
-                    "value": "{{purchase.fx_Amount}}",
-                    "operations": [
-                      {
-                        "name": "STRING_TO_BIGDECIMAL"
-                      },
-                      {
-                        "name": "DOUBLE_TO_CEIL"
-                      },
-                      {
-                        "name": "DOUBLE_TO_STRING"
-                      }
-                    ]
-                  },
-                  {
-                    "value": "0",
-                    "required": true
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "LIST_VALUE_JOIN"
-                  }
-                ],
+                "value": "{{payout.fx_Amount}}",
                 "required": true
               },
               {
@@ -388,7 +368,7 @@
                 "required": true
               },
               {
-                "value": "{{purchase.fx_Currency}}",
+                "value": "{{payout.fx_Currency}}",
                 "required": true
               },
               {
@@ -396,7 +376,7 @@
                 "required": true
               },
               {
-                "value": "{{purchase.client.country}}",
+                "value": "{{payout.client.country}}",
                 "required": true,
                 "operations": [
                   {
@@ -499,22 +479,6 @@
                     }
                   ]
                 }
-              }
-            ]
-          },
-          {
-            "key": "expireInMin",
-            "mappings": [
-              {
-                "value": "{{purchase.purchase.expireInMin}}"
-              },
-              {
-                "value": "7200"
-              }
-            ],
-            "operations": [
-              {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
               }
             ]
           },

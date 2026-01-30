@@ -1,0 +1,406 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://gateway-dev.payrock.io/api/v1/payout",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "version",
+            "value": "2.0",
+            "required": true
+          },
+          {
+            "key": "merchantCode",
+            "mappings": [
+              {
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "amount",
+            "value": "{{payout.fx_Amount}}",
+            "required": true
+          },
+          {
+            "key": "ipAddress",
+            "value": "{{payout.clientIp}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": ","
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 0
+                }
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "paymentMethod",
+            "value": "BANK_TRANSFER",
+            "required": true
+          },
+          {
+            "key": "cartId",
+            "value": "{{payout.payoutId}}",
+            "required": true
+          },
+          {
+            "key": "country",
+            "value": "{{payout.client.country}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "STRING_TO_UPPERCASE"
+              }
+            ]
+          },
+          {
+            "key": "currency",
+            "value": "{{payout.fx_Currency}}",
+            "required": true
+          },
+          {
+            "key": "callbackUrl",
+            "mappings": [
+              {
+                "value": "{{extraParams.baseUrl}}",
+                "required": true
+              },
+              {
+                "value": "/webhook/payout/",
+                "required": true
+              },
+              {
+                "value": "{{payout.bankname}}",
+                "required": true
+              },
+              {
+                "value": "/",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "email",
+            "value": "{{payout.client.email}}",
+            "required": true
+          },
+          {
+            "key": "data",
+            "mappings": [
+              {
+                "key": "accountName",
+                "value": "{{payout.beneficiaryDetail.bankAccountName}}"
+              },
+              {
+                "key": "accountNumber",
+                "value": "{{payout.beneficiaryDetail.bankAccountNumber}}"
+              },
+              {
+                "key": "bankCode",
+                "value": "{{extraParams.providerBankCode}}"
+              },
+              {
+                "key": "bankName",
+                "value": "{{extraParams.providerBankName}}"
+              },
+              {
+                "key": "ifsc",
+                "value": "{{payout.beneficiaryDetail.ifscCode}}"
+              },
+              {
+                "key": "city",
+                "value": "{{payout.client.city}}",
+                "required": false
+              },
+              {
+                "key": "state",
+                "value": "{{payout.client.stateCode}}",
+                "required": false
+              },
+              {
+                "key": "street",
+                "value": "{{payout.client.street_address}}",
+                "required": false
+              },
+              {
+                "key": "address",
+                "value": "{{payout.client.street_address}}",
+                "required": false
+              },
+              {
+                "key": "postalCode",
+                "value": "{{payout.client.zip_code}}",
+                "required": false
+              },
+              {
+                "key": "mobile",
+                "value": "{{payout.client.phone}}",
+                "required": false
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "hash",
+            "mappings": [
+              {
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0
+                    }
+                  }
+                ]
+              },
+              {
+                "value": ";",
+                "required": true
+              },
+              {
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "value": ";",
+                "required": true
+              },
+              {
+                "value": "{{payout.payoutId}}",
+                "required": true
+              },
+              {
+                "value": ";",
+                "required": true
+              },
+              {
+                "value": "{{payout.fx_Amount}}",
+                "required": true
+              },
+              {
+                "value": ";",
+                "required": true
+              },
+              {
+                "value": "{{payout.fx_Currency}}",
+                "required": true
+              },
+              {
+                "value": ";",
+                "required": true
+              },
+              {
+                "value": "{{payout.client.country}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "STRING_TO_UPPERCASE"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              },
+              {
+                "name": "COMPUTE_SHA_HASH",
+                "params": {
+                  "algorithm": "SHA256",
+                  "outputFormat": "HEX"
+                }
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse0.reference}}"
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse0.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "fail",
+                  "mappings": [
+                    {
+                      "from": "IN_PROGRESS",
+                      "to": "success"
+                    },
+                    {
+                      "from": "SUCCESS",
+                      "to": "success"
+                    },
+                    {
+                      "from": "PENDING",
+                      "to": "success"
+                    },
+                    {
+                      "from": "FAILED",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "FAILURE",
+                      "to": "fail"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse0.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "fail",
+                  "mappings": [
+                    {
+                      "from": "IN_PROGRESS",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "PENDING",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "FAILED",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "FAILURE",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "SUCCESS",
+                      "to": "paid"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "value": "{{pspResponse0.message}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]
