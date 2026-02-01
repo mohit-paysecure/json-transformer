@@ -1,0 +1,1207 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://try.access.worldpay.com/verifiedTokens/oneTime",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/vnd.worldpay.verified-tokens-v3.hal+json",
+            "required": true
+          },
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "Basic ",
+                "required": true
+              },
+              {
+                "mappings": [
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 0
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 1
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  },
+                  {
+                    "name": "BASE64_TRANSFORM",
+                    "params": {
+                      "mode": "ENCODE"
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "paymentInstrument",
+            "mappings": [
+              {
+                "key": "type",
+                "value": "card/plain",
+                "required": true
+              },
+              {
+                "key": "cardHolderName",
+                "mappings": [
+                  {
+                    "value": "{{purchase.client.full_name}}"
+                  },
+                  {
+                    "value": "{{cardInfo.cardholder_name}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              },
+              {
+                "key": "cardNumber",
+                "value": "{{cardInfo.number}}",
+                "required": true
+              },
+              {
+                "key": "cardExpiryDate",
+                "mappings": [
+                  {
+                    "key": "month",
+                    "value": "{{cardInfo.expireMonth}}",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "STRING_TO_INTEGER"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "year",
+                    "mappings": [
+                      {
+                        "value": "20"
+                      },
+                      {
+                        "value": "{{cardInfo.expireYear}}"
+                      }
+                    ],
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "LIST_VALUE_JOIN"
+                      },
+                      {
+                        "name": "STRING_TO_INTEGER"
+                      }
+                    ]
+                  }
+                ],
+                "required": true,
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ]
+              },
+              {
+                "key": "cvc",
+                "value": "{{cardInfo.cvc}}",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "narrative",
+            "mappings": [
+              {
+                "key": "line1",
+                "mappings": [
+                  {
+                    "value": "{{bankTransaction.product_info}}"
+                  },
+                  {
+                    "value": "PGS Payment"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "merchant",
+            "mappings": [
+              {
+                "key": "entity",
+                "value": "default",
+                "required": true
+              }
+            ],
+            "required": true,
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "verificationCurrency",
+            "value": "{{purchase.fx_Currency}}",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "tempObject",
+            "mappings": [
+              {
+                "key": "tokenHref",
+                "value": "{{pspResponse0._embedded.token.tokenPaymentInstrument.href}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "schemeTransactionReference",
+                "value": "{{pspResponse0._embedded.token.schemeTransactionReference}}",
+                "storeIn": "worldpay"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{store.worldpay.tokenHref}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": false,
+                      "to": "payment_in_process"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{store.worldpay.tokenHref}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": "fail"
+                    },
+                    {
+                      "from": false,
+                      "to": "success"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.message}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://try.access.worldpay.com/verifications/customers/3ds/deviceDataInitialization",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/vnd.worldpay.verifications.customers-v3.hal+json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.worldpay.verifications.customers-v3.hal+json",
+            "required": true
+          },
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "Basic ",
+                "required": true
+              },
+              {
+                "mappings": [
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 0
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 1
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  },
+                  {
+                    "name": "BASE64_TRANSFORM",
+                    "params": {
+                      "mode": "ENCODE"
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "transactionReference",
+            "value": "{{purchase.purchaseId}}",
+            "required": true
+          },
+          {
+            "key": "merchant",
+            "mappings": [
+              {
+                "key": "entity",
+                "value": "default",
+                "required": true
+              }
+            ],
+            "required": true,
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "paymentInstrument",
+            "mappings": [
+              {
+                "key": "type",
+                "value": "card/front",
+                "required": true
+              },
+              {
+                "key": "cardNumber",
+                "value": "{{cardInfo.number}}",
+                "required": true
+              },
+              {
+                "key": "cardExpiryDate",
+                "mappings": [
+                  {
+                    "key": "month",
+                    "value": "{{cardInfo.expireMonth}}",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "STRING_TO_INTEGER"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "year",
+                    "mappings": [
+                      {
+                        "value": "20"
+                      },
+                      {
+                        "value": "{{cardInfo.expireYear}}"
+                      }
+                    ],
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "LIST_VALUE_JOIN"
+                      },
+                      {
+                        "name": "STRING_TO_INTEGER"
+                      }
+                    ]
+                  }
+                ],
+                "required": true,
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "tempObject",
+            "mappings": [
+              {
+                "key": "ddcJwt",
+                "value": "{{pspResponse1.deviceDataCollection.jwt}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "ddcUrl",
+                "value": "{{pspResponse1.deviceDataCollection.url}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "ddcBin",
+                "value": "{{pspResponse1.deviceDataCollection.bin}}",
+                "storeIn": "worldpay"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "payment_in_process"
+          },
+          {
+            "key": "code",
+            "value": "success"
+          },
+          {
+            "key": "message",
+            "value": "Device data collection initialized"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://try.access.worldpay.com/verifications/customers/3ds/authentication",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/vnd.worldpay.verifications.customers-v3.hal+json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.worldpay.verifications.customers-v3.hal+json",
+            "required": true
+          },
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "Basic ",
+                "required": true
+              },
+              {
+                "mappings": [
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 0
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 1
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  },
+                  {
+                    "name": "BASE64_TRANSFORM",
+                    "params": {
+                      "mode": "ENCODE"
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "transactionReference",
+            "value": "{{purchase.purchaseId}}",
+            "required": true
+          },
+          {
+            "key": "merchant",
+            "mappings": [
+              {
+                "key": "entity",
+                "value": "default",
+                "required": true
+              }
+            ],
+            "required": true,
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "instruction",
+            "mappings": [
+              {
+                "key": "value",
+                "mappings": [
+                  {
+                    "key": "currency",
+                    "value": "{{purchase.fx_Currency}}",
+                    "required": true
+                  },
+                  {
+                    "key": "amount",
+                    "mappings": [
+                      {
+                        "value": "{{purchase.fx_Amount}}",
+                        "required": true,
+                        "operations": [
+                          {
+                            "name": "STRING_TO_DOUBLE"
+                          }
+                        ]
+                      },
+                      {
+                        "value": "100",
+                        "required": true,
+                        "operations": [
+                          {
+                            "name": "STRING_TO_DOUBLE"
+                          }
+                        ]
+                      }
+                    ],
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "LIST_VALUE_MULTIPLY"
+                      },
+                      {
+                        "name": "DOUBLE_TO_FLOOR"
+                      }
+                    ]
+                  }
+                ],
+                "required": true,
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ]
+              },
+              {
+                "key": "paymentInstrument",
+                "mappings": [
+                  {
+                    "key": "type",
+                    "value": "card/tokenized",
+                    "required": true
+                  },
+                  {
+                    "key": "href",
+                    "value": "{{store.worldpay.tokenHref}}",
+                    "required": true
+                  }
+                ],
+                "required": true,
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ]
+              }
+            ],
+            "required": true,
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "deviceData",
+            "mappings": [
+              {
+                "key": "acceptHeader",
+                "value": "{{s2s.accept_header}}",
+                "required": true
+              },
+              {
+                "key": "userAgentHeader",
+                "value": "{{s2s.user_agent}}",
+                "required": true
+              },
+              {
+                "key": "browserLanguage",
+                "mappings": [
+                  {
+                    "value": "{{s2s.browser_language}}"
+                  },
+                  {
+                    "value": "en-GB"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              },
+              {
+                "key": "browserJavaEnabled",
+                "mappings": [
+                  {
+                    "value": "{{s2s.java_enabled}}"
+                  },
+                  {
+                    "value": true
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              },
+              {
+                "key": "browserColorDepth",
+                "mappings": [
+                  {
+                    "value": "{{s2s.color_depth}}"
+                  },
+                  {
+                    "value": "24"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              },
+              {
+                "key": "browserScreenHeight",
+                "mappings": [
+                  {
+                    "value": "{{s2s.screen_height}}"
+                  },
+                  {
+                    "value": 1080
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              },
+              {
+                "key": "browserScreenWidth",
+                "mappings": [
+                  {
+                    "value": "{{s2s.screen_width}}"
+                  },
+                  {
+                    "value": 1920
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              },
+              {
+                "key": "timeZone",
+                "mappings": [
+                  {
+                    "value": "{{s2s.time_zone}}"
+                  },
+                  {
+                    "value": "-330"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              },
+              {
+                "key": "browserJavascriptEnabled",
+                "mappings": [
+                  {
+                    "value": "{{s2s.javascript_enabled}}"
+                  },
+                  {
+                    "value": true
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              },
+              {
+                "key": "ipAddress",
+                "mappings": [
+                  {
+                    "value": "{{s2s.remote_ip}}"
+                  },
+                  {
+                    "value": "{{s2s.ip_address}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              }
+            ],
+            "required": true,
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "challenge",
+            "mappings": [
+              {
+                "key": "windowSize",
+                "mappings": [
+                  {
+                    "value": "{{s2s.challenge_window_size}}"
+                  },
+                  {
+                    "value": "fullPage"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              },
+              {
+                "key": "preference",
+                "mappings": [
+                  {
+                    "value": "{{s2s.challenge_preference}}"
+                  },
+                  {
+                    "value": "noPreference"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              },
+              {
+                "key": "returnUrl",
+                "mappings": [
+                  {
+                    "value": "{{extraParams.baseUrl}}",
+                    "required": true
+                  },
+                  {
+                    "value": "/custRedirect/",
+                    "required": true
+                  },
+                  {
+                    "value": "{{purchase.bankid}}",
+                    "required": true
+                  },
+                  {
+                    "value": "/",
+                    "required": true
+                  },
+                  {
+                    "value": "{{purchase.purchaseId}}",
+                    "required": true
+                  },
+                  {
+                    "value": "/",
+                    "required": true
+                  }
+                ],
+                "required": true,
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  }
+                ]
+              }
+            ],
+            "required": true,
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "outcome",
+            "value": "{{pspResponse2.outcome}}",
+            "hidden": true,
+            "storeIn": "worldpay"
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse2.authentication.transactionId}}"
+          },
+          {
+            "key": "tempObject",
+            "mappings": [
+              {
+                "key": "eci",
+                "value": "{{pspResponse2.authentication.eci}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "authenticationValue",
+                "value": "{{pspResponse2.authentication.authenticationValue}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "transactionId",
+                "value": "{{pspResponse2.authentication.transactionId}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "version",
+                "value": "{{pspResponse2.authentication.version}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "challengeReference",
+                "value": "{{pspResponse2.challenge.reference}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "challengeUrl",
+                "value": "{{pspResponse2.challenge.url}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "challengeJwt",
+                "value": "{{pspResponse2.challenge.jwt}}",
+                "storeIn": "worldpay"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse2.outcome}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "fail",
+                  "mappings": [
+                    {
+                      "from": "authenticated",
+                      "to": "success"
+                    },
+                    {
+                      "from": "challenged",
+                      "to": "success"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse2.outcome}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "failed",
+                  "mappings": [
+                    {
+                      "from": "authenticated",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "challenged",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "authenticationFailed",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "unavailable",
+                      "to": "payment_failed"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse2.message}}"
+              },
+              {
+                "value": "{{pspResponse2.validationErrors0.message}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "isChallenge",
+            "value": "{{pspResponse2.outcome}}",
+            "storeIn": "worldpay",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": true,
+                  "mappings": [
+                    {
+                      "from": "challenged",
+                      "to": false
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "redirectUrl",
+            "mappings": [
+              {
+                "key": "postUrl",
+                "value": "{{store.worldpay.challengeUrl}}"
+              },
+              {
+                "key": "JWT",
+                "value": "{{store.worldpay.challengeJwt}}"
+              },
+              {
+                "key": "reference",
+                "value": "{{store.worldpay.challengeReference}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GENERATE_HTML",
+                "params": {
+                  "htmlRenderMode": "FORM_SUBMISSION"
+                }
+              }
+            ],
+            "skipIf": "{{store.worldpay.isChallenge}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]

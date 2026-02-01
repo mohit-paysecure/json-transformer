@@ -1,0 +1,273 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://try.access.worldpay.com/verifications/customers/3ds/verification",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/vnd.worldpay.verifications.customers-v3.hal+json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.worldpay.verifications.customers-v3.hal+json",
+            "required": true
+          },
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "Basic ",
+                "required": true
+              },
+              {
+                "mappings": [
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 0
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 1
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  },
+                  {
+                    "name": "BASE64_TRANSFORM",
+                    "params": {
+                      "mode": "ENCODE"
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "transactionReference",
+            "value": "{{purchase.purchaseId}}",
+            "required": true
+          },
+          {
+            "key": "merchant",
+            "mappings": [
+              {
+                "key": "entity",
+                "value": "default",
+                "required": true
+              }
+            ],
+            "required": true,
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "challenge",
+            "mappings": [
+              {
+                "key": "reference",
+                "value": "{{bankTransaction.tempObject.challengeReference}}",
+                "required": true
+              }
+            ],
+            "required": true,
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse0.authentication.transactionId}}"
+          },
+          {
+            "key": "tempObject",
+            "mappings": [
+              {
+                "key": "eci",
+                "value": "{{pspResponse0.authentication.eci}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "authenticationValue",
+                "value": "{{pspResponse0.authentication.authenticationValue}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "transactionId",
+                "value": "{{pspResponse0.authentication.transactionId}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "version",
+                "value": "{{pspResponse0.authentication.version}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "status",
+                "value": "{{pspResponse0.status}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "enrolled",
+                "value": "{{pspResponse0.enrolled}}",
+                "storeIn": "worldpay"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse0.outcome}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "fail",
+                  "mappings": [
+                    {
+                      "from": "authenticated",
+                      "to": "success"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse0.outcome}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "payment_failed",
+                  "mappings": [
+                    {
+                      "from": "authenticated",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "authenticationFailed",
+                      "to": "failed"
+                    },
+                    {
+                      "from": "unavailable",
+                      "to": "failed"
+                    },
+                    {
+                      "from": "signatureFailed",
+                      "to": "failed"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.message}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]
