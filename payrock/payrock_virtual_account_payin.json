@@ -280,21 +280,7 @@
               {
                 "key": "dob",
                 "value": "{{purchase.client.date_of_birth}}",
-                "required": true,
-                "operations": [
-                  {
-                    "name": "STRING_DATE_TO_EPOCH",
-                    "params": {
-                      "dateFormat": "yyyy-dd-MM"
-                    }
-                  },
-                  {
-                    "name": "EPOCH_TO_STRING_DATE",
-                    "params": {
-                      "dateFormat": "yyyy-MM-dd"
-                    }
-                  }
-                ]
+                "required": true
               }
             ],
             "operations": [
