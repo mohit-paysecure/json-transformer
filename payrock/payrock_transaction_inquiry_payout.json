@@ -202,7 +202,7 @@
               {
                 "name": "VALUE_MAPPER",
                 "params": {
-                  "defaultValue": "fail",
+                  "defaultValue": "payment_failed",
                   "mappings": [
                     {
                       "from": "SUCCESS",
@@ -210,15 +210,15 @@
                     },
                     {
                       "from": "FAILED",
-                      "to": "fail"
+                      "to": "payment_failed"
                     },
                     {
                       "from": "PENDING",
-                      "to": "payment_in_process"
+                      "to": "payout_in_process"
                     },
                     {
                       "from": "IN_PROGRESS",
-                      "to": "payment_in_process"
+                      "to": "payout_in_process"
                     }
                   ]
                 }
