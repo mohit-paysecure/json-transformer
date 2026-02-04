@@ -1,0 +1,349 @@
+[
+  {
+    "requestMapping": {
+      "method": "GET",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://try.access.worldpay.com/paymentQueries/payments?transactionReference=",
+            "required": true
+          },
+          {
+            "value": "{{purchase.purchaseId}}",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Accept",
+            "value": "application/vnd.worldpay.payment-queries-v1.hal+json",
+            "required": true
+          },
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "Basic ",
+                "required": true
+              },
+              {
+                "mappings": [
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 0
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 1
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  },
+                  {
+                    "name": "BASE64_TRANSFORM",
+                    "params": {
+                      "mode": "ENCODE"
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "paymentsNotFound",
+            "value": "{{pspResponse0._embedded.payments}}",
+            "hidden": true,
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              }
+            ]
+          },
+          {
+            "key": "lastEvent",
+            "value": "{{pspResponse0._embedded.payments0.lastEvent}}",
+            "hidden": true,
+            "skipIf": "{{store.worldpay.paymentsNotFound}}"
+          },
+          {
+            "key": "status",
+            "skipIf": "{{store.worldpay.paymentsNotFound}}",
+            "value": "{{store.worldpay.lastEvent}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "payment_in_process",
+                  "mappings": [
+                    {
+                      "from": "saleSucceeded",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "settlementRequestSubmitted",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "authorizationRequested",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "saleRequested",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "settlementRequested",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "refundRequested",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "cancellationRequested",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "reversalRequested",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "authorizationRefused",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "authorizationFailed",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "authorizationTimedOut",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "saleRefused",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "saleFailed",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "saleTimedOut",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "settlementRequestSubmissionFailed",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "settlementRequestSubmissionTimedOut",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "refundRequestSubmissionFailed",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "refundRequestSubmissionTimedOut",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "cancellationFailed",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "cancellationRequestSubmissionTimedOut",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "reversalRequestSubmissionFailed",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "reversalRequestSubmissionTimedOut",
+                      "to": "payment_failed"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{store.worldpay.lastEvent}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "fail",
+                  "mappings": [
+                    {
+                      "from": "saleSucceeded",
+                      "to": "success"
+                    },
+                    {
+                      "from": "settlementRequestSubmitted",
+                      "to": "success"
+                    },
+                    {
+                      "from": "authorizationRequested",
+                      "to": "success"
+                    },
+                    {
+                      "from": "saleRequested",
+                      "to": "success"
+                    },
+                    {
+                      "from": "settlementRequested",
+                      "to": "success"
+                    },
+                    {
+                      "from": "refundRequested",
+                      "to": "success"
+                    },
+                    {
+                      "from": "cancellationRequested",
+                      "to": "success"
+                    },
+                    {
+                      "from": "reversalRequested",
+                      "to": "success"
+                    },
+                    {
+                      "from": "authorizationRefused",
+                      "to": "error"
+                    },
+                    {
+                      "from": "authorizationFailed",
+                      "to": "error"
+                    },
+                    {
+                      "from": "authorizationTimedOut",
+                      "to": "error"
+                    },
+                    {
+                      "from": "saleRefused",
+                      "to": "error"
+                    },
+                    {
+                      "from": "saleFailed",
+                      "to": "error"
+                    },
+                    {
+                      "from": "saleTimedOut",
+                      "to": "error"
+                    },
+                    {
+                      "from": "settlementRequestSubmissionFailed",
+                      "to": "error"
+                    },
+                    {
+                      "from": "settlementRequestSubmissionTimedOut",
+                      "to": "error"
+                    },
+                    {
+                      "from": "refundRequestSubmissionFailed",
+                      "to": "error"
+                    },
+                    {
+                      "from": "refundRequestSubmissionTimedOut",
+                      "to": "error"
+                    },
+                    {
+                      "from": "cancellationFailed",
+                      "to": "error"
+                    },
+                    {
+                      "from": "cancellationRequestSubmissionTimedOut",
+                      "to": "error"
+                    },
+                    {
+                      "from": "reversalRequestSubmissionFailed",
+                      "to": "error"
+                    },
+                    {
+                      "from": "reversalRequestSubmissionTimedOut",
+                      "to": "error"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]
