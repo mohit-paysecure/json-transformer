@@ -292,9 +292,20 @@
                 "required": false
               },
               {
-                "key": "mobile",
-                "value": "{{payout.client.phone}}",
-                "required": false
+                "key": "mobileNumber",
+                "value": "{{purchase.client.phone}}",
+                "operations": [
+                  {
+                    "name": "SUB_STRING",
+                    "params": {
+                      "fromIndex": 9,
+                      "toIndex": 0,
+                      "fromIndexFromLast": true,
+                      "toIndexFromLast": true
+                    }
+                  }
+                ],
+                "required": true
               }
             ],
             "operations": [
