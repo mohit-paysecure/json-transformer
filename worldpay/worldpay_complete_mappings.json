@@ -6,7 +6,11 @@
         "mappings": [
           {
             "value": "https://try.access.worldpay.com/verifiedTokens/oneTime",
-            "required": true
+            "skipIf": "{{store.worldpay.isRecurring}}"
+          },
+          {
+            "value": "https://try.access.worldpay.com/cardPayments/merchantInitiatedTransactions",
+            "skipIf": "{{store.worldpay.isMandate}}"
           }
         ],
         "operations": [
@@ -20,7 +24,17 @@
           {
             "key": "Content-Type",
             "value": "application/vnd.worldpay.verified-tokens-v3.hal+json",
-            "required": true
+            "skipIf": "{{store.worldpay.isRecurring}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/vnd.worldpay.payments-v7+json",
+            "skipIf": "{{store.worldpay.isMandate}}"
+          },
+          {
+            "key": "Accept",
+            "value": "application/vnd.worldpay.payments-v7+json",
+            "skipIf": "{{store.worldpay.isMandate}}"
           },
           {
             "key": "Authorization",
@@ -101,7 +115,52 @@
       "body": {
         "mappings": [
           {
+            "key": "isMandate",
+            "value": "{{purchase.paymentType}}",
+            "hidden": true,
+            "storeIn": "worldpay",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": false,
+                  "mappings": [
+                    {
+                      "from": "MANDATE",
+                      "to": true
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "isRecurring",
+            "value": "{{purchase.paymentType}}",
+            "hidden": true,
+            "storeIn": "worldpay",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": false,
+                  "mappings": [
+                    {
+                      "from": "RECURRING",
+                      "to": true
+                    },
+                    {
+                      "from": "INTERNAL_RECURRING",
+                      "to": true
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
             "key": "paymentInstrument",
+            "skipIf": "{{store.worldpay.isRecurring}}",
             "mappings": [
               {
                 "key": "type",
@@ -180,11 +239,11 @@
               {
                 "name": "KEY_VALUE_LIST_TO_OBJECT"
               }
-            ],
-            "required": true
+            ]
           },
           {
             "key": "narrative",
+            "skipIf": "{{store.worldpay.isRecurring}}",
             "mappings": [
               {
                 "key": "line1",
@@ -218,7 +277,6 @@
                 "required": true
               }
             ],
-            "required": true,
             "operations": [
               {
                 "name": "KEY_VALUE_LIST_TO_OBJECT"
@@ -228,7 +286,214 @@
           {
             "key": "verificationCurrency",
             "value": "{{purchase.fx_Currency}}",
-            "required": true
+            "skipIf": "{{store.worldpay.isRecurring}}"
+          },
+          {
+            "key": "transactionReference",
+            "value": "{{purchase.purchaseId}}",
+            "skipIf": "{{store.worldpay.isMandate}}"
+          },
+          {
+            "key": "transactionContext",
+            "skipIf": "{{store.worldpay.isMandate}}",
+            "mappings": [
+              {
+                "key": "id",
+                "value": "{{purchase.mandateId}}",
+                "required": true
+              },
+              {
+                "key": "idType",
+                "value": "mandateId",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "GET_TRANSACTION_CONTEXT_BY_ID",
+                "params": {}
+              }
+            ],
+            "storeIn": "worldpay",
+            "hidden": true
+          },
+          {
+            "key": "instruction",
+            "skipIf": "{{store.worldpay.isMandate}}",
+            "mappings": [
+              {
+                "key": "value",
+                "mappings": [
+                  {
+                    "key": "currency",
+                    "value": "{{purchase.fx_Currency}}",
+                    "required": true
+                  },
+                  {
+                    "key": "amount",
+                    "mappings": [
+                      {
+                        "value": "{{purchase.fx_Amount}}",
+                        "required": true,
+                        "operations": [
+                          {
+                            "name": "STRING_TO_DOUBLE"
+                          }
+                        ]
+                      },
+                      {
+                        "value": "100",
+                        "required": true,
+                        "operations": [
+                          {
+                            "name": "STRING_TO_INTEGER"
+                          }
+                        ]
+                      }
+                    ],
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "LIST_VALUE_MULTIPLY"
+                      },
+                      {
+                        "name": "DOUBLE_TO_FLOOR"
+                      }
+                    ]
+                  }
+                ],
+                "required": true,
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ]
+              },
+              {
+                "key": "paymentInstrument",
+                "skipIf": "{{store.worldpay.isMandate}}",
+                "mappings": [
+                  {
+                    "key": "type",
+                    "value": "card/token"
+                  },
+                  {
+                    "key": "href",
+                    "value": "{{store.worldpay.transactionContext.mandate.pspRecurringToken}}",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 0
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "required": true,
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ]
+              },
+              {
+                "key": "customerAgreement",
+                "skipIf": "{{store.worldpay.isMandate}}",
+                "mappings": [
+                  {
+                    "key": "type",
+                    "value": "subscription"
+                  },
+                  {
+                    "key": "schemeReference",
+                    "value": "{{store.worldpay.transactionContext.mandate.pspRecurringToken}}",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 1
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ]
+              },
+              {
+                "key": "requestAutoSettlement",
+                "skipIf": "{{store.worldpay.isMandate}}",
+                "mappings": [
+                  {
+                    "key": "enabled",
+                    "value": "true",
+                    "operations": [
+                      {
+                        "name": "STRING_TO_BOOLEAN"
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ]
+              },
+              {
+                "key": "narrative",
+                "skipIf": "{{store.worldpay.isMandate}}",
+                "mappings": [
+                  {
+                    "key": "line1",
+                    "mappings": [
+                      {
+                        "value": "{{bankTransaction.product_info}}"
+                      },
+                      {
+                        "value": "PGS Payment"
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "GET_FIRST_NON_EMPTY_STRING"
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
           }
         ],
         "operations": [
@@ -243,6 +508,7 @@
         "mappings": [
           {
             "key": "tempObject",
+            "skipIf": "{{store.worldpay.isRecurring}}",
             "mappings": [
               {
                 "key": "tokenHref",
@@ -262,7 +528,28 @@
             ]
           },
           {
+            "skipIf": "{{store.worldpay.isRecurring}}",
+            "key": "mandateReferenceId",
+            "mappings": [
+              {
+                "value": "{{pspResponse0._embedded.token.tokenPaymentInstrument.href}}"
+              },
+              {
+                "value": "##"
+              },
+              {
+                "value": "{{pspResponse0._embedded.token.schemeTransactionReference}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
+          },
+          {
             "key": "status",
+            "skipIf": "{{store.worldpay.isRecurring}}",
             "value": "{{store.worldpay.tokenHref}}",
             "operations": [
               {
@@ -288,6 +575,7 @@
           {
             "key": "code",
             "value": "{{store.worldpay.tokenHref}}",
+            "skipIf": "{{store.worldpay.isRecurring}}",
             "operations": [
               {
                 "name": "CHECK_IF_NULL"
@@ -322,6 +610,75 @@
             "operations": [
               {
                 "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse0.outcome}}",
+            "skipIf": "{{store.worldpay.isMandate}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "failed",
+                  "mappings": [
+                    {
+                      "from": "Sent for Settlement",
+                      "to": "success"
+                    },
+                    {
+                      "from": "Authorized",
+                      "to": "success"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "skipIf": "{{store.worldpay.isMandate}}",
+            "value": "{{pspResponse0.outcome}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "failed",
+                  "mappings": [
+                    {
+                      "from": "Sent for Settlement",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "Authorized",
+                      "to": "paid"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "skipPspCount",
+            "value": "{{pspResponse0.outcome}}",
+            "skipIf": "{{store.worldpay.isMandate}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": 0,
+                  "mappings": [
+                    {
+                      "from": "Sent for Settlement",
+                      "to": 2
+                    },
+                    {
+                      "from": "Authorized",
+                      "to": 2
+                    }
+                  ]
+                }
               }
             ]
           }
