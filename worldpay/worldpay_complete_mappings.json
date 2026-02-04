@@ -159,6 +159,52 @@
             ]
           },
           {
+            "key": "paymentTypeValid",
+            "value": "{{purchase.paymentType}}",
+            "hidden": true,
+            "storeIn": "worldpay",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": false,
+                  "mappings": [
+                    {
+                      "from": "MANDATE",
+                      "to": true
+                    },
+                    {
+                      "from": "RECURRING",
+                      "to": true
+                    },
+                    {
+                      "from": "INTERNAL_RECURRING",
+                      "to": true
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "requestValidationMessage",
+            "value": "{{store.worldpay.paymentTypeValid}}",
+            "skipIf": "{{store.worldpay.paymentTypeValid}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "Invalid Payment Type So Can Not Perform Mandate"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
             "key": "paymentInstrument",
             "skipIf": "{{store.worldpay.isRecurring}}",
             "mappings": [
@@ -658,6 +704,11 @@
                 }
               }
             ]
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse0.paymentId}}",
+            "skipIf": "{{store.worldpay.isMandate}}"
           },
           {
             "key": "skipPspCount",
