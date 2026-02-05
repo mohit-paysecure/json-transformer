@@ -292,8 +292,8 @@
                 "required": false
               },
               {
-                "key": "mobileNumber",
-                "value": "{{purchase.client.phone}}",
+                "key": "mobile",
+                "value": "{{payout.client.phone}}",
                 "operations": [
                   {
                     "name": "SUB_STRING",
