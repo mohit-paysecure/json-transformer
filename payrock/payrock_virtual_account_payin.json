@@ -243,7 +243,8 @@
               {
                 "name": "GET_ELEMENT_AT_INDEX",
                 "params": {
-                  "index": 1
+                  "index": 0,
+                  "fromLast": true
                 }
               }
             ],

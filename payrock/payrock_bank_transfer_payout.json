@@ -72,7 +72,31 @@
           },
           {
             "key": "amount",
-            "value": "{{payout.fx_Amount}}",
+            "mappings": [
+              {
+                "value": "{{payout.fx_Amount}}",
+                "operations": [
+                  {
+                    "name": "STRING_TO_BIGDECIMAL"
+                  },
+                  {
+                    "name": "DOUBLE_TO_CEIL"
+                  },
+                  {
+                    "name": "DOUBLE_TO_STRING"
+                  }
+                ]
+              },
+              {
+                "value": "0",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
             "required": true
           },
           {
@@ -247,6 +271,65 @@
             "key": "data",
             "mappings": [
               {
+                "key": "firstName",
+                "mappings": [
+                  {
+                    "value": "{{payout.client.full_name}}"
+                  },
+                  {
+                    "value": "John"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  },
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "\\s+"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0
+                    }
+                  }
+                ],
+                "required": true
+              },
+              {
+                "key": "lastName",
+                "mappings": [
+                  {
+                    "value": "{{payout.client.full_name}}"
+                  },
+                  {
+                    "value": "Doe"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  },
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "\\s+"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0,
+                      "fromLast": true
+                    }
+                  }
+                ],
+                "required": true
+              },
+              {
                 "key": "accountName",
                 "value": "{{payout.beneficiaryDetail.bankAccountName}}"
               },
@@ -372,6 +455,31 @@
               },
               {
                 "value": "{{payout.fx_Amount}}",
+                "mappings": [
+                  {
+                    "value": "{{purchase.fx_Amount}}",
+                    "operations": [
+                      {
+                        "name": "STRING_TO_BIGDECIMAL"
+                      },
+                      {
+                        "name": "DOUBLE_TO_CEIL"
+                      },
+                      {
+                        "name": "DOUBLE_TO_STRING"
+                      }
+                    ]
+                  },
+                  {
+                    "value": "0",
+                    "required": true
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  }
+                ],
                 "required": true
               },
               {
