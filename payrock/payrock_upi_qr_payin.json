@@ -5,7 +5,7 @@
       "url": {
         "mappings": [
           {
-            "value": "https://gateway-dev.payrock.io/api/v1/payin",
+            "value": "https://gateway.payment88.io/api/v1/payin",
             "required": true
           }
         ],
@@ -77,7 +77,7 @@
                 "value": "{{purchase.fx_Amount}}",
                 "operations": [
                   {
-                    "name": "STRING_TO_BIGDECIMAL"
+                    "name": "STRING_TO_DOUBLE"
                   },
                   {
                     "name": "DOUBLE_TO_CEIL"
@@ -397,7 +397,7 @@
                     "value": "{{purchase.fx_Amount}}",
                     "operations": [
                       {
-                        "name": "STRING_TO_BIGDECIMAL"
+                        "name": "STRING_TO_DOUBLE"
                       },
                       {
                         "name": "DOUBLE_TO_CEIL"

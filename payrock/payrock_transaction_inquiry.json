@@ -5,7 +5,7 @@
       "url": {
         "mappings": [
           {
-            "value": "https://gateway-dev.payrock.io/api/v1/payin/status",
+            "value": "https://gateway.payment88.io/api/v1/payin/status",
             "required": true
           }
         ],
