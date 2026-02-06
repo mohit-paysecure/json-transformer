@@ -107,7 +107,7 @@
                     "value": "{{purchase.fx_Amount}}",
                     "operations": [
                       {
-                        "name": "STRING_TO_BIGDECIMAL"
+                        "name": "STRING_TO_DOUBLE"
                       },
                       {
                         "name": "LIST_VALUE_MULTIPLY_BIGDECIMAL",

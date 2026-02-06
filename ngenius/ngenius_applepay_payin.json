@@ -237,7 +237,7 @@
                     "value": "{{purchase.fx_Amount}}",
                     "operations": [
                       {
-                        "name": "STRING_TO_BIGDECIMAL"
+                        "name": "STRING_TO_DOUBLE"
                       }
                     ]
                   },
@@ -476,7 +476,7 @@
                   "splitType": "key_value"
                 }
               }
-            ],
+            ]
           },
           {
             "key": "status",
