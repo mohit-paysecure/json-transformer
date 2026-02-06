@@ -258,6 +258,10 @@
             "key": "map",
             "mappings": [
               {
+                "key": "state",
+                "value": "{{purchase.client.stateCode}}"
+              },
+              {
                 "key": "city",
                 "value": "{{purchase.client.city}}",
                 "required": true

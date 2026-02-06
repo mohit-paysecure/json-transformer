@@ -263,6 +263,10 @@
                 "required": true
               },
               {
+                "key": "state",
+                "value": "{{purchase.client.stateCode}}"
+              },
+              {
                 "key": "address",
                 "value": "{{purchase.client.street_address}}",
                 "required": true
