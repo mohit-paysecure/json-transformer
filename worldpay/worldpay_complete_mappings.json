@@ -115,6 +115,11 @@
       "body": {
         "mappings": [
           {
+            "key": "isPaymentInfoRequest",
+            "value": true,
+            "required": true
+          },
+          {
             "key": "isMandate",
             "value": "{{purchase.paymentType}}",
             "hidden": true,
