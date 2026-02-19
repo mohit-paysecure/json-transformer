@@ -5,7 +5,7 @@
       "url": {
         "mappings": [
           {
-            "value": "https://gateway.payment88.io/api/v1/payout",
+            "value": "https://gateway-dev.payrock.io/api/v1/payout",
             "required": true
           }
         ],
@@ -36,6 +36,1502 @@
       },
       "body": {
         "mappings": [
+          {
+            "key": "skipResolvedBankCodeValidation",
+            "value": "{{payout.beneficiaryDetail.bankName}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              }
+            ],
+            "storeIn": "pspCall"
+          },
+          {
+            "skipIf": "{{store.pspCall.skipResolvedBankCodeValidation}}",
+            "key": "resolvedBankCode",
+            "value": "{{payout.beneficiaryDetail.bankName}}",
+            "operations": [
+              {
+                "name": "STRING_TO_UPPERCASE"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "ICICI BANK",
+                      "to": "ICBB_INR"
+                    },
+                    {
+                      "from": "ICICI",
+                      "to": "ICBB_INR"
+                    },
+                    {
+                      "from": "AU SMALL FINANCE BANK",
+                      "to": "AU_INR"
+                    },
+                    {
+                      "from": "ADITYA BIRLA PAYMENTS BANK",
+                      "to": "ABPB_INR"
+                    },
+                    {
+                      "from": "AIRTEL PAYMENTS BANK",
+                      "to": "AIRPB_INR"
+                    },
+                    {
+                      "from": "ALLAHABAD BANK",
+                      "to": "ALHB_INR"
+                    },
+                    {
+                      "from": "ANDHRA BANK",
+                      "to": "ADRB_INR"
+                    },
+                    {
+                      "from": "ANDHRA PRADESH GRAMEENA VIKAS BANK",
+                      "to": "APGVB_INR"
+                    },
+                    {
+                      "from": "ANDHRA PRAGATHI GRAMEENA BANK",
+                      "to": "APGB_INR"
+                    },
+                    {
+                      "from": "ARUNACHAL PRADESH RURAL BANK",
+                      "to": "APRB_INR"
+                    },
+                    {
+                      "from": "ARYAVART BANK",
+                      "to": "ARYAVB_INR"
+                    },
+                    {
+                      "from": "ASSAM GRAMIN VIKASH BANK",
+                      "to": "AGVB_INR"
+                    },
+                    {
+                      "from": "AXIS BANK",
+                      "to": "AXSB_INR"
+                    },
+                    {
+                      "from": "AXIS",
+                      "to": "AXSB_INR"
+                    },
+                    {
+                      "from": "BANK OF BAHRAIN AND KUWAIT",
+                      "to": "BBK_INR"
+                    },
+                    {
+                      "from": "BHARAT BANK",
+                      "to": "BHARATB_INR"
+                    },
+                    {
+                      "from": "BANDHAN BANK",
+                      "to": "BDHN_INR"
+                    },
+                    {
+                      "from": "BANGIYA GRAMIN VIKASH BANK",
+                      "to": "BGVB_INR"
+                    },
+                    {
+                      "from": "BANK DBS INDONESIA",
+                      "to": "DBSI_INR"
+                    },
+                    {
+                      "from": "BANK OF BARODA",
+                      "to": "BOBB_INR"
+                    },
+                    {
+                      "from": "BOB",
+                      "to": "BOBB_INR"
+                    },
+                    {
+                      "from": "BANK OF INDIA",
+                      "to": "BOIB_INR"
+                    },
+                    {
+                      "from": "BOI",
+                      "to": "BOIB_INR"
+                    },
+                    {
+                      "from": "BANK OF MAHARASHTRA",
+                      "to": "BOMB_INR"
+                    },
+                    {
+                      "from": "BARODA GUJARAT GRAMIN BANK",
+                      "to": "BGGB_INR"
+                    },
+                    {
+                      "from": "BARODA RAJASTHAN KSHETRIYA GRAMIN BANK",
+                      "to": "BRKGB_INR"
+                    },
+                    {
+                      "from": "BARODA UTTAR PRADESH GRAMIN BANK",
+                      "to": "BUPGB_INR"
+                    },
+                    {
+                      "from": "BASSEIN CATHOLIC CO-OPERATIVE BANK",
+                      "to": "BCCB_INR"
+                    },
+                    {
+                      "from": "CAPITAL SMALL FINANCE BANK LTD",
+                      "to": "CSFB_INR"
+                    },
+                    {
+                      "from": "CAPITAL SMALL FINANCE BANK",
+                      "to": "CSFB_INR"
+                    },
+                    {
+                      "from": "COSMOS BANK",
+                      "to": "COSMB_INR"
+                    },
+                    {
+                      "from": "CSB BANK",
+                      "to": "CSBB_INR"
+                    },
+                    {
+                      "from": "CANARA BANK",
+                      "to": "CNRB_INR"
+                    },
+                    {
+                      "from": "CATHOLIC SYRIAN BANK",
+                      "to": "CSB_INR"
+                    },
+                    {
+                      "from": "CENTRAL BANK OF INDIA",
+                      "to": "CBIB_INR"
+                    },
+                    {
+                      "from": "CHAITANYA GODAVARI GRAMEENA BANK",
+                      "to": "CGGB_INR"
+                    },
+                    {
+                      "from": "CHHATTISGARH RAJYA GRAMIN BANK",
+                      "to": "CRGB_INR"
+                    },
+                    {
+                      "from": "CITI BANK",
+                      "to": "CITI_INR"
+                    },
+                    {
+                      "from": "CITIBANK",
+                      "to": "CITI_INR"
+                    },
+                    {
+                      "from": "CITY UNION BANK",
+                      "to": "CUBL_INR"
+                    },
+                    {
+                      "from": "COASTAL LOCAL AREA BANK LIMITED",
+                      "to": "CLABL_INR"
+                    },
+                    {
+                      "from": "COASTAL LOCAL AREA BANK",
+                      "to": "CLABL_INR"
+                    },
+                    {
+                      "from": "CORPORATION BANK",
+                      "to": "CORP_INR"
+                    },
+                    {
+                      "from": "DCB BANK",
+                      "to": "DCBB_INR"
+                    },
+                    {
+                      "from": "DEVELOPMENT BANK OF SINGAPORE",
+                      "to": "DBS_INR"
+                    },
+                    {
+                      "from": "DBS",
+                      "to": "DBS_INR"
+                    },
+                    {
+                      "from": "DNLM",
+                      "to": "DNLM_INR"
+                    },
+                    {
+                      "from": "DAKSHIN BIHAR GRAMIN BANK",
+                      "to": "DBGB_INR"
+                    },
+                    {
+                      "from": "DENA BANK",
+                      "to": "DENAB_INR"
+                    },
+                    {
+                      "from": "DEUTSCHE BANK",
+                      "to": "DSHB_INR"
+                    },
+                    {
+                      "from": "DHANLAXMI BANK",
+                      "to": "DHLXM_INR"
+                    },
+                    {
+                      "from": "ESAF SMALL FINANCE BANK",
+                      "to": "ESAFF_INR"
+                    },
+                    {
+                      "from": "ESAF",
+                      "to": "ESAFF_INR"
+                    },
+                    {
+                      "from": "ELLAQUAI DEHATI BANK",
+                      "to": "EDB_INR"
+                    },
+                    {
+                      "from": "EQUITAS SMALL FINANCE BANK",
+                      "to": "EQSF_INR"
+                    },
+                    {
+                      "from": "EQUITAS BANK",
+                      "to": "EQB_INR"
+                    },
+                    {
+                      "from": "EXIM BANK",
+                      "to": "EXIM_INR"
+                    },
+                    {
+                      "from": "FINO PAYMENT BANK",
+                      "to": "FNPB_INR"
+                    },
+                    {
+                      "from": "FEDERAL BANK LTD",
+                      "to": "FEDB_INR"
+                    },
+                    {
+                      "from": "FEDERAL BANK",
+                      "to": "FEDB_INR"
+                    },
+                    {
+                      "from": "FINCARE SMALL FINANCE BANK",
+                      "to": "FCSF_INR"
+                    },
+                    {
+                      "from": "GOPINATH PATIL PARSIK JANATA SAHAKARI BANK LTD",
+                      "to": "GPPJSB_INR"
+                    },
+                    {
+                      "from": "HDFC BANK",
+                      "to": "HDFC_INR"
+                    },
+                    {
+                      "from": "HDFC",
+                      "to": "HDFC_INR"
+                    },
+                    {
+                      "from": "HIMACHAL PRADESH GRAMIN BANK",
+                      "to": "HPGB_INR"
+                    },
+                    {
+                      "from": "IDBI BANK",
+                      "to": "IDBI_INR"
+                    },
+                    {
+                      "from": "IDBI",
+                      "to": "IDBI_INR"
+                    },
+                    {
+                      "from": "IDFC BANK",
+                      "to": "IDFC_INR"
+                    },
+                    {
+                      "from": "IDFC FIRST BANK",
+                      "to": "IDFC_INR"
+                    },
+                    {
+                      "from": "IDFC",
+                      "to": "IDFC_INR"
+                    },
+                    {
+                      "from": "INDIA POST PAYMENT BANK",
+                      "to": "IPPB_INR"
+                    },
+                    {
+                      "from": "IPPB",
+                      "to": "IPPB_INR"
+                    },
+                    {
+                      "from": "INDIAN BANK",
+                      "to": "IB_INR"
+                    },
+                    {
+                      "from": "INDUSIND BANK",
+                      "to": "IDSB_INR"
+                    },
+                    {
+                      "from": "INDUSIND",
+                      "to": "IDSB_INR"
+                    },
+                    {
+                      "from": "J&K GRAMEEN BANK",
+                      "to": "JKGB_INR"
+                    },
+                    {
+                      "from": "JK GRAMEEN BANK",
+                      "to": "JKGB_INR"
+                    },
+                    {
+                      "from": "JANATA SAHAKARI BANK LTD PUNE",
+                      "to": "JSBP_INR"
+                    },
+                    {
+                      "from": "JANATA SAHAKARI BANK",
+                      "to": "JSBP_INR"
+                    },
+                    {
+                      "from": "JAMMU AND KASHMIR BANK LIMITED",
+                      "to": "JAKB_INR"
+                    },
+                    {
+                      "from": "JAMMU AND KASHMIR BANK",
+                      "to": "JAKB_INR"
+                    },
+                    {
+                      "from": "J&K BANK",
+                      "to": "JAKB_INR"
+                    },
+                    {
+                      "from": "JK BANK",
+                      "to": "JAKB_INR"
+                    },
+                    {
+                      "from": "JANA SMALL FINANCE BANK",
+                      "to": "JSFB_INR"
+                    },
+                    {
+                      "from": "JHARKHAND RAJYA GRAMIN BANK",
+                      "to": "JRGB_INR"
+                    },
+                    {
+                      "from": "JIO PAYMENTS BANK",
+                      "to": "JPB_INR"
+                    },
+                    {
+                      "from": "KARNATAKA BANK LIMITED",
+                      "to": "KBLB_INR"
+                    },
+                    {
+                      "from": "KARNATAKA BANK",
+                      "to": "KBLB_INR"
+                    },
+                    {
+                      "from": "KARNATAKA GRAMIN BANK",
+                      "to": "KRGB_INR"
+                    },
+                    {
+                      "from": "KARNATAKA VIKAS GRAMEENA BANK",
+                      "to": "KVGB_INR"
+                    },
+                    {
+                      "from": "KARUR VYSYA BANK",
+                      "to": "KVB_INR"
+                    },
+                    {
+                      "from": "KVB",
+                      "to": "KVB_INR"
+                    },
+                    {
+                      "from": "KASHI GOMTI SAMYUT GRAMIN BANK",
+                      "to": "KGSG_INR"
+                    },
+                    {
+                      "from": "KERALA GRAMIN BANK",
+                      "to": "KGB_INR"
+                    },
+                    {
+                      "from": "KOTAK MAHINDRA BANK",
+                      "to": "KTKB_INR"
+                    },
+                    {
+                      "from": "KOTAK BANK",
+                      "to": "KTKB_INR"
+                    },
+                    {
+                      "from": "KOTAK",
+                      "to": "KTKB_INR"
+                    },
+                    {
+                      "from": "LAKSHMI VILAS BANK",
+                      "to": "LXVB_INR"
+                    },
+                    {
+                      "from": "MADHYA BIHAR GRAMIN BANK",
+                      "to": "MBGB_INR"
+                    },
+                    {
+                      "from": "MEGHALAYA RURAL BANK",
+                      "to": "MRB_INR"
+                    },
+                    {
+                      "from": "MANIPUR RURAL BANK",
+                      "to": "MRB_INR"
+                    },
+                    {
+                      "from": "MIZORAM RURAL BANK",
+                      "to": "MRB_INR"
+                    },
+                    {
+                      "from": "MADHYA PRADESH GRAMIN BANK",
+                      "to": "MPGB_INR"
+                    },
+                    {
+                      "from": "MADHYANCHAL GRAMIN BANK",
+                      "to": "MGGB_INR"
+                    },
+                    {
+                      "from": "MAHARASHTRA GRAMIN BANK",
+                      "to": "MAHGB_INR"
+                    },
+                    {
+                      "from": "NHB",
+                      "to": "NHB_INR"
+                    },
+                    {
+                      "from": "NSDL PAYMENTS BANK LIMITED",
+                      "to": "NSDLB_INR"
+                    },
+                    {
+                      "from": "NSDL PAYMENTS BANK",
+                      "to": "NSDLB_INR"
+                    },
+                    {
+                      "from": "NAGALAND RURAL BANK",
+                      "to": "NGRB_INR"
+                    },
+                    {
+                      "from": "NAINITAL BANK",
+                      "to": "NAINB_INR"
+                    },
+                    {
+                      "from": "NORTH EAST SMALL FINANCE BANK",
+                      "to": "NESFB_INR"
+                    },
+                    {
+                      "from": "ODISHA GRAMYA BANK",
+                      "to": "OGB_INR"
+                    },
+                    {
+                      "from": "ORIENTAL BANK OF COMMERCE",
+                      "to": "OBC_INR"
+                    },
+                    {
+                      "from": "OBC",
+                      "to": "OBC_INR"
+                    },
+                    {
+                      "from": "PAYTM PAYMENTS BANK LTD",
+                      "to": "PTMB_INR"
+                    },
+                    {
+                      "from": "PAYTM PAYMENTS BANK",
+                      "to": "PTMB_INR"
+                    },
+                    {
+                      "from": "PUNJAB GRAMIN BANK",
+                      "to": "PGB_INR"
+                    },
+                    {
+                      "from": "PASCHIM BANGA GRAMIN BANK",
+                      "to": "PBGB_INR"
+                    },
+                    {
+                      "from": "PRAGATHI KRISHNA GRAMIN BANK",
+                      "to": "PKGB_INR"
+                    },
+                    {
+                      "from": "PRAGATI KRUSHNA GRAMINA BANK",
+                      "to": "PKGB1_INR"
+                    },
+                    {
+                      "from": "PRATHAMA UP GRAMIN BANK",
+                      "to": "PUGB_INR"
+                    },
+                    {
+                      "from": "PUDUVAI BHARATHIAR GRAMA BANK",
+                      "to": "PBGGB_INR"
+                    },
+                    {
+                      "from": "PUNJAB NATIONAL BANK",
+                      "to": "PNB_INR"
+                    },
+                    {
+                      "from": "PNB",
+                      "to": "PNB_INR"
+                    },
+                    {
+                      "from": "PUNJAB AND SIND BANK",
+                      "to": "PSB_INR"
+                    },
+                    {
+                      "from": "PURVANCHAL BANK",
+                      "to": "PB_INR"
+                    },
+                    {
+                      "from": "RBL BANK LTD",
+                      "to": "RBL_INR"
+                    },
+                    {
+                      "from": "RBL BANK",
+                      "to": "RBL_INR"
+                    },
+                    {
+                      "from": "RATNAKAR BANK",
+                      "to": "RBL_INR"
+                    },
+                    {
+                      "from": "ROYAL BANK OF SCOTLAND",
+                      "to": "RBS_INR"
+                    },
+                    {
+                      "from": "RAJASTHAN MARUDHARA GRAMIN BANK",
+                      "to": "RMGB_INR"
+                    },
+                    {
+                      "from": "RESERVE BANK OF INDIA",
+                      "to": "RBI_INR"
+                    },
+                    {
+                      "from": "STANDARD CHARTERED BANK THAI PCL",
+                      "to": "SCBT_INR"
+                    },
+                    {
+                      "from": "STANDARD CHARTERED BANK",
+                      "to": "SCBT_INR"
+                    },
+                    {
+                      "from": "SVC COOPERATIVE BANK LTD",
+                      "to": "SVCB_INR"
+                    },
+                    {
+                      "from": "SVC COOPERATIVE BANK",
+                      "to": "SVCB_INR"
+                    },
+                    {
+                      "from": "SAPTAGIRI GRAMEENA BANK",
+                      "to": "SGGB_INR"
+                    },
+                    {
+                      "from": "SARVA HARYANA GRAMIN BANK",
+                      "to": "SHGB_INR"
+                    },
+                    {
+                      "from": "SAURASHTRA GRAMIN BANK",
+                      "to": "SGB_INR"
+                    },
+                    {
+                      "from": "SMALL INDUSTRIES DEVELOPMENT BANK OF INDIA",
+                      "to": "SIDBI_INR"
+                    },
+                    {
+                      "from": "SIDBI",
+                      "to": "SIDBI_INR"
+                    },
+                    {
+                      "from": "SOUTH INDIAN BANK",
+                      "to": "SINB_INR"
+                    },
+                    {
+                      "from": "STATE BANK OF HYDERABAD",
+                      "to": "SBH_INR"
+                    },
+                    {
+                      "from": "SBH",
+                      "to": "SBH_INR"
+                    },
+                    {
+                      "from": "STATE BANK OF INDIA",
+                      "to": "SBOI_INR"
+                    },
+                    {
+                      "from": "SBI",
+                      "to": "SBOI_INR"
+                    },
+                    {
+                      "from": "SUBHADRA LOCAL AREA BANK LTD",
+                      "to": "SLABL_INR"
+                    },
+                    {
+                      "from": "SUBHADRA LOCAL AREA BANK",
+                      "to": "SLABL_INR"
+                    },
+                    {
+                      "from": "SUCO SOUHARDA SAHAKARI BANK",
+                      "to": "SSSB_INR"
+                    },
+                    {
+                      "from": "SURYODAY SMALL FINANCE BANK LTD",
+                      "to": "SSFBL_INR"
+                    },
+                    {
+                      "from": "SURYODAY SMALL FINANCE BANK",
+                      "to": "SSFBL_INR"
+                    },
+                    {
+                      "from": "SYNDICATE BANK",
+                      "to": "SYNB_INR"
+                    },
+                    {
+                      "from": "TAMIL NADU GRAMA BANK",
+                      "to": "TNGB_INR"
+                    },
+                    {
+                      "from": "TAMILNAD MERCANTILE BANK LIMITED",
+                      "to": "TMBL_INR"
+                    },
+                    {
+                      "from": "TAMILNAD MERCANTILE BANK",
+                      "to": "TMBL_INR"
+                    },
+                    {
+                      "from": "TMB",
+                      "to": "TMBL_INR"
+                    },
+                    {
+                      "from": "TRIPURA GRAMIN BANK",
+                      "to": "TGB_INR"
+                    },
+                    {
+                      "from": "UCO BANK",
+                      "to": "UCOB_INR"
+                    },
+                    {
+                      "from": "UCO",
+                      "to": "UCOB_INR"
+                    },
+                    {
+                      "from": "UTTAR BIHAR GRAMIN BANK",
+                      "to": "UBGB_INR"
+                    },
+                    {
+                      "from": "UJJIVAN SMALL FINANCE BANK",
+                      "to": "UJVB_INR"
+                    },
+                    {
+                      "from": "UJJIVAN",
+                      "to": "UJVB_INR"
+                    },
+                    {
+                      "from": "UNION BANK OF INDIA",
+                      "to": "UBOI_INR"
+                    },
+                    {
+                      "from": "UNION BANK",
+                      "to": "UBOI_INR"
+                    },
+                    {
+                      "from": "UNITED BANK OF INDIA",
+                      "to": "UBI_INR"
+                    },
+                    {
+                      "from": "UTTARAKHAND GRAMIN BANK",
+                      "to": "UKGB_INR"
+                    },
+                    {
+                      "from": "VANANCHAL GRAMIN BANK",
+                      "to": "VGB_INR"
+                    },
+                    {
+                      "from": "VIDHARBHA KONKAN GRAMIN BANK",
+                      "to": "VKGB_INR"
+                    },
+                    {
+                      "from": "VIJAYA BANK",
+                      "to": "VIJB_INR"
+                    },
+                    {
+                      "from": "YES BANK",
+                      "to": "YES_INR"
+                    },
+                    {
+                      "from": "YES",
+                      "to": "YES_INR"
+                    },
+                    {
+                      "from": "SARASWAT BANK",
+                      "to": "SARASWAT_INR"
+                    },
+                    {
+                      "from": "SARASWAT CO OPERATIVE BANK",
+                      "to": "SARASWAT_INR"
+                    },
+                    {
+                      "from": "HSBC BANK",
+                      "to": "HSBC_INR"
+                    },
+                    {
+                      "from": "HSBC",
+                      "to": "HSBC_INR"
+                    },
+                    {
+                      "from": "INDIAN OVERSEAS BANK",
+                      "to": "IOB_INR"
+                    },
+                    {
+                      "from": "IOB",
+                      "to": "IOB_INR"
+                    },
+                    {
+                      "from": "UTKAL GRAMEEN BANK",
+                      "to": "UGB_INR"
+                    },
+                    {
+                      "from": "UTKARSH SMALL FINANCE BANK",
+                      "to": "USFB_INR"
+                    },
+                    {
+                      "from": "UTTAR BANGA KSHETRIYA GRAMIN BANK",
+                      "to": "UBKGB_INR"
+                    },
+                    {
+                      "from": "TELANGANA GRAMEENA BANK",
+                      "to": "TSGB_INR"
+                    }
+                  ]
+                }
+              }
+            ],
+            "hidden": true,
+            "storeIn": "pspCall"
+          },
+          {
+            "skipIf": "{{store.pspCall.skipResolvedBankCodeValidation}}",
+            "key": "resolvedBankName",
+            "value": "{{payout.beneficiaryDetail.bankName}}",
+            "operations": [
+              {
+                "name": "STRING_TO_UPPERCASE"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "ICICI BANK",
+                      "to": "ICICI Bank"
+                    },
+                    {
+                      "from": "ICICI",
+                      "to": "ICICI Bank"
+                    },
+                    {
+                      "from": "AU SMALL FINANCE BANK",
+                      "to": "AU Small Finance Bank"
+                    },
+                    {
+                      "from": "ADITYA BIRLA PAYMENTS BANK",
+                      "to": "Aditya Birla Payments Bank"
+                    },
+                    {
+                      "from": "AIRTEL PAYMENTS BANK",
+                      "to": "Airtel Payments Bank"
+                    },
+                    {
+                      "from": "ALLAHABAD BANK",
+                      "to": "Allahabad Bank"
+                    },
+                    {
+                      "from": "ANDHRA BANK",
+                      "to": "Andhra Bank"
+                    },
+                    {
+                      "from": "ANDHRA PRADESH GRAMEENA VIKAS BANK",
+                      "to": "Andhra Pradesh Grameena Vikas Bank"
+                    },
+                    {
+                      "from": "ANDHRA PRAGATHI GRAMEENA BANK",
+                      "to": "Andhra Pragathi Grameena Bank"
+                    },
+                    {
+                      "from": "ARUNACHAL PRADESH RURAL BANK",
+                      "to": "Arunachal Pradesh Rural Bank"
+                    },
+                    {
+                      "from": "ARYAVART BANK",
+                      "to": "Aryavart Bank"
+                    },
+                    {
+                      "from": "ASSAM GRAMIN VIKASH BANK",
+                      "to": "Assam Gramin Vikash Bank"
+                    },
+                    {
+                      "from": "AXIS BANK",
+                      "to": "Axis Bank"
+                    },
+                    {
+                      "from": "AXIS",
+                      "to": "Axis Bank"
+                    },
+                    {
+                      "from": "BANK OF BAHRAIN AND KUWAIT",
+                      "to": "BANK OF BAHRAIN AND KUWAIT"
+                    },
+                    {
+                      "from": "BHARAT BANK",
+                      "to": "BHARAT BANK"
+                    },
+                    {
+                      "from": "BANDHAN BANK",
+                      "to": "Bandhan Bank"
+                    },
+                    {
+                      "from": "BANGIYA GRAMIN VIKASH BANK",
+                      "to": "Bangiya Gramin Vikash Bank"
+                    },
+                    {
+                      "from": "BANK DBS INDONESIA",
+                      "to": "Bank DBS Indonesia"
+                    },
+                    {
+                      "from": "BANK OF BARODA",
+                      "to": "Bank Of Baroda"
+                    },
+                    {
+                      "from": "BOB",
+                      "to": "Bank Of Baroda"
+                    },
+                    {
+                      "from": "BANK OF INDIA",
+                      "to": "Bank of India"
+                    },
+                    {
+                      "from": "BOI",
+                      "to": "Bank of India"
+                    },
+                    {
+                      "from": "BANK OF MAHARASHTRA",
+                      "to": "Bank of Maharashtra"
+                    },
+                    {
+                      "from": "BARODA GUJARAT GRAMIN BANK",
+                      "to": "Baroda Gujarat Gramin Bank"
+                    },
+                    {
+                      "from": "BARODA RAJASTHAN KSHETRIYA GRAMIN BANK",
+                      "to": "Baroda Rajasthan Kshetriya Gramin Bank"
+                    },
+                    {
+                      "from": "BARODA UTTAR PRADESH GRAMIN BANK",
+                      "to": "Baroda Uttar Pradesh Gramin Bank"
+                    },
+                    {
+                      "from": "BASSEIN CATHOLIC CO-OPERATIVE BANK",
+                      "to": "Bassein Catholic Co-operative Bank"
+                    },
+                    {
+                      "from": "CAPITAL SMALL FINANCE BANK LTD",
+                      "to": "CAPITAL SMALL FINANCE BANK LTD"
+                    },
+                    {
+                      "from": "CAPITAL SMALL FINANCE BANK",
+                      "to": "CAPITAL SMALL FINANCE BANK LTD"
+                    },
+                    {
+                      "from": "COSMOS BANK",
+                      "to": "COSMOS BANK"
+                    },
+                    {
+                      "from": "CSB BANK",
+                      "to": "CSB Bank"
+                    },
+                    {
+                      "from": "CANARA BANK",
+                      "to": "Canara Bank"
+                    },
+                    {
+                      "from": "CATHOLIC SYRIAN BANK",
+                      "to": "Catholic Syrian Bank"
+                    },
+                    {
+                      "from": "CENTRAL BANK OF INDIA",
+                      "to": "Central Bank of India"
+                    },
+                    {
+                      "from": "CHAITANYA GODAVARI GRAMEENA BANK",
+                      "to": "Chaitanya Godavari Grameena Bank"
+                    },
+                    {
+                      "from": "CHHATTISGARH RAJYA GRAMIN BANK",
+                      "to": "Chhattisgarh Rajya Gramin Bank"
+                    },
+                    {
+                      "from": "CITI BANK",
+                      "to": "Citi Bank"
+                    },
+                    {
+                      "from": "CITIBANK",
+                      "to": "Citi Bank"
+                    },
+                    {
+                      "from": "CITY UNION BANK",
+                      "to": "City Union Bank"
+                    },
+                    {
+                      "from": "COASTAL LOCAL AREA BANK LIMITED",
+                      "to": "Coastal Local Area Bank Limited"
+                    },
+                    {
+                      "from": "COASTAL LOCAL AREA BANK",
+                      "to": "Coastal Local Area Bank Limited"
+                    },
+                    {
+                      "from": "CORPORATION BANK",
+                      "to": "Corporation Bank"
+                    },
+                    {
+                      "from": "DCB BANK",
+                      "to": "DCB Bank"
+                    },
+                    {
+                      "from": "DEVELOPMENT BANK OF SINGAPORE",
+                      "to": "DEVELOPMENT BANK OF SINGAPORE"
+                    },
+                    {
+                      "from": "DBS",
+                      "to": "DEVELOPMENT BANK OF SINGAPORE"
+                    },
+                    {
+                      "from": "DNLM",
+                      "to": "DNLM"
+                    },
+                    {
+                      "from": "DAKSHIN BIHAR GRAMIN BANK",
+                      "to": "Dakshin Bihar Gramin Bank"
+                    },
+                    {
+                      "from": "DENA BANK",
+                      "to": "Dena Bank"
+                    },
+                    {
+                      "from": "DEUTSCHE BANK",
+                      "to": "Deutsche Bank"
+                    },
+                    {
+                      "from": "DHANLAXMI BANK",
+                      "to": "Dhanlaxmi Bank"
+                    },
+                    {
+                      "from": "ESAF SMALL FINANCE BANK",
+                      "to": "ESAF Small Finance Bank"
+                    },
+                    {
+                      "from": "ESAF",
+                      "to": "ESAF Small Finance Bank"
+                    },
+                    {
+                      "from": "ELLAQUAI DEHATI BANK",
+                      "to": "Ellaquai Dehati Bank"
+                    },
+                    {
+                      "from": "EQUITAS SMALL FINANCE BANK",
+                      "to": "Equitas Small Finance Bank"
+                    },
+                    {
+                      "from": "EQUITAS BANK",
+                      "to": "Equitas Bank"
+                    },
+                    {
+                      "from": "EXIM BANK",
+                      "to": "Exim Bank"
+                    },
+                    {
+                      "from": "FINO PAYMENT BANK",
+                      "to": "FINO PAYMENT BANK"
+                    },
+                    {
+                      "from": "FEDERAL BANK LTD",
+                      "to": "Federal Bank LTD"
+                    },
+                    {
+                      "from": "FEDERAL BANK",
+                      "to": "Federal Bank LTD"
+                    },
+                    {
+                      "from": "FINCARE SMALL FINANCE BANK",
+                      "to": "Fincare Small Finance Bank"
+                    },
+                    {
+                      "from": "GOPINATH PATIL PARSIK JANATA SAHAKARI BANK LTD",
+                      "to": "GOPINATH PATIL PARSIK JANATA SAHAKARI BANK LTD"
+                    },
+                    {
+                      "from": "HDFC BANK",
+                      "to": "HDFC Bank"
+                    },
+                    {
+                      "from": "HDFC",
+                      "to": "HDFC Bank"
+                    },
+                    {
+                      "from": "HIMACHAL PRADESH GRAMIN BANK",
+                      "to": "Himachal Pradesh Gramin Bank"
+                    },
+                    {
+                      "from": "IDBI BANK",
+                      "to": "IDBI Bank"
+                    },
+                    {
+                      "from": "IDBI",
+                      "to": "IDBI Bank"
+                    },
+                    {
+                      "from": "IDFC BANK",
+                      "to": "IDFC Bank"
+                    },
+                    {
+                      "from": "IDFC FIRST BANK",
+                      "to": "IDFC Bank"
+                    },
+                    {
+                      "from": "IDFC",
+                      "to": "IDFC Bank"
+                    },
+                    {
+                      "from": "INDIA POST PAYMENT BANK",
+                      "to": "India Post Payment Bank"
+                    },
+                    {
+                      "from": "IPPB",
+                      "to": "India Post Payment Bank"
+                    },
+                    {
+                      "from": "INDIAN BANK",
+                      "to": "Indian Bank"
+                    },
+                    {
+                      "from": "INDUSIND BANK",
+                      "to": "IndusInd Bank"
+                    },
+                    {
+                      "from": "INDUSIND",
+                      "to": "IndusInd Bank"
+                    },
+                    {
+                      "from": "J&K GRAMEEN BANK",
+                      "to": "J&K Grameen Bank"
+                    },
+                    {
+                      "from": "JK GRAMEEN BANK",
+                      "to": "J&K Grameen Bank"
+                    },
+                    {
+                      "from": "JANATA SAHAKARI BANK LTD PUNE",
+                      "to": "JANATA SAHAKARI BANK LTD PUNE"
+                    },
+                    {
+                      "from": "JANATA SAHAKARI BANK",
+                      "to": "JANATA SAHAKARI BANK LTD PUNE"
+                    },
+                    {
+                      "from": "JAMMU AND KASHMIR BANK LIMITED",
+                      "to": "Jammu and Kashmir Bank Limited"
+                    },
+                    {
+                      "from": "JAMMU AND KASHMIR BANK",
+                      "to": "Jammu and Kashmir Bank Limited"
+                    },
+                    {
+                      "from": "J&K BANK",
+                      "to": "Jammu and Kashmir Bank Limited"
+                    },
+                    {
+                      "from": "JK BANK",
+                      "to": "Jammu and Kashmir Bank Limited"
+                    },
+                    {
+                      "from": "JANA SMALL FINANCE BANK",
+                      "to": "Jana Small Finance Bank"
+                    },
+                    {
+                      "from": "JHARKHAND RAJYA GRAMIN BANK",
+                      "to": "Jharkhand Rajya Gramin Bank"
+                    },
+                    {
+                      "from": "JIO PAYMENTS BANK",
+                      "to": "Jio Payments Bank"
+                    },
+                    {
+                      "from": "KARNATAKA BANK LIMITED",
+                      "to": "Karnataka Bank Limited"
+                    },
+                    {
+                      "from": "KARNATAKA BANK",
+                      "to": "Karnataka Bank Limited"
+                    },
+                    {
+                      "from": "KARNATAKA GRAMIN BANK",
+                      "to": "Karnataka Gramin Bank"
+                    },
+                    {
+                      "from": "KARNATAKA VIKAS GRAMEENA BANK",
+                      "to": "Karnataka Vikas Grameena Bank"
+                    },
+                    {
+                      "from": "KARUR VYSYA BANK",
+                      "to": "Karur Vysya Bank"
+                    },
+                    {
+                      "from": "KVB",
+                      "to": "Karur Vysya Bank"
+                    },
+                    {
+                      "from": "KASHI GOMTI SAMYUT GRAMIN BANK",
+                      "to": "Kashi Gomti Samyut Gramin Bank"
+                    },
+                    {
+                      "from": "KERALA GRAMIN BANK",
+                      "to": "Kerala Gramin Bank"
+                    },
+                    {
+                      "from": "KOTAK MAHINDRA BANK",
+                      "to": "Kotak Mahindra Bank"
+                    },
+                    {
+                      "from": "KOTAK BANK",
+                      "to": "Kotak Mahindra Bank"
+                    },
+                    {
+                      "from": "KOTAK",
+                      "to": "Kotak Mahindra Bank"
+                    },
+                    {
+                      "from": "LAKSHMI VILAS BANK",
+                      "to": "Lakshmi Vilas Bank"
+                    },
+                    {
+                      "from": "MADHYA BIHAR GRAMIN BANK",
+                      "to": "Madhya Bihar Gramin Bank"
+                    },
+                    {
+                      "from": "MEGHALAYA RURAL BANK",
+                      "to": "MEGHALAYA RURAL BANK"
+                    },
+                    {
+                      "from": "MANIPUR RURAL BANK",
+                      "to": "Manipur Rural Bank"
+                    },
+                    {
+                      "from": "MIZORAM RURAL BANK",
+                      "to": "Mizoram Rural Bank"
+                    },
+                    {
+                      "from": "MADHYA PRADESH GRAMIN BANK",
+                      "to": "Madhya Pradesh Gramin Bank"
+                    },
+                    {
+                      "from": "MADHYANCHAL GRAMIN BANK",
+                      "to": "Madhyanchal Gramin Bank"
+                    },
+                    {
+                      "from": "MAHARASHTRA GRAMIN BANK",
+                      "to": "Maharashtra Gramin Bank"
+                    },
+                    {
+                      "from": "NHB",
+                      "to": "NHB"
+                    },
+                    {
+                      "from": "NSDL PAYMENTS BANK LIMITED",
+                      "to": "NSDL Payments Bank Limited"
+                    },
+                    {
+                      "from": "NSDL PAYMENTS BANK",
+                      "to": "NSDL Payments Bank Limited"
+                    },
+                    {
+                      "from": "NAGALAND RURAL BANK",
+                      "to": "Nagaland Rural Bank"
+                    },
+                    {
+                      "from": "NAINITAL BANK",
+                      "to": "Nainital Bank"
+                    },
+                    {
+                      "from": "NORTH EAST SMALL FINANCE BANK",
+                      "to": "North East Small Finance Bank"
+                    },
+                    {
+                      "from": "ODISHA GRAMYA BANK",
+                      "to": "Odisha Gramya Bank"
+                    },
+                    {
+                      "from": "ORIENTAL BANK OF COMMERCE",
+                      "to": "Oriental Bank of Commerce"
+                    },
+                    {
+                      "from": "OBC",
+                      "to": "Oriental Bank of Commerce"
+                    },
+                    {
+                      "from": "PAYTM PAYMENTS BANK LTD",
+                      "to": "PAYTM Payments Bank LTD"
+                    },
+                    {
+                      "from": "PAYTM PAYMENTS BANK",
+                      "to": "PAYTM Payments Bank LTD"
+                    },
+                    {
+                      "from": "PUNJAB GRAMIN BANK",
+                      "to": "PUNJAB GRAMIN BANK"
+                    },
+                    {
+                      "from": "PASCHIM BANGA GRAMIN BANK",
+                      "to": "Paschim Banga Gramin Bank"
+                    },
+                    {
+                      "from": "PRAGATHI KRISHNA GRAMIN BANK",
+                      "to": "Pragathi Krishna Gramin Bank"
+                    },
+                    {
+                      "from": "PRAGATI KRUSHNA GRAMINA BANK",
+                      "to": "Pragati Krushna Gramina Bank"
+                    },
+                    {
+                      "from": "PRATHAMA UP GRAMIN BANK",
+                      "to": "Prathama UP Gramin Bank"
+                    },
+                    {
+                      "from": "PUDUVAI BHARATHIAR GRAMA BANK",
+                      "to": "Puduvai Bharathiar Grama Bank"
+                    },
+                    {
+                      "from": "PUNJAB NATIONAL BANK",
+                      "to": "Punjab National Bank"
+                    },
+                    {
+                      "from": "PNB",
+                      "to": "Punjab National Bank"
+                    },
+                    {
+                      "from": "PUNJAB AND SIND BANK",
+                      "to": "Punjab and Sind Bank"
+                    },
+                    {
+                      "from": "PURVANCHAL BANK",
+                      "to": "Purvanchal Bank"
+                    },
+                    {
+                      "from": "RBL BANK LTD",
+                      "to": "RBL BANK LTD"
+                    },
+                    {
+                      "from": "RBL BANK",
+                      "to": "RBL BANK LTD"
+                    },
+                    {
+                      "from": "RATNAKAR BANK",
+                      "to": "RBL BANK LTD"
+                    },
+                    {
+                      "from": "ROYAL BANK OF SCOTLAND",
+                      "to": "ROYAL BANK OF SCOTLAND"
+                    },
+                    {
+                      "from": "RAJASTHAN MARUDHARA GRAMIN BANK",
+                      "to": "Rajasthan Marudhara Gramin Bank"
+                    },
+                    {
+                      "from": "RESERVE BANK OF INDIA",
+                      "to": "Reserve Bank of India"
+                    },
+                    {
+                      "from": "STANDARD CHARTERED BANK THAI PCL",
+                      "to": "STANDARD CHARTERED BANK THAI PCL"
+                    },
+                    {
+                      "from": "STANDARD CHARTERED BANK",
+                      "to": "STANDARD CHARTERED BANK THAI PCL"
+                    },
+                    {
+                      "from": "SVC COOPERATIVE BANK LTD",
+                      "to": "SVC COOPERATIVE BANK LTD"
+                    },
+                    {
+                      "from": "SVC COOPERATIVE BANK",
+                      "to": "SVC COOPERATIVE BANK LTD"
+                    },
+                    {
+                      "from": "SAPTAGIRI GRAMEENA BANK",
+                      "to": "Saptagiri Grameena Bank"
+                    },
+                    {
+                      "from": "SARVA HARYANA GRAMIN BANK",
+                      "to": "Sarva Haryana Gramin Bank"
+                    },
+                    {
+                      "from": "SAURASHTRA GRAMIN BANK",
+                      "to": "Saurashtra Gramin Bank"
+                    },
+                    {
+                      "from": "SMALL INDUSTRIES DEVELOPMENT BANK OF INDIA",
+                      "to": "Small Industries Development Bank of India"
+                    },
+                    {
+                      "from": "SIDBI",
+                      "to": "Small Industries Development Bank of India"
+                    },
+                    {
+                      "from": "SOUTH INDIAN BANK",
+                      "to": "South Indian Bank"
+                    },
+                    {
+                      "from": "STATE BANK OF HYDERABAD",
+                      "to": "State Bank of Hyderabad"
+                    },
+                    {
+                      "from": "SBH",
+                      "to": "State Bank of Hyderabad"
+                    },
+                    {
+                      "from": "STATE BANK OF INDIA",
+                      "to": "State Bank of India"
+                    },
+                    {
+                      "from": "SBI",
+                      "to": "State Bank of India"
+                    },
+                    {
+                      "from": "SUBHADRA LOCAL AREA BANK LTD",
+                      "to": "Subhadra Local Area Bank Ltd"
+                    },
+                    {
+                      "from": "SUBHADRA LOCAL AREA BANK",
+                      "to": "Subhadra Local Area Bank Ltd"
+                    },
+                    {
+                      "from": "SUCO SOUHARDA SAHAKARI BANK",
+                      "to": "Suco Souharda Sahakari Bank"
+                    },
+                    {
+                      "from": "SURYODAY SMALL FINANCE BANK LTD",
+                      "to": "Suryoday Small Finance Bank Ltd"
+                    },
+                    {
+                      "from": "SURYODAY SMALL FINANCE BANK",
+                      "to": "Suryoday Small Finance Bank Ltd"
+                    },
+                    {
+                      "from": "SYNDICATE BANK",
+                      "to": "Syndicate Bank"
+                    },
+                    {
+                      "from": "TAMIL NADU GRAMA BANK",
+                      "to": "Tamil Nadu Grama Bank"
+                    },
+                    {
+                      "from": "TAMILNAD MERCANTILE BANK LIMITED",
+                      "to": "Tamilnad Mercantile Bank Limited"
+                    },
+                    {
+                      "from": "TAMILNAD MERCANTILE BANK",
+                      "to": "Tamilnad Mercantile Bank Limited"
+                    },
+                    {
+                      "from": "TMB",
+                      "to": "Tamilnad Mercantile Bank Limited"
+                    },
+                    {
+                      "from": "TRIPURA GRAMIN BANK",
+                      "to": "Tripura Gramin Bank"
+                    },
+                    {
+                      "from": "UCO BANK",
+                      "to": "UCO Bank"
+                    },
+                    {
+                      "from": "UCO",
+                      "to": "UCO Bank"
+                    },
+                    {
+                      "from": "UTTAR BIHAR GRAMIN BANK",
+                      "to": "UTTAR BIHAR GRAMIN BANK"
+                    },
+                    {
+                      "from": "UJJIVAN SMALL FINANCE BANK",
+                      "to": "Ujjivan Small Finance Bank"
+                    },
+                    {
+                      "from": "UJJIVAN",
+                      "to": "Ujjivan Small Finance Bank"
+                    },
+                    {
+                      "from": "UNION BANK OF INDIA",
+                      "to": "Union Bank of India"
+                    },
+                    {
+                      "from": "UNION BANK",
+                      "to": "Union Bank of India"
+                    },
+                    {
+                      "from": "UNITED BANK OF INDIA",
+                      "to": "United Bank of India"
+                    },
+                    {
+                      "from": "UTTARAKHAND GRAMIN BANK",
+                      "to": "Uttarakhand Gramin Bank"
+                    },
+                    {
+                      "from": "VANANCHAL GRAMIN BANK",
+                      "to": "Vananchal Gramin Bank"
+                    },
+                    {
+                      "from": "VIDHARBHA KONKAN GRAMIN BANK",
+                      "to": "Vidharbha Konkan Gramin Bank"
+                    },
+                    {
+                      "from": "VIJAYA BANK",
+                      "to": "Vijaya Bank"
+                    },
+                    {
+                      "from": "YES BANK",
+                      "to": "YES BANK"
+                    },
+                    {
+                      "from": "YES",
+                      "to": "YES BANK"
+                    },
+                    {
+                      "from": "SARASWAT BANK",
+                      "to": "Saraswat Bank"
+                    },
+                    {
+                      "from": "SARASWAT CO OPERATIVE BANK",
+                      "to": "Saraswat Bank"
+                    },
+                    {
+                      "from": "HSBC BANK",
+                      "to": "HSBC Bank"
+                    },
+                    {
+                      "from": "HSBC",
+                      "to": "HSBC Bank"
+                    },
+                    {
+                      "from": "INDIAN OVERSEAS BANK",
+                      "to": "Indian Overseas Bank"
+                    },
+                    {
+                      "from": "IOB",
+                      "to": "Indian Overseas Bank"
+                    },
+                    {
+                      "from": "UTKAL GRAMEEN BANK",
+                      "to": "Utkal Grameen Bank"
+                    },
+                    {
+                      "from": "UTKARSH SMALL FINANCE BANK",
+                      "to": "Utkarsh Small Finance Bank"
+                    },
+                    {
+                      "from": "UTTAR BANGA KSHETRIYA GRAMIN BANK",
+                      "to": "Uttar Banga Kshetriya Gramin Bank"
+                    },
+                    {
+                      "from": "TELANGANA GRAMEENA BANK",
+                      "to": "Telangana grameena bank"
+                    }
+                  ]
+                }
+              }
+            ],
+            "hidden": true,
+            "storeIn": "pspCall"
+          },
           {
             "key": "version",
             "value": "2.0",
@@ -202,8 +1698,8 @@
             "storeIn": "pspCall"
           },
           {
-            "key": "isSwiftCodePresent",
-            "value": "{{payout.beneficiaryDetail.swiftCode}}",
+            "key": "bankName",
+            "value": "{{payout.beneficiaryDetail.bankName}}",
             "operations": [
               {
                 "name": "CHECK_IF_NULL"
@@ -213,12 +1709,12 @@
                 "params": {
                   "mappings": [
                     {
-                      "from": true,
-                      "to": false
-                    },
-                    {
                       "from": false,
                       "to": true
+                    },
+                    {
+                      "from": true,
+                      "to": false
                     }
                   ]
                 }
@@ -229,12 +1725,12 @@
           },
           {
             "key": "skipPspCall",
-            "skipIf": "{{store.pspCall.isSwiftCodePresent}}",
+            "skipIf": "{{store.pspCall.bankName}}",
             "value": true
           },
           {
             "key": "flowReturnData",
-            "skipIf": "{{store.pspCall.isSwiftCodePresent}}",
+            "skipIf": "{{store.pspCall.bankName}}",
             "mappings": [
               {
                 "key": "providerBankDetails",
@@ -242,7 +1738,7 @@
               },
               {
                 "key": "providerBankDetails",
-              "value": "{{pspConfig.payrock}}"
+                "value": "{{pspConfig.payrock}}"
               },
               {
                 "key": "returnUrl",
@@ -339,11 +1835,11 @@
               },
               {
                 "key": "bankCode",
-                "value": "{{payout.beneficiaryDetail.swiftCode}}"
+                "value": "{{store.pspCall.resolvedBankCode}}"
               },
               {
                 "key": "bankName",
-                "value": "{{payout.beneficiaryDetail.bankName}}"
+                "value": "{{store.pspCall.resolvedBankName}}"
               },
               {
                 "key": "ifsc",
