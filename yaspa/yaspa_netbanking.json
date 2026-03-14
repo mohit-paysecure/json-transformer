@@ -1,0 +1,305 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://testapi.yaspa.com/v2/payins/hosted-payin/generate-link",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "AuthorizationCitizen",
+            "mappings": [
+              {
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "customerData",
+            "value": "{{purchase.purchaseId}}",
+            "operations": [
+              {
+                "name": "GET_OR_CREATE_CUSTOMER"
+              }
+            ],
+            "hidden": true,
+            "storeIn": "customerData"
+          },
+          {
+            "key": "customerIdentifier",
+            "value": "{{store.customerData.customerData.customer.customerId}}",
+            "required": true
+          },
+          {
+            "key": "currency",
+            "value": "{{purchase.fx_Currency}}",
+            "required": true
+          },
+          {
+            "key": "amount",
+            "value": "{{purchase.fx_Amount}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "STRING_TO_DOUBLE"
+              }
+            ]
+          },
+          {
+            "key": "paymentGiro",
+            "value": "{{purchase.fx_Currency}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "GBP",
+                      "to": "FPS"
+                    },
+                    {
+                      "from": "EUR",
+                      "to": "SEPA"
+                    }
+                  ]
+                }
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "reference",
+            "value": "{{purchase.purchaseId}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SUB_STRING",
+                "params": {
+                  "fromIndex": 14,
+                  "fromIndexFromLast": true,
+                  "toIndex": 0,
+                  "toIndexFromLast": true
+                }
+              }
+            ]
+          },
+          {
+            "key": "journeyType",
+            "value": "HOSTED_PAYMENT",
+            "required": true
+          },
+          {
+            "key": "successBankRedirectUrl",
+            "mappings": [
+              {
+                "value": "{{extraParams.baseUrl}}",
+                "required": true
+              },
+              {
+                "value": "/custRedirect/",
+                "required": true
+              },
+              {
+                "value": "{{purchase.bankid}}",
+                "required": true
+              },
+              {
+                "value": "/",
+                "required": true
+              },
+              {
+                "value": "{{purchase.purchaseId}}",
+                "required": true
+              },
+              {
+                "value": "/",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "failureBankRedirectUrl",
+            "mappings": [
+              {
+                "value": "{{extraParams.baseUrl}}",
+                "required": true
+              },
+              {
+                "value": "/custRedirect/",
+                "required": true
+              },
+              {
+                "value": "{{purchase.bankid}}",
+                "required": true
+              },
+              {
+                "value": "/",
+                "required": true
+              },
+              {
+                "value": "{{purchase.purchaseId}}",
+                "required": true
+              },
+              {
+                "value": "/",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "description",
+            "mappings": [
+              {
+                "value": "{{purchase.merchantDescriptor}}",
+                "operations": [
+                  {
+                    "name": "CHECK_IF_EMPTY"
+                  }
+                ]
+              },
+              {
+                "value": "{{purchase.purchaseId}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "isNegative",
+            "value": "{{pspResponse0.error}}",
+            "hidden": true,
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              }
+            ],
+            "storeIn": "isNegative"
+          },
+          {
+            "key": "code",
+            "value": "{{store.isNegative.isNegative}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "fail",
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": "success"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{store.isNegative.isNegative}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "payment_failed",
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": "payment_in_process"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.message}}"
+              },
+              {
+                "value": "{{pspResponse0.error}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "redirectUrl",
+            "value": "{{pspResponse0.value}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]
