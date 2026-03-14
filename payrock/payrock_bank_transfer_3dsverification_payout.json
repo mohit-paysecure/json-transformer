@@ -486,11 +486,11 @@
                   "mappings": [
                     {
                       "from": "IN_PROGRESS",
-                      "to": "payment_in_process"
+                      "to": "payout_in_process"
                     },
                     {
                       "from": "PENDING",
-                      "to": "payment_in_process"
+                      "to": "payout_in_process"
                     },
                     {
                       "from": "FAILED",
