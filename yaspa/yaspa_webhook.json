@@ -1,0 +1,176 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": []
+      },
+      "headers": {
+        "mappings": []
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "transactionContext",
+            "mappings": [
+              {
+                "key": "id",
+                "value": "{{webhookRequest.data.reference}}",
+                "required": true
+              },
+              {
+                "key": "idType",
+                "value": "purchaseId",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "GET_TRANSACTION_CONTEXT_BY_ID"
+              }
+            ],
+            "storeIn": "contextStore",
+            "hidden": true
+          },
+          {
+            "key": "purchaseId",
+            "value": "{{webhookRequest.data.reference}}",
+            "required": true
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{webhookRequest.data.id}}",
+            "required": true
+          },
+          {
+            "key": "receivedSignature",
+            "value": "true"
+          },
+          {
+            "key": "generatedSignature",
+            "mappings": [
+              {
+                "key": "signature",
+                "value": "{{webhookRequestHeader.webhook-signature}}",
+                "required": true
+              },
+              {
+                "key": "data",
+                "value": "{{webhookRequest}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "STRINGIFY_JSON"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "VERIFY_RSA_SIGNATURE",
+                "params": {
+                  "publicKeyFilePath": "/Users/mohitbhagwani/Desktop/paysecure/src/main/resources/test.pem",
+                  "signatureAlgorithm": "SHA256withRSA"
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{webhookRequest.data.transactionStatus}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "payment_failed",
+                  "mappings": [
+                    {
+                      "from": "COMPLETE",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "ACCEPTED",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "INITIATED",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "PENDING_USER_AUTHORISATION",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "PENDING_ASPSP_AUTHORISATION",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "PAYIN_CONSENT_GRANTED",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "CANCELLED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "REJECTED_BY_ASPSP",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "EXPIRED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "FAILED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "ERROR",
+                      "to": "payment_failed"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{webhookRequest.type}}"
+              },
+              {
+                "value": "{{webhookRequest.data.transactionStatus}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": []
+      }
+    }
+  }
+]
