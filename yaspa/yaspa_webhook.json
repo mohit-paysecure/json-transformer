@@ -66,7 +66,7 @@
                 "name": "VERIFY_RSA_SIGNATURE",
                 "params": {
                   "action": "VERIFY",
-                  "publicKeyFilePath": "/Users/mohitbhagwani/Desktop/paysecure/src/main/resources/test.pem",
+                  "publicKeyFilePath": "/home/testGateway/upload/bankssl/527/paysecure_yaspa_openbanking_sbx_private_key.pem",
                   "signatureAlgorithm": "SHA256withRSA"
                 }
               }
