@@ -142,6 +142,9 @@
             "key": "message",
             "mappings": [
               {
+                "value": "{{pspResponse0.errorReason}}"
+              },
+              {
                 "value": "{{pspResponse0.transactionStatus}}"
               },
               {

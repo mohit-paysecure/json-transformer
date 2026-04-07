@@ -70,12 +70,7 @@
           {
             "key": "amount",
             "value": "{{purchase.fx_Amount}}",
-            "required": true,
-            "operations": [
-              {
-                "name": "STRING_TO_DOUBLE"
-              }
-            ]
+            "required": true
           },
           {
             "key": "paymentGiro",
@@ -194,12 +189,7 @@
             "key": "description",
             "mappings": [
               {
-                "value": "{{purchase.merchantDescriptor}}",
-                "operations": [
-                  {
-                    "name": "CHECK_IF_EMPTY"
-                  }
-                ]
+                "value": "{{purchase.merchantDescriptor}}"
               },
               {
                 "value": "{{purchase.purchaseId}}"
@@ -292,6 +282,180 @@
           {
             "key": "redirectUrl",
             "value": "{{pspResponse0.value}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "requestMapping": {
+      "method": "GET",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://testapi.yaspa.com/v2/payins/reference/",
+            "required": true
+          },
+          {
+            "value": "{{purchase.purchaseId}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SUB_STRING",
+                "params": {
+                  "fromIndex": 14,
+                  "fromIndexFromLast": true,
+                  "toIndex": 0,
+                  "toIndexFromLast": true
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "AuthorizationCitizen",
+            "mappings": [
+              {
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse1.id}}"
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse1.transactionStatus}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "fail",
+                  "mappings": [
+                    {
+                      "from": "COMPLETE",
+                      "to": "success"
+                    },
+                    {
+                      "from": "ACCEPTED",
+                      "to": "success"
+                    },
+                    {
+                      "from": "CREATED",
+                      "to": "success"
+                    },
+                    {
+                      "from": "INITIATED",
+                      "to": "success"
+                    },
+                    {
+                      "from": "PENDING_USER_AUTHORISATION",
+                      "to": "success"
+                    },
+                    {
+                      "from": "PAYIN_CONSENT_GRANTED",
+                      "to": "success"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "redirectUrl",
+            "value": "{{pspResponse0.value}}"
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse1.transactionStatus}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "payment_failed",
+                  "mappings": [
+                    {
+                      "from": "COMPLETE",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "ACCEPTED",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "CREATED",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "INITIATED",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "PENDING_USER_AUTHORISATION",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "PAYIN_CONSENT_GRANTED",
+                      "to": "payment_in_process"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse1.errorReason}}"
+              },
+              {
+                "value": "{{pspResponse1.transactionStatus}}"
+              },
+              {
+                "value": "{{pspResponse1.error}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
           }
         ],
         "operations": [
