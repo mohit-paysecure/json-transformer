@@ -1,0 +1,940 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://api.test.paysafe.com",
+            "required": true
+          },
+          {
+            "value": "/paymenthub/v1/singleusepaymenthandles",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "Basic ",
+                "required": true
+              },
+              {
+                "mappings": [
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 0
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 1
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  },
+                  {
+                    "name": "BASE64_TRANSFORM",
+                    "params": {
+                      "mode": "ENCODE"
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "merchantRefNum",
+            "value": "{{purchase.purchaseId}}",
+            "required": true
+          },
+          {
+            "key": "transactionType",
+            "value": "PAYMENT",
+            "required": true
+          },
+          {
+            "key": "paymentType",
+            "value": "CARD",
+            "required": true
+          },
+          {
+            "key": "amount",
+            "mappings": [
+              {
+                "value": "{{purchase.fx_Amount}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "STRING_TO_DOUBLE"
+                  }
+                ]
+              },
+              {
+                "value": "100",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "STRING_TO_DOUBLE"
+                  }
+                ]
+              }
+            ],
+            "required": true,
+            "operations": [
+              {
+                "name": "LIST_VALUE_MULTIPLY"
+              },
+              {
+                "name": "DOUBLE_TO_FLOOR"
+              },
+              {
+                "name": "INTEGER_TO_STRING"
+              }
+            ]
+          },
+          {
+            "key": "currencyCode",
+            "mappings": [
+              {
+                "value": "{{purchase.fx_Currency}}"
+              },
+              {
+                "value": "{{purchase.purchase.currency}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "accountId",
+            "mappings": [
+              {
+                "value": "{{purchase.fx_Currency}}",
+                "operations": [
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": "USD",
+                          "to": "1002997120"
+                        },
+                        {
+                          "from": "GBP",
+                          "to": "1002997100"
+                        },
+                        {
+                          "from": "EUR",
+                          "to": "1002997110"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "key": "fallback",
+                "value": "{{extraParams.paysafeAccountId}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "customerIp",
+            "value": "110.235.229.28"
+          },
+          {
+            "key": "googlePay",
+            "mappings": [
+              {
+                "key": "isGooglePayTokenMissing",
+                "value": "{{purchase.extraParam.googlepay_param.googlePayPaymentToken}}",
+                "operations": [
+                  {
+                    "name": "CHECK_IF_NULL"
+                  }
+                ],
+                "hidden": true,
+                "storeIn": "gpay"
+              },
+              {
+                "key": "isGooglePayTokenPresent",
+                "value": "{{store.gpay.isGooglePayTokenMissing}}",
+                "operations": [
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "defaultValue": false,
+                      "mappings": [
+                        {
+                          "from": true,
+                          "to": false
+                        },
+                        {
+                          "from": false,
+                          "to": true
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "hidden": true,
+                "storeIn": "gpay"
+              },
+              {
+                "skipIf": "{{store.gpay.isGooglePayTokenMissing}}",
+                "key": "googlePayPaymentToken",
+                "value": "{{purchase.extraParam.googlepay_param.googlePayPaymentToken}}",
+                "required": true
+              },
+              {
+                "skipIf": "{{store.gpay.isGooglePayTokenPresent}}",
+                "key": "googlePayPaymentToken",
+                "mappings": [
+                  {
+                    "key": "apiVersion",
+                    "value": 2,
+                    "required": true
+                  },
+                  {
+                    "key": "apiVersionMinor",
+                    "value": 0,
+                    "required": true
+                  },
+                  {
+                    "key": "paymentMethodData",
+                    "mappings": [
+                      {
+                        "key": "type",
+                        "value": "CARD",
+                        "required": true
+                      },
+                      {
+                        "key": "tokenizationData",
+                        "mappings": [
+                          {
+                            "key": "type",
+                            "value": "PAYMENT_GATEWAY",
+                            "required": true
+                          },
+                          {
+                            "key": "isGpayDecryptedTokenMissing",
+                            "value": "{{bankTransaction.gpayDecryptedToken}}",
+                            "operations": [
+                              {
+                                "name": "CHECK_IF_NULL"
+                              }
+                            ],
+                            "hidden": true,
+                            "storeIn": "gpayTokenType"
+                          },
+                          {
+                            "key": "isGpayDecryptedTokenPresent",
+                            "value": "{{store.gpayTokenType.isGpayDecryptedTokenMissing}}",
+                            "operations": [
+                              {
+                                "name": "VALUE_MAPPER",
+                                "params": {
+                                  "mappings": [
+                                    {
+                                      "from": true,
+                                      "to": false
+                                    },
+                                    {
+                                      "from": false,
+                                      "to": true
+                                    }
+                                  ]
+                                }
+                              }
+                            ],
+                            "hidden": true,
+                            "storeIn": "gpayTokenType"
+                          },
+                          {
+                            "skipIf": "{{store.gpayTokenType.isGpayDecryptedTokenMissing}}",
+                            "key": "decryptedToken",
+                            "value": "{{bankTransaction.gpayDecryptedToken}}"
+                          },
+                          {
+                            "skipIf": "{{store.gpayTokenType.isGpayDecryptedTokenPresent}}",
+                            "key": "token",
+                            "mappings": [
+                              {
+                                "value": "{{bankTransaction.gpayEncryptedToken}}"
+                              },
+                              {
+                                "value": "{{bankTransaction.gpayEncryptedPayload}}"
+                              },
+                              {
+                                "value": "{{purchase.extraParam.googlepay_param.googlepay_encrypted_payload}}"
+                              },
+                              {
+                                "value": "{{purchase.extraParam.googlepay_param.googlePayPaymentToken.paymentMethodData.tokenizationData.token}}"
+                              },
+                              {
+                                "value": "{{purchase.extraParam.googlepay_param.tokenizationData.token}}"
+                              }
+                            ],
+                            "operations": [
+                              {
+                                "name": "GET_FIRST_NON_EMPTY_STRING"
+                              }
+                            ],
+                            "required": true
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "KEY_VALUE_LIST_TO_OBJECT"
+                          }
+                        ],
+                        "required": true
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }
+                    ],
+                    "required": true
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ],
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "profile",
+            "mappings": [
+              {
+                "key": "email",
+                "value": "{{purchase.client.email}}"
+              },
+              {
+                "key": "phone",
+                "value": "{{purchase.client.phone}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "billingDetails",
+            "mappings": [
+              {
+                "key": "country",
+                "value": "{{purchase.client.country}}"
+              },
+              {
+                "key": "zip",
+                "value": "{{purchase.client.zip_code}}"
+              },
+              {
+                "key": "state",
+                "value": "{{purchase.client.stateCode}}"
+              },
+              {
+                "key": "city",
+                "value": "{{purchase.client.city}}"
+              },
+              {
+                "key": "street",
+                "value": "{{purchase.client.street_address}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "returnLinks",
+            "value": "{{extraParams.returnLinks}}"
+          },
+          {
+            "key": "skip3ds",
+            "value": "{{extraParams.skip3ds}}"
+          },
+          {
+            "key": "threeDs",
+            "value": "{{extraParams.threeDs}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse0.paymentHandleToken}}"
+          },
+          {
+            "key": "pspToken",
+            "value": "{{pspResponse0.paymentHandleToken}}"
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse0.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "payment_pending",
+                  "mappings": [
+                    {
+                      "from": "PAYABLE",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "INITIATED",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "PROCESSING",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "FAILED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "EXPIRED",
+                      "to": "payment_failed"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse0.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "success",
+                  "mappings": [
+                    {
+                      "from": "FAILED",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "EXPIRED",
+                      "to": "fail"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.errorMessage}}"
+              },
+              {
+                "value": "{{pspResponse0.status}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "action",
+            "value": "{{pspResponse0.action}}"
+          },
+          {
+            "key": "isRedirectAction",
+            "value": "{{pspResponse0.action}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": false,
+                  "mappings": [
+                    {
+                      "from": "REDIRECT",
+                      "to": true
+                    }
+                  ]
+                }
+              }
+            ],
+            "hidden": true,
+            "storeIn": "paysafePh"
+          },
+          {
+            "key": "shouldSkipRedirectUrl",
+            "value": "{{store.paysafePh.isRedirectAction}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": true,
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": false
+                    },
+                    {
+                      "from": false,
+                      "to": true
+                    }
+                  ]
+                }
+              }
+            ],
+            "hidden": true,
+            "storeIn": "paysafePh"
+          },
+          {
+            "skipIf": "{{store.paysafePh.shouldSkipRedirectUrl}}",
+            "key": "redirectUrl",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.links.0.href}}"
+              },
+              {
+                "value": "{{pspResponse0.links.1.href}}"
+              },
+              {
+                "value": "{{pspResponse0.links.2.href}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "skipPspCount",
+            "value": "{{pspResponse0.action}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": 0,
+                  "mappings": [
+                    {
+                      "from": "REDIRECT",
+                      "to": 99
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://api.test.paysafe.com",
+            "required": true
+          },
+          {
+            "value": "/paymenthub/v1/payments",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "Basic ",
+                "required": true
+              },
+              {
+                "mappings": [
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 0
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 1
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  },
+                  {
+                    "name": "BASE64_TRANSFORM",
+                    "params": {
+                      "mode": "ENCODE"
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "merchantRefNum",
+            "value": "{{purchase.purchaseId}}",
+            "required": true
+          },
+          {
+            "key": "amount",
+            "mappings": [
+              {
+                "value": "{{purchase.fx_Amount}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "STRING_TO_DOUBLE"
+                  }
+                ]
+              },
+              {
+                "value": "100",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "STRING_TO_DOUBLE"
+                  }
+                ]
+              }
+            ],
+            "required": true,
+            "operations": [
+              {
+                "name": "LIST_VALUE_MULTIPLY"
+              },
+              {
+                "name": "DOUBLE_TO_FLOOR"
+              },
+              {
+                "name": "INTEGER_TO_STRING"
+              }
+            ]
+          },
+          {
+            "key": "currencyCode",
+            "mappings": [
+              {
+                "value": "{{purchase.fx_Currency}}"
+              },
+              {
+                "value": "{{purchase.purchase.currency}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "dupCheck",
+            "value": true
+          },
+          {
+            "key": "settleWithAuth",
+            "value": true
+          },
+          {
+            "key": "paymentHandleToken",
+            "mappings": [
+              {
+                "value": "{{bankTransaction.token}}"
+              },
+              {
+                "value": "{{pspResponse0.paymentHandleToken}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "description",
+            "value": "{{bankTransaction.product_info}}"
+          },
+          {
+            "key": "customerIp",
+            "value": "110.235.229.28"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse1.id}}"
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse1.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "payment_pending",
+                  "mappings": [
+                    {
+                      "from": "COMPLETED",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "AUTHORIZED",
+                      "to": "authorized"
+                    },
+                    {
+                      "from": "FAILED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "DECLINED",
+                      "to": "payment_declined"
+                    },
+                    {
+                      "from": "PENDING",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "PROCESSING",
+                      "to": "payment_in_process"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse1.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "success",
+                  "mappings": [
+                    {
+                      "from": "FAILED",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "DECLINED",
+                      "to": "fail"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse1.errorMessage}}"
+              },
+              {
+                "value": "{{pspResponse1.status}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]
