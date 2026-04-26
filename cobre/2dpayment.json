@@ -229,7 +229,7 @@
                   "mappings": [
                     {
                       "from": false,
-                      "to": 1
+                      "to": 2
                     }
                   ],
                   "defaultValue": 0
@@ -432,6 +432,176 @@
       "url": {
         "mappings": [
           {
+            "value": "https://api.cobre.co/v1/subscriptions"
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{bankTransaction.tempObject.authToken}}",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "url",
+            "mappings": [
+              { "value": "{{extraParams.baseUrl}}", "required": true },
+              { "value": "/webhook/" },
+              { "value": "{{purchase.bankname}}" },
+              { "value": "/" }
+            ],
+            "operations": [
+              { "name": "LIST_VALUE_JOIN" }
+            ],
+            "required": true
+          },
+          {
+            "key": "description",
+            "mappings": [
+              {
+                "value": "{{bankTransaction.bankName}}"
+              },
+              {
+                "value": "_"
+              },
+              {
+                "value": "{{bankTransaction.midName}}"
+              },
+              {
+                "value": "_webhook"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
+          },
+          {
+            "key": "events",
+            "mappings": [
+              { "value": "money_movements.status.initiated" },
+              { "value": "money_movements.status.processing" },
+              { "value": "money_movements.status.completed" },
+              { "value": "money_movements.status.failed" },
+              { "value": "money_movements.status.rejected" }
+            ],
+            "operations": [
+              { "name": "MAP_LIST_TO_VALUE_LIST" }
+            ]
+          },
+          {
+            "key": "event_signature_key",
+            "mappings": [
+              { "value": "{{bankTransaction.bankName}}" },
+              { "value": "_" },
+              { "value": "{{bankTransaction.midName}}" }
+            ],
+            "operations": [
+              { "name": "LIST_VALUE_JOIN" }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "code",
+            "value": "{{pspResponse2.id}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse2.id}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "payment_in_process"
+                    }
+                  ],
+                  "defaultValue": "payment_failed"
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "value": "{{pspResponse2.message}}"
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{bankTransaction.paymentTransId}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
             "value": "https://api.cobre.co/v1/counterparties"
           }
         ],
@@ -509,7 +679,7 @@
         "mappings": [
           {
             "key": "code",
-            "value": "{{pspResponse2.id}}",
+            "value": "{{pspResponse3.id}}",
             "operations": [
               {
                 "name": "CHECK_IF_NULL"
@@ -530,7 +700,7 @@
           },
           {
             "key": "status",
-            "value": "{{pspResponse2.id}}",
+            "value": "{{pspResponse3.id}}",
             "operations": [
               {
                 "name": "CHECK_IF_NULL"
@@ -553,10 +723,10 @@
             "key": "message",
             "mappings": [
               {
-                "value": "{{pspResponse2.message}}"
+                "value": "{{pspResponse3.message}}"
               },
               {
-                "value": "{{pspResponse2.error_description}}"
+                "value": "{{pspResponse3.error_description}}"
               },
               {
                 "value": ""
@@ -570,7 +740,7 @@
           },
           {
             "key": "counterpartyId",
-            "value": "{{pspResponse2.id}}",
+            "value": "{{pspResponse3.id}}",
             "storeIn": "cp",
             "hidden": true
           }
@@ -754,7 +924,7 @@
         "mappings": [
           {
             "key": "isMMFailed",
-            "value": "{{pspResponse3.id}}",
+            "value": "{{pspResponse4.id}}",
             "operations": [
               {
                 "name": "CHECK_IF_NULL"
@@ -805,7 +975,7 @@
             "mappings": [
               {
                 "key": "copyCLABE",
-                "value": "{{pspResponse3.metadata.virtual_account}}"
+                "value": "{{pspResponse4.metadata.virtual_account}}"
               },
               {
                 "key": "copyReference",
@@ -835,7 +1005,7 @@
           },
           {
             "key": "pspTransactionId",
-            "value": "{{pspResponse3.id}}"
+            "value": "{{pspResponse4.id}}"
           },
           {
             "key": "expireInMin",

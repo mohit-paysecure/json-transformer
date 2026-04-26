@@ -17,7 +17,11 @@
         "mappings": [
           {
             "key": "pspTransactionId",
-            "value": "{{webhookRequest.content.id}}",
+            "value": "{{webhookRequest.content.id}}"
+          },
+          {
+            "key": "purchaseId",
+            "value": "{{webhookRequest.content.external_id}}",
             "required": true
           },
           {
@@ -28,26 +32,11 @@
                 "name": "VALUE_MAPPER",
                 "params": {
                   "mappings": [
-                    {
-                      "from": "completed",
-                      "to": "paid"
-                    },
-                    {
-                      "from": "processing",
-                      "to": "payment_in_process"
-                    },
-                    {
-                      "from": "initiated",
-                      "to": "payment_in_process"
-                    },
-                    {
-                      "from": "rejected",
-                      "to": "payment_failed"
-                    },
-                    {
-                      "from": "failed",
-                      "to": "payment_failed"
-                    }
+                    { "from": "completed",  "to": "paid" },
+                    { "from": "processing", "to": "payment_in_process" },
+                    { "from": "initiated",  "to": "payment_in_process" },
+                    { "from": "rejected",   "to": "payment_failed" },
+                    { "from": "failed",     "to": "payment_failed" }
                   ],
                   "defaultValue": "payment_in_process"
                 }
@@ -59,20 +48,16 @@
             "mappings": [
               {
                 "key": "id",
-                "value": "{{webhookRequest.content.id}}"
+                "value": "{{webhookRequest.content.external_id}}"
               },
               {
                 "key": "idType",
-                "value": "pspTransactionId"
+                "value": "purchaseId"
               }
             ],
             "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              },
-              {
-                "name": "GET_TRANSACTION_CONTEXT_BY_ID"
-              }
+              { "name": "KEY_VALUE_LIST_TO_OBJECT" },
+              { "name": "GET_TRANSACTION_CONTEXT_BY_ID" }
             ],
             "storeIn": "ctx",
             "hidden": true
@@ -80,20 +65,12 @@
           {
             "key": "sigInput",
             "mappings": [
-              {
-                "value": "{{webhookRequestHeader.event-timestamp}}"
-              },
-              {
-                "value": "."
-              },
-              {
-                "value": "{{webhookRequestHeader.x-raw-body}}"
-              }
+              { "value": "{{webhookRequestHeader.event-timestamp}}" },
+              { "value": "." },
+              { "value": "{{webhookRequestHeader.x-raw-body}}" }
             ],
             "operations": [
-              {
-                "name": "LIST_VALUE_JOIN"
-              }
+              { "name": "LIST_VALUE_JOIN" }
             ],
             "storeIn": "sigData",
             "hidden": true
@@ -107,27 +84,18 @@
               },
               {
                 "key": "secretKey",
-                "value": "{{store.ctx.txnContext.bankTransaction.usedAuthKey}}",
+                "mappings": [
+                  { "value": "{{store.ctx.txnContext.bankTransaction.bankName}}" },
+                  { "value": "_" },
+                  { "value": "{{store.ctx.txnContext.bankTransaction.midName}}" }
+                ],
                 "operations": [
-                  {
-                    "name": "SPLIT_STRING",
-                    "params": {
-                      "delimiter": "##"
-                    }
-                  },
-                  {
-                    "name": "GET_ELEMENT_AT_INDEX",
-                    "params": {
-                      "index": 3
-                    }
-                  }
+                  { "name": "LIST_VALUE_JOIN" }
                 ]
               }
             ],
             "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              },
+              { "name": "KEY_VALUE_LIST_TO_OBJECT" },
               {
                 "name": "COMPUTE_HMAC_SHA",
                 "params": {
