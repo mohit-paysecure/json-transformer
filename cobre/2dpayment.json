@@ -682,28 +682,6 @@
             "value": "{{purchase.purchaseId}}"
           },
           {
-            "key": "validity",
-            "mappings": [
-              {
-                "value": "{{purchase.expireInMin}}"
-              },
-              {
-                "value": "30"
-              }
-            ],
-            "operations": [
-              {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
-              },
-              {
-                "name": "STRING_TO_DOUBLE"
-              },
-              {
-                "name": "DOUBLE_TO_FLOOR"
-              }
-            ]
-          },
-          {
             "key": "metadata",
             "mappings": [
               {
@@ -712,11 +690,49 @@
               },
               {
                 "key": "description_to_payer",
-                "value": "Payment"
+                "value": "{{bankTransaction.product_description}}"
               },
               {
                 "key": "description_to_payee",
-                "value": "Payment received"
+                "mappings": [
+                  {
+                    "value": "{{purchase.merchantDescriptor}}"
+                  },
+                  {
+                    "mappings": [
+                      { "value": "{{purchase.purchaseId}}" },
+                      { "value": " payment" }
+                    ],
+                    "operations": [
+                      { "name": "LIST_VALUE_JOIN" }
+                    ]
+                  }
+                ],
+                "operations": [
+                  { "name": "GET_FIRST_NON_EMPTY_STRING" }
+                ]
+              },
+              {
+                "key": "valid_until",
+                "mappings": [
+                  {
+                    "value": "{{purchase.expireInMin}}"
+                  },
+                  {
+                    "value": "30"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  },
+                  {
+                    "name": "GENERATE_DATETIME",
+                    "params": {
+                      "offsetUnit": "MINUTES"
+                    }
+                  }
+                ]
               }
             ],
             "operations": [
@@ -785,20 +801,35 @@
           },
           {
             "key": "message",
+            "skipIf": "{{store.mmResult.isMMFailed}}",
             "mappings": [
               {
-                "value": "{{pspResponse3.message}}"
+                "key": "copyCLABE",
+                "value": "{{pspResponse3.metadata.virtual_account}}"
               },
               {
-                "value": "{{pspResponse3.error_description}}"
+                "key": "copyReference",
+                "value": "{{purchase.purchaseId}}"
               },
               {
-                "value": ""
+                "key": "Bank",
+                "value": "STP"
+              },
+              {
+                "key": "Amount",
+                "value": "{{purchase.fx_Amount}}"
+              },
+              {
+                "key": "Currency",
+                "value": "{{purchase.fx_Currency}}"
               }
             ],
             "operations": [
               {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
+                "name": "GENERATE_HTML",
+                "params": {
+                  "htmlRenderMode": "TEXT_HTML"
+                }
               }
             ]
           },
@@ -826,31 +857,10 @@
             "key": "redirectUrl",
             "skipIf": "{{store.mmResult.isMMFailed}}",
             "mappings": [
-              {
-                "key": "copyCLABE",
-                "value": "{{pspResponse3.metadata.virtual_account}}"
-              },
-              {
-                "key": "copyReference",
-                "value": "{{purchase.purchaseId}}"
-              },
-              {
-                "key": "Amount",
-                "value": "{{purchase.fx_Amount}}"
-              },
-              {
-                "key": "Currency",
-                "value": "{{purchase.fx_Currency}}"
-              }
+              { "value": "/depositdetail/" },
+              { "value": "{{purchase.purchaseId}}" }
             ],
-            "operations": [
-              {
-                "name": "GENERATE_HTML",
-                "params": {
-                  "htmlRenderMode": "TEXT_HTML"
-                }
-              }
-            ]
+            "operations": [{ "name": "LIST_VALUE_JOIN" }]
           }
         ],
         "operations": [
