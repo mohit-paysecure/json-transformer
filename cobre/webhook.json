@@ -1,0 +1,163 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "value": ""
+      },
+      "headers": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "pspTransactionId",
+            "value": "{{webhookRequest.content.id}}",
+            "required": true
+          },
+          {
+            "key": "status",
+            "value": "{{webhookRequest.content.status.state}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "completed",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "processing",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "initiated",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "rejected",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "failed",
+                      "to": "payment_failed"
+                    }
+                  ],
+                  "defaultValue": "payment_in_process"
+                }
+              }
+            ]
+          },
+          {
+            "key": "txnContext",
+            "mappings": [
+              {
+                "key": "id",
+                "value": "{{webhookRequest.content.id}}"
+              },
+              {
+                "key": "idType",
+                "value": "pspTransactionId"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "GET_TRANSACTION_CONTEXT_BY_ID"
+              }
+            ],
+            "storeIn": "ctx",
+            "hidden": true
+          },
+          {
+            "key": "sigInput",
+            "mappings": [
+              {
+                "value": "{{webhookRequestHeader.event-timestamp}}"
+              },
+              {
+                "value": "."
+              },
+              {
+                "value": "{{webhookRequestHeader.x-raw-body}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "storeIn": "sigData",
+            "hidden": true
+          },
+          {
+            "key": "generatedSignature",
+            "mappings": [
+              {
+                "key": "input",
+                "value": "{{store.sigData.sigInput}}"
+              },
+              {
+                "key": "secretKey",
+                "value": "{{store.ctx.txnContext.bankTransaction.usedAuthKey}}",
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 3
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "COMPUTE_HMAC_SHA",
+                "params": {
+                  "algorithm": "HmacSHA256",
+                  "outputFormat": "HEX"
+                }
+              }
+            ]
+          },
+          {
+            "key": "receivedSignature",
+            "value": "{{webhookRequestHeader.event-signature}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]

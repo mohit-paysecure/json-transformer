@@ -1,0 +1,256 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "value": "https://api.cobre.co/v1/auth"
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "user_id",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 0
+                }
+              }
+            ]
+          },
+          {
+            "key": "secret",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 1
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "token",
+            "value": "{{pspResponse0.access_token}}",
+            "storeIn": "auth"
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse0.access_token}}",
+            "operations": [
+              { "name": "CHECK_IF_NULL" },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [{ "from": false, "to": "success" }],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse0.access_token}}",
+            "operations": [
+              { "name": "CHECK_IF_NULL" },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [{ "from": false, "to": "payment_in_process" }],
+                  "defaultValue": "payment_failed"
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "value": "{{pspResponse0.error_description}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "requestMapping": {
+      "method": "GET",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://api.cobre.co/v1/money_movements/"
+          },
+          {
+            "value": "{{bankTransaction.paymentTransId}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "Bearer "
+              },
+              {
+                "value": "{{store.auth.token}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse1.id}}"
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse1.status.state}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "completed",
+                      "to": "success"
+                    },
+                    {
+                      "from": "processing",
+                      "to": "success"
+                    },
+                    {
+                      "from": "initiated",
+                      "to": "success"
+                    },
+                    {
+                      "from": "rejected",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "failed",
+                      "to": "fail"
+                    }
+                  ],
+                  "defaultValue": "success"
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse1.status.state}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "completed",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "processing",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "initiated",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "rejected",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "failed",
+                      "to": "payment_failed"
+                    }
+                  ],
+                  "defaultValue": "payment_in_process"
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "value": "{{pspResponse1.status.state}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]
