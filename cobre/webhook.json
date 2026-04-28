@@ -48,11 +48,11 @@
             "mappings": [
               {
                 "key": "id",
-                "value": "{{webhookRequest.content.external_id}}"
+                "value": "{{webhookRequest.content.id}}"
               },
               {
                 "key": "idType",
-                "value": "purchaseId"
+                "value": "pspTransactionId"
               }
             ],
             "operations": [

@@ -973,34 +973,33 @@
             "key": "message",
             "skipIf": "{{store.mmResult.isMMFailed}}",
             "mappings": [
+              { "value": "deposit##" },
               {
-                "key": "copyCLABE",
-                "value": "{{pspResponse4.metadata.virtual_account}}"
+                "mappings": [
+                  { "key": "copyCLABE",      "value": "{{pspResponse4.metadata.virtual_account}}" },
+                  { "key": "copyReference",  "value": "{{purchase.purchaseId}}" },
+                  { "key": "Bank",           "value": "STP" },
+                  { "key": "Amount",         "value": "{{purchase.fx_Amount}}" },
+                  { "key": "Currency",       "value": "{{purchase.fx_Currency}}" }
+                ],
+                "operations": [
+                  { "name": "GENERATE_HTML", "params": { "htmlRenderMode": "TEXT_HTML" } }
+                ]
               },
+              { "value": "##" },
               {
-                "key": "copyReference",
-                "value": "{{purchase.purchaseId}}"
-              },
-              {
-                "key": "Bank",
-                "value": "STP"
-              },
-              {
-                "key": "Amount",
-                "value": "{{purchase.fx_Amount}}"
-              },
-              {
-                "key": "Currency",
-                "value": "{{purchase.fx_Currency}}"
+                "mappings": [
+                  { "value": "{{purchase.expireInMin}}" },
+                  { "value": "30" }
+                ],
+                "operations": [
+                  { "name": "GET_FIRST_NON_EMPTY_STRING" },
+                  { "name": "GENERATE_DATETIME", "params": { "offsetUnit": "MINUTES", "format": "EPOCH_SECONDS" } }
+                ]
               }
             ],
             "operations": [
-              {
-                "name": "GENERATE_HTML",
-                "params": {
-                  "htmlRenderMode": "TEXT_HTML"
-                }
-              }
+              { "name": "LIST_VALUE_JOIN" }
             ]
           },
           {
