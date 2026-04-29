@@ -1,0 +1,595 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://api.cobre.co/v1/auth"
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "user_id",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 0
+                }
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "secret",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 1
+                }
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "code",
+            "value": "{{pspResponse0.access_token}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "error"
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse0.access_token}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "refund_in_process"
+                    }
+                  ],
+                  "defaultValue": "refund_failed"
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "value": "{{pspResponse0.error_description}}"
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{bankTransaction.paymentTransId}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "requestMapping": {
+      "method": "GET",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://api.cobre.co/v1/accounts/"
+          },
+          {
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 2
+                }
+              }
+            ]
+          },
+          {
+            "value": "/transactions?date_gte="
+          },
+          {
+            "mappings": [
+              {
+                "value": "{{purchase.created_on}}",
+                "operations": [
+                  {
+                    "name": "INTEGER_TO_STRING"
+                  },
+                  {
+                    "name": "STRING_TO_DOUBLE"
+                  }
+                ]
+              },
+              {
+                "value": "1000",
+                "operations": [
+                  {
+                    "name": "STRING_TO_DOUBLE"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_MULTIPLY"
+              },
+              {
+                "name": "DOUBLE_TO_FLOOR"
+              },
+              {
+                "name": "EPOCH_TO_STRING_DATE",
+                "params": {
+                  "dateFormat": "yyyy-MM-dd"
+                }
+              }
+            ]
+          },
+          {
+            "value": "&amount_gte="
+          },
+          {
+            "mappings": [
+              {
+                "value": "{{purchase.fx_Amount}}",
+                "operations": [
+                  {
+                    "name": "STRING_TO_DOUBLE"
+                  }
+                ]
+              },
+              {
+                "value": "100",
+                "operations": [
+                  {
+                    "name": "STRING_TO_DOUBLE"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_MULTIPLY"
+              },
+              {
+                "name": "DOUBLE_TO_FLOOR"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "Bearer "
+              },
+              {
+                "value": "{{pspResponse0.access_token}}",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "originalTransactionId",
+            "mappings": [
+              {
+                "key": "list",
+                "value": "{{pspResponse1.contents}}"
+              },
+              {
+                "key": "matchValue",
+                "value": "{{bankTransaction.paymentTransId}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "FIND_OBJECT_IN_LIST_BY_FIELD_MATCH",
+                "params": {
+                  "fieldPath": "metadata.money_movement_id",
+                  "extractField": "id"
+                }
+              }
+            ],
+            "storeIn": "trx",
+            "hidden": true
+          },
+          {
+            "key": "code",
+            "value": "{{store.trx.originalTransactionId}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{store.trx.originalTransactionId}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "refund_in_process"
+                    }
+                  ],
+                  "defaultValue": "refund_failed"
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "value": "{{store.trx.originalTransactionId}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "Original transaction located"
+                    }
+                  ],
+                  "defaultValue": "Original transaction not found for refund"
+                }
+              }
+            ]
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{bankTransaction.paymentTransId}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://api.cobre.co/v1/money_movements_return"
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "Bearer "
+              },
+              {
+                "value": "{{pspResponse0.access_token}}",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
+          },
+          {
+            "key": "idempotency",
+            "mappings": [
+              {
+                "value": "refund_"
+              },
+              {
+                "value": "{{bankTransaction.paymentTransId}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "transaction_id",
+            "value": "{{store.trx.originalTransactionId}}",
+            "required": true
+          },
+          {
+            "key": "metadata",
+            "mappings": [
+              {
+                "key": "description",
+                "mappings": [
+                  {
+                    "value": "Refund "
+                  },
+                  {
+                    "value": "{{purchase.purchaseId}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  }
+                ],
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "code",
+            "value": "{{pspResponse2.status.state}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    { "from": "completed",   "to": "success" },
+                    { "from": "returned",    "to": "success" },
+                    { "from": "processing",  "to": "success" },
+                    { "from": "initiated",   "to": "success" },
+                    { "from": "under_review","to": "success" },
+                    { "from": "rejected",    "to": "error" },
+                    { "from": "failed",      "to": "error" },
+                    { "from": "canceled",    "to": "error" }
+                  ],
+                  "defaultValue": "error"
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse2.status.state}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    { "from": "completed",   "to": "refunded" },
+                    { "from": "returned",    "to": "refunded" },
+                    { "from": "processing",  "to": "refund_in_process" },
+                    { "from": "initiated",   "to": "refund_in_process" },
+                    { "from": "under_review","to": "refund_in_process" },
+                    { "from": "rejected",    "to": "refund_failed" },
+                    { "from": "failed",      "to": "refund_failed" },
+                    { "from": "canceled",    "to": "refund_failed" }
+                  ],
+                  "defaultValue": "refund_failed"
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse2.error_description}}"
+              },
+              {
+                "value": "{{pspResponse2.status.description}}"
+              },
+              {
+                "value": "{{pspResponse2.status.code}}"
+              },
+              {
+                "value": "{{pspResponse2.status.state}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "refundTransId",
+            "value": "{{pspResponse2.id}}"
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{bankTransaction.paymentTransId}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]

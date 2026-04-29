@@ -822,7 +822,7 @@
             "key": "amount",
             "mappings": [
               {
-                "value": "{{purchase.purchase.total}}",
+                "value": "{{purchase.fx_Amount}}",
                 "operations": [
                   {
                     "name": "STRING_TO_DOUBLE"
