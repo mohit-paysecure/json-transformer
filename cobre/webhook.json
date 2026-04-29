@@ -16,34 +16,6 @@
       "body": {
         "mappings": [
           {
-            "key": "pspTransactionId",
-            "value": "{{webhookRequest.content.id}}"
-          },
-          {
-            "key": "purchaseId",
-            "value": "{{webhookRequest.content.external_id}}",
-            "required": true
-          },
-          {
-            "key": "status",
-            "value": "{{webhookRequest.content.status.state}}",
-            "operations": [
-              {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "mappings": [
-                    { "from": "completed",  "to": "paid" },
-                    { "from": "processing", "to": "payment_in_process" },
-                    { "from": "initiated",  "to": "payment_in_process" },
-                    { "from": "rejected",   "to": "payment_failed" },
-                    { "from": "failed",     "to": "payment_failed" }
-                  ],
-                  "defaultValue": "payment_in_process"
-                }
-              }
-            ]
-          },
-          {
             "key": "txnContext",
             "mappings": [
               {
@@ -61,6 +33,87 @@
             ],
             "storeIn": "ctx",
             "hidden": true
+          },
+          {
+            "key": "payoutMissing",
+            "value": "{{store.ctx.txnContext.payout.payoutId}}",
+            "operations": [
+              { "name": "CHECK_IF_NULL" }
+            ],
+            "storeIn": "flow",
+            "hidden": true
+          },
+          {
+            "key": "purchaseMissing",
+            "value": "{{store.ctx.txnContext.purchase.purchaseId}}",
+            "operations": [
+              { "name": "CHECK_IF_NULL" }
+            ],
+            "storeIn": "flow",
+            "hidden": true
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{webhookRequest.content.id}}"
+          },
+          {
+            "key": "purchaseId",
+            "value": "{{webhookRequest.content.external_id}}",
+            "required": true
+          },
+          {
+            "key": "status",
+            "value": "{{webhookRequest.content.status.state}}",
+            "skipIf": "{{store.flow.payoutMissing}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    { "from": "completed",  "to": "paid" },
+                    { "from": "processing", "to": "payout_in_process" },
+                    { "from": "initiated",  "to": "payout_in_process" },
+                    { "from": "rejected",   "to": "payment_failed" },
+                    { "from": "failed",     "to": "payment_failed" },
+                    { "from": "canceled",   "to": "payment_failed" }
+                  ],
+                  "defaultValue": "payout_in_process"
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "skipIf": "{{store.flow.purchaseMissing}}",
+            "mappings": [
+              { "value": "{{webhookRequest.content.type}}" },
+              { "value": "_" },
+              { "value": "{{webhookRequest.content.status.state}}" }
+            ],
+            "operations": [
+              { "name": "LIST_VALUE_JOIN" },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    { "from": "spei_return_completed",  "to": "refunded" },
+                    { "from": "spei_return_processing", "to": "refund_in_process" },
+                    { "from": "spei_return_initiated",  "to": "refund_in_process" },
+                    { "from": "spei_return_rejected",   "to": "refund_failed" },
+                    { "from": "spei_return_failed",     "to": "refund_failed" },
+                    { "from": "spei_return_canceled",   "to": "refund_failed" },
+
+                    { "from": "r2p_spei_completed",     "to": "paid" },
+                    { "from": "r2p_spei_processing",    "to": "payment_in_process" },
+                    { "from": "r2p_spei_initiated",     "to": "payment_in_process" },
+                    { "from": "r2p_spei_rejected",      "to": "payment_failed" },
+                    { "from": "r2p_spei_failed",        "to": "payment_failed" },
+                    { "from": "r2p_spei_canceled",      "to": "payment_failed" }
+                  ],
+                  "defaultValue": "payment_in_process"
+                }
+              }
+            ]
           },
           {
             "key": "sigInput",
