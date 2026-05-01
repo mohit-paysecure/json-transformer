@@ -1,0 +1,52 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": []
+      },
+      "headers": {
+        "mappings": []
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "postRedirectFlowRequired",
+            "value": "{{redirectRequest.value}}",
+            "operations": [
+              {
+                "name": "STRING_PATTERN_MATCH",
+                "params": {
+                  "regex": "^status=completed$",
+                  "defaultValue": "not_completed"
+                }
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": false,
+                  "mappings": [
+                    {
+                      "from": "status=completed",
+                      "to": true
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": []
+      }
+    }
+  }
+]

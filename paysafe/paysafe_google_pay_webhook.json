@@ -1,0 +1,433 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": []
+      },
+      "headers": {
+        "mappings": []
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "merchantRefNumFromWebhook",
+            "mappings": [
+              {
+                "value": "{{webhookRequest.payload.merchantRefNum}}"
+              },
+              {
+                "value": "{{webhookRequest.merchantRefNum}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "storeIn": "paysafeWebhook",
+            "hidden": true
+          },
+          {
+            "key": "pspTxnIdFromWebhook",
+            "mappings": [
+              {
+                "value": "{{webhookRequest.payload.id}}"
+              },
+              {
+                "value": "{{webhookRequest.payload.paymentHandleToken}}"
+              },
+              {
+                "value": "{{webhookRequest.resourceId}}"
+              },
+              {
+                "value": "{{webhookRequest.id}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "storeIn": "paysafeWebhook",
+            "hidden": true
+          },
+          {
+            "key": "isMerchantRefMissing",
+            "value": "{{store.paysafeWebhook.merchantRefNumFromWebhook}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              }
+            ],
+            "storeIn": "paysafeWebhook",
+            "hidden": true
+          },
+          {
+            "key": "transactionContext",
+            "mappings": [
+              {
+                "key": "id",
+                "mappings": [
+                  {
+                    "value": "{{store.paysafeWebhook.merchantRefNumFromWebhook}}"
+                  },
+                  {
+                    "value": "{{store.paysafeWebhook.pspTxnIdFromWebhook}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              },
+              {
+                "key": "idType",
+                "value": "{{store.paysafeWebhook.isMerchantRefMissing}}",
+                "operations": [
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "defaultValue": "purchaseId",
+                      "mappings": [
+                        {
+                          "from": true,
+                          "to": "pspTransactionId"
+                        },
+                        {
+                          "from": false,
+                          "to": "purchaseId"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "GET_TRANSACTION_CONTEXT_BY_ID"
+              }
+            ],
+            "storeIn": "contextStore",
+            "hidden": true
+          },
+          {
+            "key": "purchaseId",
+            "mappings": [
+              {
+                "value": "{{store.paysafeWebhook.merchantRefNumFromWebhook}}"
+              },
+              {
+                "value": "{{store.contextStore.transactionContext.purchase.purchaseId}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "pspTransactionId",
+            "mappings": [
+              {
+                "value": "{{store.paysafeWebhook.pspTxnIdFromWebhook}}"
+              },
+              {
+                "value": "{{store.contextStore.transactionContext.bankTransaction.paymentTransId}}"
+              },
+              {
+                "value": "{{store.contextStore.transactionContext.bankTransaction.token}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "receivedSignature",
+            "mappings": [
+              {
+                "value": "{{webhookRequestHeader.Signature}}"
+              },
+              {
+                "value": "{{webhookRequestHeader.signature}}"
+              },
+              {
+                "value": "{{webhookRequestHeader.SIGNATURE}}"
+              },
+              {
+                "value": "MISSING_SIGNATURE"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "generatedSignature",
+            "mappings": [
+              {
+                "key": "input",
+                "value": "{{webhookRequestHeader.x-raw-body}}",
+                "required": true
+              },
+              {
+                "key": "secretKey",
+                "mappings": [
+                  {
+                    "value": "{{store.contextStore.transactionContext.bankTransaction.extraParam.paysafeWebhookSecret}}"
+                  },
+                  {
+                    "value": "{{store.contextStore.transactionContext.purchase.extraParam.paysafeWebhookSecret}}"
+                  },
+                  {
+                    "value": "{{store.contextStore.transactionContext.bankTransaction.webhookSecret}}"
+                  },
+                  {
+                    "value": "{{store.contextStore.transactionContext.purchase.extraParam.webhookSecret}}"
+                  },
+                  {
+                    "value": "{{store.contextStore.transactionContext.bankTransaction.usedAuthKey}}",
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 2,
+                          "defaultValue": ""
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": "{{store.contextStore.transactionContext.bankTransaction.usedAuthKey}}",
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 1,
+                          "defaultValue": ""
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": "MISSING_WEBHOOK_SECRET"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ],
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "COMPUTE_HMAC_SHA",
+                "params": {
+                  "algorithm": "HmacSHA256",
+                  "outputFormat": "BASE64"
+                }
+              }
+            ]
+          },
+          {
+            "key": "webhookStatusSource",
+            "mappings": [
+              {
+                "value": "{{webhookRequest.payload.status}}"
+              },
+              {
+                "value": "{{webhookRequest.status}}"
+              },
+              {
+                "value": "{{webhookRequest.eventType}}"
+              },
+              {
+                "value": "{{webhookRequest.eventName}}"
+              },
+              {
+                "value": "UNKNOWN"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "storeIn": "paysafeWebhook",
+            "hidden": true
+          },
+          {
+            "key": "status",
+            "value": "{{store.paysafeWebhook.webhookStatusSource}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "payment_in_process",
+                  "mappings": [
+                    {
+                      "from": "PAYABLE",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "INITIATED",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "PROCESSING",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "PENDING",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "PAYMENT_HANDLE_PAYABLE",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "PAYMENT_HANDLE_PROCESSING",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "COMPLETED",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "PAYMENT_COMPLETED",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "SETTLEMENT_COMPLETED",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "SETTLEMENT_CLEARED",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "AUTHORIZED",
+                      "to": "authorized"
+                    },
+                    {
+                      "from": "FAILED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "PAYMENT_FAILED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "PAYMENT_HANDLE_FAILED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "PAYMENT_RETURNED_COMPLETED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "EXPIRED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "PAYMENT_HANDLE_EXPIRED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "DECLINED",
+                      "to": "payment_declined"
+                    },
+                    {
+                      "from": "CANCELLED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "SETTLEMENT_CANCELLED",
+                      "to": "payment_failed"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{webhookRequest.payload.error.message}}"
+              },
+              {
+                "value": "{{webhookRequest.payload.error.code}}"
+              },
+              {
+                "value": "{{webhookRequest.payload.errorMessage}}"
+              },
+              {
+                "value": "{{webhookRequest.errorMessage}}"
+              },
+              {
+                "value": "{{webhookRequest.payload.status}}"
+              },
+              {
+                "value": "{{webhookRequest.status}}"
+              },
+              {
+                "value": "{{webhookRequest.eventType}}"
+              },
+              {
+                "value": "{{webhookRequest.eventName}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": []
+      }
+    }
+  }
+]
