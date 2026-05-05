@@ -149,7 +149,8 @@
               {
                 "name": "GET_FIRST_NON_EMPTY_STRING"
               }
-            ]
+            ],
+            "skipIf": "{{store.paysafeWebhook.isRefundEvent}}"
           },
           {
             "key": "receivedSignature",
@@ -184,6 +185,24 @@
               {
                 "key": "secretKey",
                 "mappings": [
+                  {
+                    "value": "{{store.contextStore.transactionContext.bankTransaction.usedAuthKey}}",
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 4,
+                          "defaultValue": ""
+                        }
+                      }
+                    ]
+                  },
                   {
                     "value": "{{store.contextStore.transactionContext.bankTransaction.extraParam.paysafeWebhookSecret}}"
                   },
@@ -252,7 +271,8 @@
                 "name": "COMPUTE_HMAC_SHA",
                 "params": {
                   "algorithm": "HmacSHA256",
-                  "outputFormat": "BASE64"
+                  "outputFormat": "BASE64",
+                  "decodeKey": true
                 }
               }
             ]
@@ -279,6 +299,62 @@
             "operations": [
               {
                 "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "storeIn": "paysafeWebhook",
+            "hidden": true
+          },
+          {
+            "key": "isRefundEvent",
+            "value": "{{store.paysafeWebhook.webhookStatusSource}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": false,
+                  "mappings": [
+                    {
+                      "from": "REFUND_COMPLETED",
+                      "to": true
+                    },
+                    {
+                      "from": "REFUND_PENDING",
+                      "to": true
+                    },
+                    {
+                      "from": "REFUND_FAILED",
+                      "to": true
+                    }
+                  ]
+                }
+              }
+            ],
+            "storeIn": "paysafeWebhook",
+            "hidden": true
+          },
+          {
+            "key": "isNonRefundEvent",
+            "value": "{{store.paysafeWebhook.webhookStatusSource}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": true,
+                  "mappings": [
+                    {
+                      "from": "REFUND_COMPLETED",
+                      "to": false
+                    },
+                    {
+                      "from": "REFUND_PENDING",
+                      "to": false
+                    },
+                    {
+                      "from": "REFUND_FAILED",
+                      "to": false
+                    }
+                  ]
+                }
               }
             ],
             "storeIn": "paysafeWebhook",
@@ -373,6 +449,30 @@
                     {
                       "from": "SETTLEMENT_CANCELLED",
                       "to": "payment_failed"
+                    },
+                    {
+                      "from": "REFUND_COMPLETED",
+                      "to": "refunded"
+                    },
+                    {
+                      "from": "REFUND_PENDING",
+                      "to": "refund_in_process"
+                    },
+                    {
+                      "from": "REFUND_FAILED",
+                      "to": "refund_failed"
+                    },
+                    {
+                      "from": "SETTLEMENT_FAILED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "SETTLEMENT_ERRORED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "SETTLEMENT_PENDING",
+                      "to": "payment_in_process"
                     }
                   ]
                 }
@@ -382,6 +482,12 @@
           {
             "key": "message",
             "mappings": [
+              {
+                "value": "{{webhookRequest.payload.statusReason}}"
+              },
+              {
+                "value": "{{webhookRequest.payload.error.description}}"
+              },
               {
                 "value": "{{webhookRequest.payload.error.message}}"
               },

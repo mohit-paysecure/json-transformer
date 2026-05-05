@@ -69,7 +69,7 @@
                       {
                         "name": "GET_ELEMENT_AT_INDEX",
                         "params": {
-                          "index": 0
+                          "index": 2
                         }
                       }
                     ]
@@ -90,7 +90,7 @@
                       {
                         "name": "GET_ELEMENT_AT_INDEX",
                         "params": {
-                          "index": 1
+                          "index": 3
                         }
                       }
                     ]
@@ -235,6 +235,10 @@
                         {
                           "from": false,
                           "to": "payment_failed"
+                        },
+                        {
+                          "from": "ERROR",
+                          "to": "payment_failed"
                         }
                       ]
                     }
@@ -276,6 +280,10 @@
                         {
                           "from": "EXPIRED",
                           "to": "payment_failed"
+                        },
+                        {
+                          "from": "ERROR",
+                          "to": "payment_failed"
                         }
                       ]
                     }
@@ -306,6 +314,10 @@
                         {
                           "from": false,
                           "to": "fail"
+                        },
+                        {
+                          "from": "ERROR",
+                          "to": "fail"
                         }
                       ]
                     }
@@ -335,6 +347,10 @@
                         {
                           "from": "EXPIRED",
                           "to": "fail"
+                        },
+                        {
+                          "from": "ERROR",
+                          "to": "fail"
                         }
                       ]
                     }
@@ -352,13 +368,13 @@
             "key": "message",
             "mappings": [
               {
-                "value": "{{pspResponse0.error.message}}"
+                "value": "{{pspResponse0.authentication.error.message}}"
               },
               {
-                "value": "{{pspResponse0.error.details.0}}"
+                "value": "{{pspResponse0.statusReason}}"
               },
               {
-                "value": "{{pspResponse0.status}}"
+                "value": ""
               }
             ],
             "operations": [
@@ -430,7 +446,7 @@
                       {
                         "name": "GET_ELEMENT_AT_INDEX",
                         "params": {
-                          "index": 0
+                          "index": 2
                         }
                       }
                     ]
@@ -451,7 +467,7 @@
                       {
                         "name": "GET_ELEMENT_AT_INDEX",
                         "params": {
-                          "index": 1
+                          "index": 3
                         }
                       }
                     ]
@@ -608,6 +624,10 @@
                         {
                           "from": false,
                           "to": "payment_failed"
+                        },
+                        {
+                          "from": "ERROR",
+                          "to": "payment_failed"
                         }
                       ]
                     }
@@ -645,6 +665,10 @@
                         {
                           "from": "PROCESSING",
                           "to": "payment_in_process"
+                        },
+                        {
+                          "from": "ERROR",
+                          "to": "payment_failed"
                         }
                       ]
                     }
@@ -675,6 +699,10 @@
                         {
                           "from": false,
                           "to": "fail"
+                        },
+                        {
+                          "from": "ERROR",
+                          "to": "fail"
                         }
                       ]
                     }
@@ -696,6 +724,10 @@
                         {
                           "from": "DECLINED",
                           "to": "fail"
+                        },
+                        {
+                          "from": "ERROR",
+                          "to": "fail"
                         }
                       ]
                     }
@@ -713,6 +745,15 @@
             "key": "message",
             "mappings": [
               {
+                "value": "{{pspResponse1.statusReason}}"
+              },
+              {
+                "value": "{{pspResponse1.authentication.error.message}}"
+              },
+              {
+                "value": "{{pspResponse1.authentication.error.description}}"
+              },
+              {
                 "value": "{{pspResponse1.error.message}}"
               },
               {
@@ -723,6 +764,9 @@
               },
               {
                 "value": "{{pspResponse1.status}}"
+              },
+              {
+                "value": ""
               }
             ],
             "operations": [

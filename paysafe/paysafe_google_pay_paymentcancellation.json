@@ -1,7 +1,7 @@
 [
   {
     "requestMapping": {
-      "method": "GET",
+      "method": "POST",
       "url": {
         "mappings": [
           {
@@ -9,23 +9,15 @@
             "required": true
           },
           {
-            "value": "/paymenthub/v1/paymenthandles/",
+            "value": "/paymenthub/v1/settlements/",
             "required": true
           },
           {
-            "mappings": [
-              {
-                "value": "{{bankTransaction.tempObject.paysafePaymentHandleId}}"
-              },
-              {
-                "value": "{{bankTransaction.paymentTransId}}"
-              }
-            ],
-            "operations": [
-              {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
-              }
-            ],
+            "value": "{{bankTransaction.paymentTransId}}",
+            "required": true
+          },
+          {
+            "value": "/refunds",
             "required": true
           }
         ],
@@ -124,7 +116,61 @@
         ]
       },
       "body": {
-        "mappings": [],
+        "mappings": [
+          {
+            "key": "merchantRefNum",
+            "mappings": [
+              {
+                "value": "{{purchase.purchaseId}}"
+              },
+              {
+                "value": "-refund"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "amount",
+            "mappings": [
+              {
+                "value": "{{purchase.fx_Amount}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "STRING_TO_DOUBLE"
+                  }
+                ]
+              },
+              {
+                "value": "100",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "STRING_TO_DOUBLE"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_MULTIPLY"
+              },
+              {
+                "name": "DOUBLE_TO_FLOOR"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "dupCheck",
+            "value": true
+          }
+        ],
         "operations": [
           {
             "name": "KEY_VALUE_LIST_TO_OBJECT"
@@ -136,20 +182,8 @@
       "body": {
         "mappings": [
           {
-            "key": "pspTransactionId",
-            "mappings": [
-              {
-                "value": "{{pspResponse0.id}}"
-              },
-              {
-                "value": "{{bankTransaction.paymentTransId}}"
-              }
-            ],
-            "operations": [
-              {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
-              }
-            ]
+            "key": "refundTransId",
+            "value": "{{pspResponse0.id}}"
           },
           {
             "key": "status",
@@ -167,11 +201,7 @@
                       "mappings": [
                         {
                           "from": false,
-                          "to": "payment_failed"
-                        },
-                        {
-                          "from": "ERROR",
-                          "to": "payment_failed"
+                          "to": "refund_failed"
                         }
                       ]
                     }
@@ -184,39 +214,35 @@
                   {
                     "name": "VALUE_MAPPER",
                     "params": {
-                      "defaultValue": "payment_in_process",
+                      "defaultValue": "refund_in_process",
                       "mappings": [
                         {
                           "from": "COMPLETED",
-                          "to": "payment_in_process"
+                          "to": "refunded"
                         },
                         {
-                          "from": "PAYABLE",
-                          "to": "payment_in_process"
+                          "from": "PENDING",
+                          "to": "refund_in_process"
                         },
                         {
                           "from": "PROCESSING",
-                          "to": "payment_in_process"
+                          "to": "refund_in_process"
                         },
                         {
-                          "from": "INITIATED",
-                          "to": "payment_in_process"
+                          "from": "RECEIVED",
+                          "to": "refund_in_process"
                         },
                         {
                           "from": "FAILED",
-                          "to": "payment_failed"
+                          "to": "refund_failed"
                         },
                         {
                           "from": "DECLINED",
-                          "to": "payment_declined"
-                        },
-                        {
-                          "from": "EXPIRED",
-                          "to": "payment_failed"
+                          "to": "refund_failed"
                         },
                         {
                           "from": "ERROR",
-                          "to": "payment_failed"
+                          "to": "refund_failed"
                         }
                       ]
                     }
@@ -247,10 +273,6 @@
                         {
                           "from": false,
                           "to": "fail"
-                        },
-                        {
-                          "from": "ERROR",
-                          "to": "fail"
                         }
                       ]
                     }
@@ -274,10 +296,6 @@
                           "to": "fail"
                         },
                         {
-                          "from": "EXPIRED",
-                          "to": "fail"
-                        },
-                        {
                           "from": "ERROR",
                           "to": "fail"
                         }
@@ -297,10 +315,16 @@
             "key": "message",
             "mappings": [
               {
-                "value": "{{pspResponse0.authentication.error.message}}"
+                "value": "{{pspResponse0.error.message}}"
               },
               {
-                "value": "{{pspResponse0.statusReason}}"
+                "value": "{{pspResponse0.error.details.0}}"
+              },
+              {
+                "value": "{{pspResponse0.error.code}}"
+              },
+              {
+                "value": "{{pspResponse0.status}}"
               },
               {
                 "value": ""
