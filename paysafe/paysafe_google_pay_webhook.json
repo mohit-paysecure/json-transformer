@@ -23,10 +23,138 @@
             "operations": [
               {
                 "name": "GET_FIRST_NON_EMPTY_STRING"
+              },
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "-refund$",
+                  "replacement": "",
+                  "occurrence": "REGEX_FIRST"
+                }
               }
             ],
             "storeIn": "paysafeWebhook",
             "hidden": true
+          },
+          {
+            "key": "webhookStatusSource",
+            "mappings": [
+              {
+                "value": "{{webhookRequest.eventName}}"
+              },
+              {
+                "value": "{{webhookRequest.type}}"
+              },
+              {
+                "value": "{{webhookRequest.eventType}}"
+              },
+              {
+                "value": "{{webhookRequest.payload.status}}"
+              },
+              {
+                "value": "{{webhookRequest.status}}"
+              },
+              {
+                "value": "UNKNOWN"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "storeIn": "paysafeWebhook",
+            "hidden": true
+          },
+          {
+            "key": "isRefundEvent",
+            "value": "{{store.paysafeWebhook.webhookStatusSource}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": false,
+                  "mappings": [
+                    {
+                      "from": "REFUND",
+                      "to": true
+                    },
+                    {
+                      "from": "REFUND_COMPLETED",
+                      "to": true
+                    },
+                    {
+                      "from": "REFUND_PENDING",
+                      "to": true
+                    },
+                    {
+                      "from": "REFUND_FAILED",
+                      "to": true
+                    }
+                  ]
+                }
+              }
+            ],
+            "storeIn": "paysafeWebhook",
+            "hidden": true
+          },
+          {
+            "key": "isNonRefundEvent",
+            "value": "{{store.paysafeWebhook.webhookStatusSource}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": true,
+                  "mappings": [
+                    {
+                      "from": "REFUND",
+                      "to": false
+                    },
+                    {
+                      "from": "REFUND_COMPLETED",
+                      "to": false
+                    },
+                    {
+                      "from": "REFUND_PENDING",
+                      "to": false
+                    },
+                    {
+                      "from": "REFUND_FAILED",
+                      "to": false
+                    }
+                  ]
+                }
+              }
+            ],
+            "storeIn": "paysafeWebhook",
+            "hidden": true
+          },
+          {
+            "key": "purchaseIdFromWebhook",
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              },
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "-refund$",
+                  "replacement": "",
+                  "occurrence": "REGEX_FIRST"
+                }
+              }
+            ],
+            "storeIn": "paysafeWebhook",
+            "hidden": true,
+            "mappings": [
+              {
+                "value": "{{store.paysafeWebhook.merchantRefNumFromWebhook}}"
+              },
+              {
+                "value": ""
+              }
+            ]
           },
           {
             "key": "pspTxnIdFromWebhook",
@@ -70,7 +198,7 @@
                 "key": "id",
                 "mappings": [
                   {
-                    "value": "{{store.paysafeWebhook.merchantRefNumFromWebhook}}"
+                    "value": "{{store.paysafeWebhook.purchaseIdFromWebhook}}"
                   },
                   {
                     "value": "{{store.paysafeWebhook.pspTxnIdFromWebhook}}"
@@ -120,7 +248,7 @@
             "key": "purchaseId",
             "mappings": [
               {
-                "value": "{{store.paysafeWebhook.merchantRefNumFromWebhook}}"
+                "value": "{{store.paysafeWebhook.purchaseIdFromWebhook}}"
               },
               {
                 "value": "{{store.contextStore.transactionContext.purchase.purchaseId}}"
@@ -179,8 +307,7 @@
             "mappings": [
               {
                 "key": "input",
-                "value": "{{webhookRequestHeader.x-raw-body}}",
-                "required": true
+                "value": "{{webhookRequestHeader.x-raw-body}}"
               },
               {
                 "key": "secretKey",
@@ -276,89 +403,6 @@
                 }
               }
             ]
-          },
-          {
-            "key": "webhookStatusSource",
-            "mappings": [
-              {
-                "value": "{{webhookRequest.payload.status}}"
-              },
-              {
-                "value": "{{webhookRequest.status}}"
-              },
-              {
-                "value": "{{webhookRequest.eventType}}"
-              },
-              {
-                "value": "{{webhookRequest.eventName}}"
-              },
-              {
-                "value": "UNKNOWN"
-              }
-            ],
-            "operations": [
-              {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
-              }
-            ],
-            "storeIn": "paysafeWebhook",
-            "hidden": true
-          },
-          {
-            "key": "isRefundEvent",
-            "value": "{{store.paysafeWebhook.webhookStatusSource}}",
-            "operations": [
-              {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "defaultValue": false,
-                  "mappings": [
-                    {
-                      "from": "REFUND_COMPLETED",
-                      "to": true
-                    },
-                    {
-                      "from": "REFUND_PENDING",
-                      "to": true
-                    },
-                    {
-                      "from": "REFUND_FAILED",
-                      "to": true
-                    }
-                  ]
-                }
-              }
-            ],
-            "storeIn": "paysafeWebhook",
-            "hidden": true
-          },
-          {
-            "key": "isNonRefundEvent",
-            "value": "{{store.paysafeWebhook.webhookStatusSource}}",
-            "operations": [
-              {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "defaultValue": true,
-                  "mappings": [
-                    {
-                      "from": "REFUND_COMPLETED",
-                      "to": false
-                    },
-                    {
-                      "from": "REFUND_PENDING",
-                      "to": false
-                    },
-                    {
-                      "from": "REFUND_FAILED",
-                      "to": false
-                    }
-                  ]
-                }
-              }
-            ],
-            "storeIn": "paysafeWebhook",
-            "hidden": true
           },
           {
             "key": "status",

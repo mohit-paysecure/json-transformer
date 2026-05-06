@@ -608,6 +608,38 @@
             "value": "{{pspResponse1.id}}"
           },
           {
+            "key": "tempObject",
+            "mappings": [
+              {
+                "key": "paysafeSettlementId",
+                "mappings": [
+                  {
+                    "value": "{{pspResponse1.settlements.0.id}}"
+                  },
+                  {
+                    "value": "{{pspResponse1.id}}"
+                  },
+                  {
+                    "value": "{{bankTransaction.tempObject.paysafeSettlementId}}"
+                  },
+                  {
+                    "value": "{{bankTransaction.paymentTransId}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
             "key": "status",
             "mappings": [
               {

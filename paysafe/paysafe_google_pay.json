@@ -198,35 +198,6 @@
             "value": "{{s2s.remote_ip}}"
           },
           {
-            "key": "decryptedGpayPayload",
-            "mappings": [
-              {
-                "key": "encryptedToken",
-                "value": "{{bankTransaction.gpayEncryptedToken}}",
-                "required": true
-              },
-              {
-                "key": "merchantProfileId",
-                "value": "{{purchase.merchant_id}}",
-                "required": true
-              },
-              {
-                "key": "isTestEnvironment",
-                "value": "true"
-              }
-            ],
-            "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              },
-              {
-                "name": "GOOGLE_PAY_DECRYPT_UNVERIFIED"
-              }
-            ],
-            "hidden": true,
-            "storeIn": "gpay"
-          },
-          {
             "key": "googlePay",
             "mappings": [
               {
@@ -447,158 +418,21 @@
                             "required": true
                           },
                           {
-                            "key": "decryptedToken",
+                            "key": "token",
                             "mappings": [
                               {
-                                "key": "paymentMethod",
-                                "mappings": [
-                                  {
-                                    "value": "{{store.gpay.decryptedGpayPayload.paymentMethod}}"
-                                  },
-                                  {
-                                    "value": "CARD"
-                                  }
-                                ],
-                                "operations": [
-                                  {
-                                    "name": "GET_FIRST_NON_EMPTY_STRING"
-                                  }
-                                ]
+                                "value": "{{bankTransaction.tempObject.googlePayPaymentToken.paymentMethodData.tokenizationData.token}}"
                               },
                               {
-                                "key": "paymentMethodDetails",
-                                "mappings": [
-                                  {
-                                    "key": "authMethod",
-                                    "mappings": [
-                                      {
-                                        "value": "{{store.gpay.decryptedGpayPayload.paymentMethodDetails.authMethod}}"
-                                      },
-                                      {
-                                        "value": "PAN_ONLY"
-                                      }
-                                    ],
-                                    "operations": [
-                                      {
-                                        "name": "GET_FIRST_NON_EMPTY_STRING"
-                                      }
-                                    ]
-                                  },
-                                  {
-                                    "key": "pan",
-                                    "mappings": [
-                                      {
-                                        "value": "{{store.gpay.decryptedGpayPayload.paymentMethodDetails.pan}}"
-                                      },
-                                      {
-                                        "value": "4000000000002503"
-                                      }
-                                    ],
-                                    "operations": [
-                                      {
-                                        "name": "GET_FIRST_NON_EMPTY_STRING"
-                                      }
-                                    ],
-                                    "required": true
-                                  },
-                                  {
-                                    "key": "expirationMonth",
-                                    "mappings": [
-                                      {
-                                        "value": "{{store.gpay.decryptedGpayPayload.paymentMethodDetails.expirationMonth}}"
-                                      },
-                                      {
-                                        "value": "5"
-                                      }
-                                    ],
-                                    "operations": [
-                                      {
-                                        "name": "GET_FIRST_NON_EMPTY_STRING"
-                                      },
-                                      {
-                                        "name": "STRING_TO_INTEGER"
-                                      }
-                                    ],
-                                    "required": true
-                                  },
-                                  {
-                                    "key": "expirationYear",
-                                    "mappings": [
-                                      {
-                                        "value": "{{store.gpay.decryptedGpayPayload.paymentMethodDetails.expirationYear}}"
-                                      },
-                                      {
-                                        "value": "2029"
-                                      }
-                                    ],
-                                    "operations": [
-                                      {
-                                        "name": "GET_FIRST_NON_EMPTY_STRING"
-                                      },
-                                      {
-                                        "name": "STRING_TO_INTEGER"
-                                      }
-                                    ],
-                                    "required": true
-                                  },
-                                  {
-                                    "key": "cryptogram",
-                                    "value": "{{store.gpay.decryptedGpayPayload.paymentMethodDetails.cryptogram}}"
-                                  },
-                                  {
-                                    "key": "eciIndicator",
-                                    "value": "{{store.gpay.decryptedGpayPayload.paymentMethodDetails.eciIndicator}}"
-                                  }
-                                ],
-                                "operations": [
-                                  {
-                                    "name": "KEY_VALUE_LIST_TO_OBJECT"
-                                  }
-                                ]
-                              },
-                              {
-                                "key": "messageId",
-                                "mappings": [
-                                  {
-                                    "value": "{{store.gpay.decryptedGpayPayload.messageId}}"
-                                  },
-                                  {
-                                    "value": "AH2EjteVmzuCDWRRE9MDbRH-DI3bVgpteaiids3oxwUfrzft3pBHnq6CThTQMXOnk7h9r6JG47fhUtIuzsKJnqrzaLmtCLehL89838brbXzzodeCpdR15LU"
-                                  }
-                                ],
-                                "operations": [
-                                  {
-                                    "name": "GET_FIRST_NON_EMPTY_STRING"
-                                  }
-                                ],
-                                "required": true
-                              },
-                              {
-                                "key": "messageExpiration",
-                                "mappings": [
-                                  {
-                                    "value": "{{store.gpay.decryptedGpayPayload.messageExpiration}}"
-                                  },
-                                  {
-                                    "value": "1728028957120"
-                                  }
-                                ],
-                                "operations": [
-                                  {
-                                    "name": "GET_FIRST_NON_EMPTY_STRING"
-                                  },
-                                  {
-                                    "name": "STRING_TO_INTEGER"
-                                  }
-                                ],
-                                "required": true
+                                "value": "{{bankTransaction.gpayEncryptedToken}}"
                               }
                             ],
                             "operations": [
                               {
-                                "name": "KEY_VALUE_LIST_TO_OBJECT"
+                                "name": "GET_FIRST_NON_EMPTY_STRING"
                               }
-                            ]
+                            ],
+                            "required": true
                           }
                         ],
                         "operations": [
@@ -644,7 +478,7 @@
                 "key": "firstName",
                 "mappings": [
                   {
-                    "value": "{{purchase.client.first_name}}"
+                    "value": "{{purchase.client.full_name}}"
                   },
                   {
                     "value": "John"
@@ -653,14 +487,27 @@
                 "operations": [
                   {
                     "name": "GET_FIRST_NON_EMPTY_STRING"
+                  },
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "\\s+"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0
+                    }
                   }
-                ]
+                ],
+                "required": true
               },
               {
                 "key": "lastName",
                 "mappings": [
                   {
-                    "value": "{{purchase.client.last_name}}"
+                    "value": "{{purchase.client.full_name}}"
                   },
                   {
                     "value": "Doe"
@@ -669,8 +516,22 @@
                 "operations": [
                   {
                     "name": "GET_FIRST_NON_EMPTY_STRING"
+                  },
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "\\s+"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0,
+                      "fromLast": true
+                    }
                   }
-                ]
+                ],
+                "required": true
               },
               {
                 "key": "email",
