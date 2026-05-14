@@ -1,0 +1,44 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": []
+      },
+      "headers": {
+        "mappings": []
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "webhookRequest",
+            "value": "{{webhookRequest.value}}",
+            "operations": [
+              {
+                "name": "URL_ENCODED_STRING_TO_JSON"
+              }
+            ],
+            "required": true,
+            "hidden": true,
+            "storeIn": "pspCall"
+          },
+          {
+            "key": "purchaseId",
+            "value": "{{store.pspCall.webhookRequest.txnid}}",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": []
+      }
+    }
+  }
+]

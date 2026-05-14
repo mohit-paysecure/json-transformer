@@ -1,0 +1,692 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 2,
+                  "defaultValue": "https://test.payu.in/_payment"
+                }
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "key",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 0
+                }
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "txnid",
+            "value": "{{purchase.purchaseId}}",
+            "required": true
+          },
+          {
+            "key": "amount",
+            "value": "{{purchase.fx_Amount}}",
+            "required": true
+          },
+          {
+            "key": "productinfo",
+            "mappings": [
+              {
+                "value": "{{bankTransaction.product_info}}"
+              },
+              {
+                "value": "{{purchase.merchantDescriptor}}"
+              },
+              {
+                "value": "Paysecure"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "required": true,
+            "storeIn": "payuCrossborder"
+          },
+          {
+            "key": "firstname",
+            "mappings": [
+              {
+                "value": "{{purchase.client.full_name}}"
+              },
+              {
+                "value": "{{cardInfo.cardholder_name}}"
+              },
+              {
+                "value": "Paysecure"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              },
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "\\s+"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 0
+                }
+              }
+            ],
+            "required": true,
+            "storeIn": "payuCrossborder"
+          },
+          {
+            "key": "lastname",
+            "mappings": [
+              {
+                "value": "{{purchase.client.full_name}}",
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "\\s+"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0,
+                      "fromLast": true,
+                      "defaultValue": ""
+                    }
+                  }
+                ]
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "email",
+            "value": "{{purchase.client.email}}",
+            "required": true
+          },
+          {
+            "key": "phone",
+            "value": "{{purchase.client.phone}}",
+            "required": true
+          },
+          {
+            "key": "address1",
+            "value": "{{purchase.client.street_address}}"
+          },
+          {
+            "key": "city",
+            "value": "{{purchase.client.city}}"
+          },
+          {
+            "key": "state",
+            "mappings": [
+              {
+                "value": "{{purchase.client.stateCode}}"
+              },
+              {
+                "value": "{{purchase.client.state}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "country",
+            "value": "{{purchase.client.country}}"
+          },
+          {
+            "key": "zipcode",
+            "value": "{{purchase.client.zip_code}}",
+            "required": true
+          },
+          {
+            "key": "surl",
+            "mappings": [
+              {
+                "value": "{{extraParams.baseUrl}}",
+                "required": true
+              },
+              {
+                "value": "/custRedirect/"
+              },
+              {
+                "value": "{{purchase.bankid}}",
+                "required": true
+              },
+              {
+                "value": "/"
+              },
+              {
+                "value": "{{purchase.purchaseId}}",
+                "required": true
+              },
+              {
+                "value": "/"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "furl",
+            "mappings": [
+              {
+                "value": "{{extraParams.baseUrl}}",
+                "required": true
+              },
+              {
+                "value": "/custRedirect/"
+              },
+              {
+                "value": "{{purchase.bankid}}",
+                "required": true
+              },
+              {
+                "value": "/"
+              },
+              {
+                "value": "{{purchase.purchaseId}}",
+                "required": true
+              },
+              {
+                "value": "/"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "pg",
+            "value": "CC",
+            "required": true
+          },
+          {
+            "key": "bankcode",
+            "value": "CC",
+            "required": true
+          },
+          {
+            "key": "ccnum",
+            "value": "{{cardInfo.number}}",
+            "required": true
+          },
+          {
+            "key": "ccvv",
+            "value": "{{cardInfo.cvc}}",
+            "required": true
+          },
+          {
+            "key": "ccname",
+            "mappings": [
+              {
+                "value": "{{cardInfo.cardholder_name}}"
+              },
+              {
+                "value": "{{purchase.client.full_name}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "ccexpmon",
+            "value": "{{cardInfo.expireMonth}}",
+            "required": true
+          },
+          {
+            "key": "ccexpyr",
+            "value": "{{cardInfo.expireYear}}",
+            "required": true
+          },
+          {
+            "key": "txn_s2s_flow",
+            "value": "4",
+            "required": true
+          },
+          {
+            "key": "s2s_client_ip",
+            "value": "{{s2s.remote_ip}}",
+            "required": true
+          },
+          {
+            "key": "s2s_device_info",
+            "value": "{{s2s.user_agent}}",
+            "required": true
+          },
+          {
+            "key": "udf1",
+            "mappings": [
+              {
+                "value": "{{purchase.client.documentId}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "storeIn": "payuCrossborder"
+          },
+          {
+            "key": "udf2",
+            "value": ""
+          },
+          {
+            "key": "udf3",
+            "mappings": [
+              {
+                "value": "{{extraParams.buyerDob}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "storeIn": "payuCrossborder"
+          },
+          {
+            "key": "udf4",
+            "mappings": [
+              {
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 3,
+                      "defaultValue": ""
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "{{extraParams.endMerchantName}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "storeIn": "payuCrossborder"
+          },
+          {
+            "key": "udf5",
+            "mappings": [
+              {
+                "value": "{{purchase.merchantRef}}"
+              },
+              {
+                "value": "{{purchase.purchaseId}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "required": true,
+            "storeIn": "payuCrossborder"
+          },
+          {
+            "key": "buyer_type_business",
+            "value": "1",
+            "storeIn": "payuCrossborder"
+          },
+          {
+            "key": "hash",
+            "mappings": [
+              {
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0
+                    }
+                  }
+                ],
+                "required": true
+              },
+              {
+                "value": "|"
+              },
+              {
+                "value": "{{purchase.purchaseId}}",
+                "required": true
+              },
+              {
+                "value": "|"
+              },
+              {
+                "value": "{{purchase.fx_Amount}}",
+                "required": true
+              },
+              {
+                "value": "|"
+              },
+              {
+                "value": "{{store.payuCrossborder.productinfo}}",
+                "required": true
+              },
+              {
+                "value": "|"
+              },
+              {
+                "value": "{{store.payuCrossborder.firstname}}",
+                "required": true
+              },
+              {
+                "value": "|"
+              },
+              {
+                "value": "{{purchase.client.email}}",
+                "required": true
+              },
+              {
+                "value": "|"
+              },
+              {
+                "value": "{{store.payuCrossborder.udf1}}"
+              },
+              {
+                "value": "||"
+              },
+              {
+                "value": "{{store.payuCrossborder.udf3}}"
+              },
+              {
+                "value": "|"
+              },
+              {
+                "value": "{{store.payuCrossborder.udf4}}"
+              },
+              {
+                "value": "|"
+              },
+              {
+                "value": "{{store.payuCrossborder.udf5}}"
+              },
+              {
+                "value": "||||||"
+              },
+              {
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 1
+                    }
+                  }
+                ],
+                "required": true
+              },
+              {
+                "value": "|"
+              },
+              {
+                "value": "{{store.payuCrossborder.buyer_type_business}}",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              },
+              {
+                "name": "COMPUTE_SHA_HASH",
+                "params": {
+                  "algorithm": "SHA512"
+                }
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "pspTransactionId",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.result.mihpayid}}"
+              },
+              {
+                "value": "{{pspResponse0.metaData.referenceId}}"
+              },
+              {
+                "value": "{{pspResponse0.metaData.txnId}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse0.metaData.unmappedStatus}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "payment_in_process",
+                  "mappings": [
+                    {
+                      "from": "success",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "captured",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "pending",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "failed",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "failure",
+                      "to": "payment_failed"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse0.metaData.unmappedStatus}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "success",
+                  "mappings": [
+                    {
+                      "from": "failed",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "failure",
+                      "to": "fail"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.metaData.message}}"
+              },
+              {
+                "value": "{{pspResponse0.metaData.txnStatus}}"
+              },
+              {
+                "value": "{{pspResponse0.metaData.unmappedStatus}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "isAcsTemplateNotPresent",
+            "value": "{{pspResponse0.result.acsTemplate}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              }
+            ],
+            "storeIn": "payuCrossborder",
+            "hidden": true
+          },
+          {
+            "key": "redirectUrl",
+            "value": "{{pspResponse0.result.acsTemplate}}",
+            "operations": [
+              {
+                "name": "BASE64_TRANSFORM",
+                "params": {
+                  "mode": "DECODE"
+                }
+              }
+            ],
+            "skipIf": "{{store.payuCrossborder.isAcsTemplateNotPresent}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]
