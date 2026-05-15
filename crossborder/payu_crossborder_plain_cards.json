@@ -5,22 +5,7 @@
       "url": {
         "mappings": [
           {
-            "value": "{{bankTransaction.usedAuthKey}}",
-            "operations": [
-              {
-                "name": "SPLIT_STRING",
-                "params": {
-                  "delimiter": "##"
-                }
-              },
-              {
-                "name": "GET_ELEMENT_AT_INDEX",
-                "params": {
-                  "index": 2,
-                  "defaultValue": "https://test.payu.in/_payment"
-                }
-              }
-            ],
+            "value": "https://test.payu.in/_payment",
             "required": true
           }
         ],
@@ -353,17 +338,22 @@
           },
           {
             "key": "udf3",
-            "mappings": [
-              {
-                "value": "{{extraParams.buyerDob}}"
-              },
-              {
-                "value": ""
-              }
-            ],
+            "value": "{{purchase.client.date_of_birth}}",
             "operations": [
               {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
+                "name": "STRING_PATTERN_MATCH",
+                "params": {
+                  "regex": "^\\d{4}-\\d{2}-\\d{2}$",
+                  "defaultValue": ""
+                }
+              },
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "^(\\d{4})-(\\d{2})-(\\d{2})$",
+                  "replacement": "$3-$2-$1",
+                  "occurrence": "REGEX_FIRST"
+                }
               }
             ],
             "storeIn": "payuCrossborder"
@@ -383,7 +373,7 @@
                   {
                     "name": "GET_ELEMENT_AT_INDEX",
                     "params": {
-                      "index": 3,
+                      "index": 2,
                       "defaultValue": ""
                     }
                   }
@@ -406,6 +396,9 @@
           {
             "key": "udf5",
             "mappings": [
+              {
+                "value": "{{purchase.invoiceNo}}"
+              },
               {
                 "value": "{{purchase.merchantRef}}"
               },
