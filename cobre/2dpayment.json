@@ -978,7 +978,6 @@
                 "mappings": [
                   { "key": "copyCLABE",      "value": "{{pspResponse4.metadata.virtual_account}}" },
                   { "key": "copyReference",  "value": "{{purchase.purchaseId}}" },
-                  { "key": "Bank",           "value": "STP" },
                   { "key": "Amount",         "value": "{{purchase.fx_Amount}}" },
                   { "key": "Currency",       "value": "{{purchase.fx_Currency}}" }
                 ],
