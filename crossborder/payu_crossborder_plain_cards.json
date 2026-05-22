@@ -274,20 +274,70 @@
             "required": true
           },
           {
-            "key": "ccname",
+            "key": "rawCcName",
+            "hidden": true,
+            "storeIn": "payuCrossborder",
             "mappings": [
               {
                 "value": "{{cardInfo.cardholder_name}}"
               },
               {
                 "value": "{{purchase.client.full_name}}"
+              },
+              {
+                "value": "NA"
               }
             ],
             "operations": [
               {
                 "name": "GET_FIRST_NON_EMPTY_STRING"
               }
+            ]
+          },
+          {
+            "key": "safeCcName",
+            "hidden": true,
+            "storeIn": "payuCrossborder",
+            "mappings": [
+              {
+                "value": "{{store.payuCrossborder.rawCcName}}",
+                "operations": [
+                  {
+                    "name": "STRING_REPLACE",
+                    "params": {
+                      "target": "^(?i)(na|n/a|\\.)$",
+                      "replacement": "",
+                      "occurrence": "REGEX_ALL"
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "{{purchase.client.full_name}}",
+                "operations": [
+                  {
+                    "name": "STRING_REPLACE",
+                    "params": {
+                      "target": "^(?i)(na|n/a|\\.)$",
+                      "replacement": "",
+                      "occurrence": "REGEX_ALL"
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "Paysecure"
+              }
             ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "ccname",
+            "value": "{{store.payuCrossborder.safeCcName}}",
             "required": true
           },
           {
