@@ -1,0 +1,182 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "value": ""
+      },
+      "headers": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "txnContext",
+            "mappings": [
+              {
+                "key": "id",
+                "value": "{{webhookRequest.data.transaction_id}}"
+              },
+              {
+                "key": "idType",
+                "value": "pspTransactionId"
+              }
+            ],
+            "operations": [
+              { "name": "KEY_VALUE_LIST_TO_OBJECT" },
+              { "name": "GET_TRANSACTION_CONTEXT_BY_ID" }
+            ],
+            "storeIn": "ctx",
+            "hidden": true
+          },
+          {
+            "key": "purchaseId",
+            "mappings": [
+              {
+                "value": "{{webhookRequest.data.client_transaction_id}}"
+              },
+              {
+                "value": "{{store.ctx.txnContext.purchase.purchaseId}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{webhookRequest.data.transaction_id}}"
+          },
+          {
+            "key": "status",
+            "value": "{{webhookRequest.data.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "payment_in_process",
+                  "mappings": [
+                    { "from": "PENDING",   "to": "payment_in_process" },
+                    { "from": "SUCCESS",   "to": "paid" },
+                    { "from": "FAILED",    "to": "payment_failed" },
+                    { "from": "CANCELLED", "to": "payment_failed" }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{webhookRequest.data.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "success",
+                  "mappings": [
+                    { "from": "SUCCESS",   "to": "success" },
+                    { "from": "PENDING",   "to": "success" },
+                    { "from": "FAILED",    "to": "fail" },
+                    { "from": "CANCELLED", "to": "fail" }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{webhookRequest.event}}"
+              },
+              {
+                "value": "{{webhookRequest.data.status}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "receivedSignature",
+            "mappings": [
+              { "value": "{{webhookRequestHeader.X-Webhook-Signature}}" },
+              { "value": "{{webhookRequestHeader.x-webhook-signature}}" },
+              { "value": "MISSING_SIGNATURE" }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "generatedSignature",
+            "mappings": [
+              {
+                "key": "input",
+                "value": "{{webhookRequestHeader.x-raw-body}}"
+              },
+              {
+                "key": "secretKey",
+                "value": "{{store.ctx.txnContext.bankTransaction.usedAuthKey}}",
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 2
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              { "name": "KEY_VALUE_LIST_TO_OBJECT" },
+              {
+                "name": "COMPUTE_HMAC_SHA",
+                "params": {
+                  "algorithm": "HmacSHA256",
+                  "outputFormat": "HEX"
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]

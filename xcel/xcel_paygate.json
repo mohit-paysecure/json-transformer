@@ -1,0 +1,286 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://sandbox-api.xcelapp.com/transactions-service/paygate/generate-payment-link",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "X-MERCHANT-ID",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 0
+                }
+              }
+            ]
+          },
+          {
+            "key": "X-PUBLIC-KEY",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 1
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "amount",
+            "value": "{{purchase.fx_Amount}}",
+            "required": true
+          },
+          {
+            "key": "currency",
+            "value": "{{purchase.fx_Currency}}",
+            "required": true
+          },
+          {
+            "key": "client_transaction_id",
+            "value": "{{purchase.purchaseId}}",
+            "required": true
+          },
+          {
+            "key": "customer_email",
+            "value": "{{purchase.client.email}}",
+            "required": true
+          },
+          {
+            "key": "customer_name",
+            "mappings": [
+              {
+                "value": "{{purchase.client.full_name}}"
+              },
+              {
+                "value": "{{s2s.cardholder_name}}"
+              }
+            ],
+            "required": true,
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "customer_phone",
+            "value": "{{purchase.client.phone}}",
+            "required": true
+          },
+          {
+            "key": "channel",
+            "value": "WEB",
+            "required": true
+          },
+          {
+            "key": "description",
+            "mappings": [
+              {
+                "value": "{{purchase.merchantDescriptor}}"
+              },
+              {
+                "value": "Payment"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "redirect_url",
+            "mappings": [
+              {
+                "value": "{{extraParams.baseUrl}}"
+              },
+              {
+                "value": "/custRedirect/"
+              },
+              {
+                "value": "{{purchase.bankid}}"
+              },
+              {
+                "value": "/"
+              },
+              {
+                "value": "{{purchase.purchaseId}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "webhook_url",
+            "mappings": [
+              {
+                "value": "{{extraParams.baseUrl}}"
+              },
+              {
+                "value": "/webhook/"
+              },
+              {
+                "value": "{{purchase.bankname}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "code",
+            "value": "{{pspResponse0.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "fail",
+                  "mappings": [
+                    { "from": "PENDING",   "to": "success" },
+                    { "from": "SUCCESS",   "to": "success" },
+                    { "from": "FAILED",    "to": "fail" },
+                    { "from": "CANCELLED", "to": "fail" }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse0.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "payment_failed",
+                  "mappings": [
+                    { "from": "PENDING",   "to": "payment_in_process" },
+                    { "from": "SUCCESS",   "to": "paid" },
+                    { "from": "FAILED",    "to": "payment_failed" },
+                    { "from": "CANCELLED", "to": "payment_failed" }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.status_reason}}"
+              },
+              {
+                "value": "{{pspResponse0.message}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse0.data.transaction_id}}"
+          },
+          {
+            "key": "pspToken",
+            "value": "{{pspResponse0.data.payment_code}}"
+          },
+          {
+            "key": "redirectUrl",
+            "value": "{{pspResponse0.data.payment_link}}"
+          },
+          {
+            "key": "tempObject",
+            "mappings": [
+              {
+                "key": "paymentCode",
+                "value": "{{pspResponse0.data.payment_code}}"
+              },
+              {
+                "key": "expiresAt",
+                "value": "{{pspResponse0.data.expires_at}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]
