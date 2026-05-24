@@ -228,7 +228,7 @@
                     "mappings": [
                       {
                         "key": "description",
-                        "value": "{{bankTransaction.tempObject.googlePayPaymentToken.paymentMethodData.description}}"
+                        "value": "{{bankTransaction.tempObject.paymentMethodData.description}}"
                       },
                       {
                         "key": "info",
@@ -240,7 +240,7 @@
                                 "key": "address1",
                                 "mappings": [
                                   {
-                                    "value": "{{bankTransaction.tempObject.googlePayPaymentToken.paymentMethodData.info.billingAddress.address1}}"
+                                    "value": "{{bankTransaction.tempObject.paymentMethodData.info.billingAddress.address1}}"
                                   },
                                   {
                                     "value": "{{purchase.client.street_address}}"
@@ -257,17 +257,17 @@
                               },
                               {
                                 "key": "address2",
-                                "value": "{{bankTransaction.tempObject.googlePayPaymentToken.paymentMethodData.info.billingAddress.address2}}"
+                                "value": "{{bankTransaction.tempObject.paymentMethodData.info.billingAddress.address2}}"
                               },
                               {
                                 "key": "address3",
-                                "value": "{{bankTransaction.tempObject.googlePayPaymentToken.paymentMethodData.info.billingAddress.address3}}"
+                                "value": "{{bankTransaction.tempObject.paymentMethodData.info.billingAddress.address3}}"
                               },
                               {
                                 "key": "administrativeArea",
                                 "mappings": [
                                   {
-                                    "value": "{{bankTransaction.tempObject.googlePayPaymentToken.paymentMethodData.info.billingAddress.administrativeArea}}"
+                                    "value": "{{bankTransaction.tempObject.paymentMethodData.info.billingAddress.administrativeArea}}"
                                   },
                                   {
                                     "value": "{{purchase.client.stateCode}}"
@@ -286,7 +286,7 @@
                                 "key": "countryCode",
                                 "mappings": [
                                   {
-                                    "value": "{{bankTransaction.tempObject.googlePayPaymentToken.paymentMethodData.info.billingAddress.countryCode}}"
+                                    "value": "{{bankTransaction.tempObject.paymentMethodData.info.billingAddress.countryCode}}"
                                   },
                                   {
                                     "value": "{{purchase.client.country}}"
@@ -305,7 +305,7 @@
                                 "key": "locality",
                                 "mappings": [
                                   {
-                                    "value": "{{bankTransaction.tempObject.googlePayPaymentToken.paymentMethodData.info.billingAddress.locality}}"
+                                    "value": "{{bankTransaction.tempObject.paymentMethodData.info.billingAddress.locality}}"
                                   },
                                   {
                                     "value": "{{purchase.client.city}}"
@@ -324,7 +324,7 @@
                                 "key": "name",
                                 "mappings": [
                                   {
-                                    "value": "{{bankTransaction.tempObject.googlePayPaymentToken.paymentMethodData.info.billingAddress.name}}"
+                                    "value": "{{bankTransaction.tempObject.paymentMethodData.info.billingAddress.name}}"
                                   },
                                   {
                                     "value": "John Doe"
@@ -340,7 +340,7 @@
                                 "key": "phoneNumber",
                                 "mappings": [
                                   {
-                                    "value": "{{bankTransaction.tempObject.googlePayPaymentToken.paymentMethodData.info.billingAddress.phoneNumber}}"
+                                    "value": "{{bankTransaction.tempObject.paymentMethodData.info.billingAddress.phoneNumber}}"
                                   },
                                   {
                                     "value": "{{purchase.client.phone}}"
@@ -356,7 +356,7 @@
                                 "key": "postalCode",
                                 "mappings": [
                                   {
-                                    "value": "{{bankTransaction.tempObject.googlePayPaymentToken.paymentMethodData.info.billingAddress.postalCode}}"
+                                    "value": "{{bankTransaction.tempObject.paymentMethodData.info.billingAddress.postalCode}}"
                                   },
                                   {
                                     "value": "{{purchase.client.zip_code}}"
@@ -373,7 +373,7 @@
                               },
                               {
                                 "key": "sortingCode",
-                                "value": "{{bankTransaction.tempObject.googlePayPaymentToken.paymentMethodData.info.billingAddress.sortingCode}}"
+                                "value": "{{bankTransaction.tempObject.paymentMethodData.info.billingAddress.sortingCode}}"
                               }
                             ],
                             "operations": [
@@ -386,7 +386,7 @@
                             "key": "cardDetails",
                             "mappings": [
                               {
-                                "value": "{{bankTransaction.tempObject.googlePayPaymentToken.paymentMethodData.info.cardDetails}}"
+                                "value": "{{bankTransaction.tempObject.paymentMethodData.info.cardDetails}}"
                               },
                               {
                                 "value": "2503"
@@ -400,7 +400,7 @@
                           },
                           {
                             "key": "cardNetwork",
-                            "value": "{{bankTransaction.tempObject.googlePayPaymentToken.paymentMethodData.info.cardNetwork}}"
+                            "value": "{{bankTransaction.tempObject.paymentMethodData.info.cardNetwork}}"
                           }
                         ],
                         "operations": [
@@ -421,7 +421,7 @@
                             "key": "token",
                             "mappings": [
                               {
-                                "value": "{{bankTransaction.tempObject.googlePayPaymentToken.paymentMethodData.tokenizationData.token}}"
+                                "value": "{{bankTransaction.tempObject.paymentMethodData.tokenizationData.token}}"
                               },
                               {
                                 "value": "{{bankTransaction.gpayEncryptedToken}}"
