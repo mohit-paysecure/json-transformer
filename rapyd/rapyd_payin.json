@@ -1,0 +1,584 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://sandboxapi.rapyd.net/v1/payments",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "access_key",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 0
+                }
+              }
+            ]
+          },
+          {
+            "key": "salt",
+            "value": "x",
+            "required": true,
+            "storeIn": "rapyd",
+            "operations": [
+              {
+                "name": "GENERATE_UUID"
+              }
+            ]
+          },
+          {
+            "key": "timestamp",
+            "value": "{{extraParams.currentTimeStamp}}",
+            "required": true,
+            "storeIn": "rapyd",
+            "operations": [
+              {
+                "name": "SUB_STRING",
+                "params": {
+                  "fromIndex": 0,
+                  "toIndex": 10
+                }
+              }
+            ]
+          },
+          {
+            "key": "signature",
+            "required": true,
+            "mappings": [
+              {
+                "key": "input",
+                "mappings": [
+                  {
+                    "value": "post"
+                  },
+                  {
+                    "value": "/v1/payments"
+                  },
+                  {
+                    "value": "{{store.rapyd.salt}}"
+                  },
+                  {
+                    "value": "{{store.rapyd.timestamp}}"
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 0
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 1
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": "{{pspRequest0}}",
+                    "operations": [
+                      {
+                        "name": "STRINGIFY_JSON"
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  }
+                ]
+              },
+              {
+                "key": "secretKey",
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "COMPUTE_HMAC_SHA",
+                "params": {
+                  "algorithm": "HmacSHA256",
+                  "outputFormat": "HEX"
+                }
+              },
+              {
+                "name": "BASE64_TRANSFORM",
+                "params": {
+                  "mode": "ENCODE"
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "amount",
+            "mappings": [
+              {
+                "value": "{{purchase.fx_Amount}}"
+              },
+              {
+                "value": "{{purchase.amount}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "currency",
+            "mappings": [
+              {
+                "value": "{{purchase.fx_Currency}}"
+              },
+              {
+                "value": "{{purchase.currency}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "payment_method",
+            "mappings": [
+              {
+                "key": "type",
+                "value": "{{cardInfo.type}}",
+                "operations": [
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "defaultValue": "gb_visa_card",
+                      "mappings": [
+                        {
+                          "from": "VISA",
+                          "to": "gb_visa_card"
+                        },
+                        {
+                          "from": "MASTERCARD",
+                          "to": "gb_mastercard_card"
+                        },
+                        {
+                          "from": "MASTER",
+                          "to": "gb_mastercard_card"
+                        },
+                        {
+                          "from": "AMEX",
+                          "to": "gb_amex_card"
+                        },
+                        {
+                          "from": "AMERICAN EXPRESS",
+                          "to": "gb_amex_card"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "key": "rawCcName",
+                "hidden": true,
+                "storeIn": "rapyd",
+                "mappings": [
+                  {
+                    "value": "{{cardInfo.cardholder_name}}"
+                  },
+                  {
+                    "value": "{{purchase.client.full_name}}"
+                  },
+                  {
+                    "value": "NA"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              },
+              {
+                "key": "safeCcName",
+                "hidden": true,
+                "storeIn": "rapyd",
+                "mappings": [
+                  {
+                    "value": "{{store.rapyd.rawCcName}}",
+                    "operations": [
+                      {
+                        "name": "STRING_REPLACE",
+                        "params": {
+                          "target": "^(?i)(na|n/a|\\.)$",
+                          "replacement": "",
+                          "occurrence": "REGEX_ALL"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": "{{purchase.client.full_name}}",
+                    "operations": [
+                      {
+                        "name": "STRING_REPLACE",
+                        "params": {
+                          "target": "^(?i)(na|n/a|\\.)$",
+                          "replacement": "",
+                          "occurrence": "REGEX_ALL"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": "Paysecure"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              },
+              {
+                "key": "fields",
+                "mappings": [
+                  {
+                    "key": "number",
+                    "value": "{{cardInfo.number}}",
+                    "required": true
+                  },
+                  {
+                    "key": "expiration_month",
+                    "value": "{{cardInfo.expireMonth}}",
+                    "required": true
+                  },
+                  {
+                    "key": "expiration_year",
+                    "value": "{{cardInfo.expireYear}}",
+                    "required": true
+                  },
+                  {
+                    "key": "cvv",
+                    "value": "{{cardInfo.cvc}}",
+                    "required": true
+                  },
+                  {
+                    "key": "name",
+                    "mappings": [
+                      {
+                        "value": "{{store.rapyd.safeCcName}}"
+                      },
+                      {
+                        "value": "Pay Secure"
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "GET_FIRST_NON_EMPTY_STRING"
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "merchant_reference_id",
+            "value": "{{purchase.purchaseId}}",
+            "required": true
+          },
+          {
+            "key": "complete_payment_url",
+            "mappings": [
+              {
+                "value": "{{extraParams.baseUrl}}",
+                "required": true
+              },
+              {
+                "value": "/custRedirect/",
+                "required": true
+              },
+              {
+                "value": "{{purchase.bankid}}",
+                "required": true
+              },
+              {
+                "value": "/",
+                "required": true
+              },
+              {
+                "value": "{{purchase.purchaseId}}",
+                "required": true
+              },
+              {
+                "value": "/?status=1",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
+          },
+          {
+            "key": "error_payment_url",
+            "mappings": [
+              {
+                "value": "{{extraParams.baseUrl}}",
+                "required": true
+              },
+              {
+                "value": "/custRedirect/",
+                "required": true
+              },
+              {
+                "value": "{{purchase.bankid}}",
+                "required": true
+              },
+              {
+                "value": "/",
+                "required": true
+              },
+              {
+                "value": "{{purchase.purchaseId}}",
+                "required": true
+              },
+              {
+                "value": "/?status=0",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
+          },
+          {
+            "key": "description",
+            "mappings": [
+              {
+                "value": "Payment "
+              },
+              {
+                "value": "{{purchase.purchaseId}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse0.data.id}}"
+          },
+          {
+            "key": "paymentTransId",
+            "value": "{{pspResponse0.data.id}}"
+          },
+          {
+            "key": "redirectUrl",
+            "value": "{{pspResponse0.data.redirect_url}}"
+          },
+          {
+            "key": "status",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.data.status}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "payment_failed",
+                  "mappings": [
+                    {
+                      "from": "CLO",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "ACT",
+                      "to": "payment_in_process"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.data.status}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "fail",
+                  "mappings": [
+                    {
+                      "from": "CLO",
+                      "to": "success"
+                    },
+                    {
+                      "from": "ACT",
+                      "to": "success"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.data.failure_message}}"
+              },
+              {
+                "value": "{{pspResponse0.status.message}}"
+              },
+              {
+                "value": "{{pspResponse0.data.status}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]
