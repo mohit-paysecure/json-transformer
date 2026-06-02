@@ -1,0 +1,353 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://sandboxapi.rapyd.net/v1/refunds",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "access_key",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 0
+                }
+              }
+            ]
+          },
+          {
+            "key": "salt",
+            "value": "x",
+            "required": true,
+            "storeIn": "rapyd",
+            "operations": [
+              {
+                "name": "GENERATE_UUID"
+              }
+            ]
+          },
+          {
+            "key": "timestamp",
+            "value": "{{extraParams.currentTimeStamp}}",
+            "required": true,
+            "storeIn": "rapyd",
+            "operations": [
+              {
+                "name": "SUB_STRING",
+                "params": {
+                  "fromIndex": 0,
+                  "toIndex": 10
+                }
+              }
+            ]
+          },
+          {
+            "key": "signature",
+            "required": true,
+            "mappings": [
+              {
+                "key": "input",
+                "mappings": [
+                  {
+                    "value": "post"
+                  },
+                  {
+                    "value": "/v1/refunds"
+                  },
+                  {
+                    "value": "{{store.rapyd.salt}}"
+                  },
+                  {
+                    "value": "{{store.rapyd.timestamp}}"
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 0
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 1
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": "{{pspRequest0}}",
+                    "operations": [
+                      {
+                        "name": "STRINGIFY_JSON"
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  }
+                ]
+              },
+              {
+                "key": "secretKey",
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "COMPUTE_HMAC_SHA",
+                "params": {
+                  "algorithm": "HmacSHA256",
+                  "outputFormat": "HEX"
+                }
+              },
+              {
+                "name": "BASE64_TRANSFORM",
+                "params": {
+                  "mode": "ENCODE"
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "payment",
+            "value": "{{bankTransaction.paymentTransId}}",
+            "required": true
+          },
+          {
+            "key": "amount",
+            "mappings": [
+              {
+                "value": "{{purchase.fx_Amount}}"
+              },
+              {
+                "value": "{{purchase.amount}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "currency",
+            "mappings": [
+              {
+                "value": "{{purchase.fx_Currency}}"
+              },
+              {
+                "value": "{{purchase.currency}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "refundTransId",
+            "value": "{{pspResponse0.data.id}}"
+          },
+          {
+            "key": "status",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.data.status}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "refund_failed",
+                  "mappings": [
+                    {
+                      "from": "Completed",
+                      "to": "refunded"
+                    },
+                    {
+                      "from": "completed",
+                      "to": "refunded"
+                    },
+                    {
+                      "from": "Pending",
+                      "to": "refund_in_process"
+                    },
+                    {
+                      "from": "pending",
+                      "to": "refund_in_process"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.data.status}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "fail",
+                  "mappings": [
+                    {
+                      "from": "Completed",
+                      "to": "success"
+                    },
+                    {
+                      "from": "completed",
+                      "to": "success"
+                    },
+                    {
+                      "from": "Pending",
+                      "to": "success"
+                    },
+                    {
+                      "from": "pending",
+                      "to": "success"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.status.message}}"
+              },
+              {
+                "value": "{{pspResponse0.data.status}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]

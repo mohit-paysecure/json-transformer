@@ -1,0 +1,296 @@
+[
+  {
+    "requestMapping": {
+      "method": "GET",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://sandboxapi.rapyd.net/v1/payments/",
+            "required": true
+          },
+          {
+            "value": "{{bankTransaction.paymentTransId}}",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "access_key",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 0
+                }
+              }
+            ]
+          },
+          {
+            "key": "salt",
+            "value": "x",
+            "required": true,
+            "storeIn": "rapyd",
+            "operations": [
+              {
+                "name": "GENERATE_UUID"
+              }
+            ]
+          },
+          {
+            "key": "timestamp",
+            "value": "{{extraParams.currentTimeStamp}}",
+            "required": true,
+            "storeIn": "rapyd",
+            "operations": [
+              {
+                "name": "SUB_STRING",
+                "params": {
+                  "fromIndex": 0,
+                  "toIndex": 10
+                }
+              }
+            ]
+          },
+          {
+            "key": "signature",
+            "required": true,
+            "mappings": [
+              {
+                "key": "input",
+                "mappings": [
+                  {
+                    "value": "get"
+                  },
+                  {
+                    "value": "/v1/payments/"
+                  },
+                  {
+                    "value": "{{bankTransaction.paymentTransId}}"
+                  },
+                  {
+                    "value": "{{store.rapyd.salt}}"
+                  },
+                  {
+                    "value": "{{store.rapyd.timestamp}}"
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 0
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 1
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  }
+                ]
+              },
+              {
+                "key": "secretKey",
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "COMPUTE_HMAC_SHA",
+                "params": {
+                  "algorithm": "HmacSHA256",
+                  "outputFormat": "HEX"
+                }
+              },
+              {
+                "name": "BASE64_TRANSFORM",
+                "params": {
+                  "mode": "ENCODE"
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": []
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse0.data.id}}"
+          },
+          {
+            "key": "paymentTransId",
+            "value": "{{pspResponse0.data.id}}"
+          },
+          {
+            "key": "redirectUrl",
+            "value": "{{pspResponse0.data.redirect_url}}"
+          },
+          {
+            "key": "status",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.data.status}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "payment_failed",
+                  "mappings": [
+                    {
+                      "from": "CLO",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "ACT",
+                      "to": "payment_in_process"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.data.status}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "fail",
+                  "mappings": [
+                    {
+                      "from": "CLO",
+                      "to": "success"
+                    },
+                    {
+                      "from": "ACT",
+                      "to": "success"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.data.failure_message}}"
+              },
+              {
+                "value": "{{pspResponse0.status.message}}"
+              },
+              {
+                "value": "{{pspResponse0.data.status}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]
