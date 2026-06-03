@@ -1,0 +1,825 @@
+[
+  {
+    "requestMapping": {
+      "method": "GET",
+      "url": {
+        "mappings": [
+          { "value": "https://sandboxapi.rapyd.net" },
+          { "value": "{{store.rapyd.listPath}}" }
+        ],
+        "operations": [
+          { "name": "LIST_VALUE_JOIN" }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "access_key",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              { "name": "SPLIT_STRING", "params": { "delimiter": "##" } },
+              { "name": "GET_ELEMENT_AT_INDEX", "params": { "index": 0 } }
+            ]
+          },
+          {
+            "key": "salt",
+            "value": "x",
+            "required": true,
+            "storeIn": "rapyd",
+            "operations": [
+              { "name": "GENERATE_UUID" }
+            ]
+          },
+          {
+            "key": "timestamp",
+            "value": "{{extraParams.currentTimeStamp}}",
+            "required": true,
+            "storeIn": "rapyd",
+            "operations": [
+              { "name": "SUB_STRING", "params": { "fromIndex": 0, "toIndex": 10 } }
+            ]
+          },
+          {
+            "key": "signature",
+            "required": true,
+            "mappings": [
+              {
+                "key": "input",
+                "mappings": [
+                  { "value": "get" },
+                  { "value": "{{store.rapyd.listPath}}" },
+                  { "value": "{{store.rapyd.salt}}" },
+                  { "value": "{{store.rapyd.timestamp}}" },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "operations": [
+                      { "name": "SPLIT_STRING", "params": { "delimiter": "##" } },
+                      { "name": "GET_ELEMENT_AT_INDEX", "params": { "index": 0 } }
+                    ]
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "operations": [
+                      { "name": "SPLIT_STRING", "params": { "delimiter": "##" } },
+                      { "name": "GET_ELEMENT_AT_INDEX", "params": { "index": 1 } }
+                    ]
+                  }
+                ],
+                "operations": [
+                  { "name": "LIST_VALUE_JOIN" }
+                ]
+              },
+              {
+                "key": "secretKey",
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "operations": [
+                  { "name": "SPLIT_STRING", "params": { "delimiter": "##" } },
+                  { "name": "GET_ELEMENT_AT_INDEX", "params": { "index": 1 } }
+                ]
+              }
+            ],
+            "operations": [
+              { "name": "KEY_VALUE_LIST_TO_OBJECT" },
+              { "name": "COMPUTE_HMAC_SHA", "params": { "algorithm": "HmacSHA256", "outputFormat": "HEX" } },
+              { "name": "BASE64_TRANSFORM", "params": { "mode": "ENCODE" } }
+            ]
+          }
+        ],
+        "operations": [
+          { "name": "KEY_VALUE_LIST_TO_OBJECT" }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "benCountry",
+            "hidden": true,
+            "storeIn": "rapyd",
+            "mappings": [
+              { "value": "{{payout.client.country}}" },
+              { "value": "{{payout.beneficiaryDetail.bankCountryCode}}" }
+            ],
+            "operations": [
+              { "name": "GET_FIRST_NON_EMPTY_STRING" },
+              { "name": "STRING_REPLACE", "params": { "target": "^(?i)(uk|zz)$", "replacement": "GB", "occurrence": "REGEX_ALL" } }
+            ]
+          },
+          {
+            "key": "curr",
+            "hidden": true,
+            "storeIn": "rapyd",
+            "mappings": [
+              { "value": "{{payout.fx_Currency}}" },
+              { "value": "{{payout.currency}}" }
+            ],
+            "operations": [
+              { "name": "GET_FIRST_NON_EMPTY_STRING" }
+            ]
+          },
+          {
+            "key": "brand",
+            "hidden": true,
+            "storeIn": "rapyd",
+            "value": "{{payout.extraParam.cardNumber}}",
+            "operations": [
+              { "name": "CARD_NUMBER_TO_BRAND" }
+            ]
+          },
+          {
+            "key": "cacheKey",
+            "hidden": true,
+            "storeIn": "rapyd",
+            "mappings": [
+              { "value": "rapyd_pmt_" },
+              { "value": "{{store.rapyd.benCountry}}" },
+              { "value": "_" },
+              { "value": "{{store.rapyd.curr}}" },
+              { "value": "_" },
+              { "value": "{{store.rapyd.brand}}" }
+            ],
+            "operations": [
+              { "name": "LIST_VALUE_JOIN" }
+            ]
+          },
+          {
+            "key": "cachedCfg",
+            "hidden": true,
+            "storeIn": "pmtCache",
+            "mappings": [
+              { "key": "id", "value": "{{store.rapyd.cacheKey}}" },
+              { "key": "idType", "value": "pspConfigId" }
+            ],
+            "operations": [
+              { "name": "KEY_VALUE_LIST_TO_OBJECT" },
+              { "name": "GET_TRANSACTION_CONTEXT_BY_ID" }
+            ]
+          },
+          {
+            "key": "skipPspCount",
+            "value": "{{store.pmtCache.cachedCfg.pspConfig.value}}",
+            "operations": [
+              { "name": "CHECK_IF_NULL" },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": 0,
+                  "mappings": [
+                    { "from": false, "to": 1 }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "listPath",
+            "hidden": true,
+            "storeIn": "rapyd",
+            "mappings": [
+              { "value": "/v1/payout_method_types?category=card&beneficiary_country=" },
+              { "value": "{{store.rapyd.benCountry}}" },
+              { "value": "&payout_currency=" },
+              { "value": "{{store.rapyd.curr}}" }
+            ],
+            "operations": [
+              { "name": "LIST_VALUE_JOIN" }
+            ]
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "matchedMethodType",
+            "hidden": true,
+            "storeIn": "rapyd",
+            "mappings": [
+              {
+                "key": "list",
+                "value": "{{pspResponse0.data}}"
+              },
+              {
+                "key": "matchValue",
+                "value": "{{payout.extraParam.cardNumber}}",
+                "operations": [
+                  { "name": "CARD_NUMBER_TO_BRAND" },
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "defaultValue": "Visa",
+                      "mappings": [
+                        { "from": "VISA", "to": "Visa" },
+                        { "from": "MASTER", "to": "Mastercard" },
+                        { "from": "MAESTRO", "to": "Mastercard" }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              { "name": "KEY_VALUE_LIST_TO_OBJECT" },
+              {
+                "name": "FIND_OBJECT_IN_LIST_BY_FIELD_MATCH",
+                "params": { "fieldPath": "name", "extractField": "payout_method_type" }
+              }
+            ]
+          },
+          {
+            "key": "pspConfigID",
+            "mappings": [
+              { "value": "rapyd_pmt_" },
+              {
+                "mappings": [
+                  { "value": "{{payout.client.country}}" },
+                  { "value": "{{payout.beneficiaryDetail.bankCountryCode}}" }
+                ],
+                "operations": [
+                  { "name": "GET_FIRST_NON_EMPTY_STRING" },
+                  { "name": "STRING_REPLACE", "params": { "target": "^(?i)(uk|zz)$", "replacement": "GB", "occurrence": "REGEX_ALL" } }
+                ]
+              },
+              { "value": "_" },
+              {
+                "mappings": [
+                  { "value": "{{payout.fx_Currency}}" },
+                  { "value": "{{payout.currency}}" }
+                ],
+                "operations": [ { "name": "GET_FIRST_NON_EMPTY_STRING" } ]
+              },
+              { "value": "_" },
+              {
+                "value": "{{payout.extraParam.cardNumber}}",
+                "operations": [ { "name": "CARD_NUMBER_TO_BRAND" } ]
+              }
+            ],
+            "operations": [
+              { "name": "LIST_VALUE_JOIN" }
+            ]
+          },
+          {
+            "key": "pspConfigData",
+            "value": "{{store.rapyd.matchedMethodType}}"
+          },
+          {
+            "key": "pspConfigDataExpiryInDays",
+            "value": "7",
+            "operations": [
+              { "name": "STRING_TO_INTEGER" }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse0.status.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "fail",
+                  "mappings": [
+                    { "from": "SUCCESS", "to": "success" }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "payout_in_process"
+          },
+          {
+            "key": "message",
+            "mappings": [
+              { "value": "{{pspResponse0.status.message}}" },
+              { "value": "{{pspResponse0.status.status}}" },
+              { "value": "" }
+            ],
+            "operations": [
+              { "name": "GET_FIRST_NON_EMPTY_STRING" }
+            ]
+          }
+        ],
+        "operations": [
+          { "name": "KEY_VALUE_LIST_TO_OBJECT" }
+        ]
+      }
+    }
+  },
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          { "value": "https://sandboxapi.rapyd.net/v1/payouts", "required": true }
+        ],
+        "operations": [
+          { "name": "LIST_VALUE_JOIN" }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "access_key",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              { "name": "SPLIT_STRING", "params": { "delimiter": "##" } },
+              { "name": "GET_ELEMENT_AT_INDEX", "params": { "index": 0 } }
+            ]
+          },
+          {
+            "key": "salt",
+            "value": "x",
+            "required": true,
+            "storeIn": "rapyd",
+            "operations": [
+              { "name": "GENERATE_UUID" }
+            ]
+          },
+          {
+            "key": "timestamp",
+            "value": "{{extraParams.currentTimeStamp}}",
+            "required": true,
+            "storeIn": "rapyd",
+            "operations": [
+              { "name": "SUB_STRING", "params": { "fromIndex": 0, "toIndex": 10 } }
+            ]
+          },
+          {
+            "key": "signature",
+            "required": true,
+            "mappings": [
+              {
+                "key": "input",
+                "mappings": [
+                  { "value": "post" },
+                  { "value": "/v1/payouts" },
+                  { "value": "{{store.rapyd.salt}}" },
+                  { "value": "{{store.rapyd.timestamp}}" },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "operations": [
+                      { "name": "SPLIT_STRING", "params": { "delimiter": "##" } },
+                      { "name": "GET_ELEMENT_AT_INDEX", "params": { "index": 0 } }
+                    ]
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "operations": [
+                      { "name": "SPLIT_STRING", "params": { "delimiter": "##" } },
+                      { "name": "GET_ELEMENT_AT_INDEX", "params": { "index": 1 } }
+                    ]
+                  },
+                  {
+                    "value": "{{pspRequest1}}",
+                    "operations": [
+                      { "name": "STRINGIFY_JSON" }
+                    ]
+                  }
+                ],
+                "operations": [
+                  { "name": "LIST_VALUE_JOIN" }
+                ]
+              },
+              {
+                "key": "secretKey",
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "operations": [
+                  { "name": "SPLIT_STRING", "params": { "delimiter": "##" } },
+                  { "name": "GET_ELEMENT_AT_INDEX", "params": { "index": 1 } }
+                ]
+              }
+            ],
+            "operations": [
+              { "name": "KEY_VALUE_LIST_TO_OBJECT" },
+              { "name": "COMPUTE_HMAC_SHA", "params": { "algorithm": "HmacSHA256", "outputFormat": "HEX" } },
+              { "name": "BASE64_TRANSFORM", "params": { "mode": "ENCODE" } }
+            ]
+          }
+        ],
+        "operations": [
+          { "name": "KEY_VALUE_LIST_TO_OBJECT" }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "parsed",
+            "hidden": true,
+            "storeIn": "ep",
+            "value": "{{bankTransaction.extraParameter}}",
+            "operations": [
+              { "name": "OBJECT_TO_JSON" }
+            ]
+          },
+          {
+            "key": "rawName",
+            "hidden": true,
+            "storeIn": "rapydPayout",
+            "mappings": [
+              { "value": "{{payout.extraParam.cardHolderName}}" },
+              { "value": "{{payout.client.full_name}}" },
+              { "value": "NA" }
+            ],
+            "operations": [
+              { "name": "GET_FIRST_NON_EMPTY_STRING" }
+            ]
+          },
+          {
+            "key": "safeName",
+            "hidden": true,
+            "storeIn": "rapydPayout",
+            "mappings": [
+              {
+                "value": "{{store.rapydPayout.rawName}}",
+                "operations": [
+                  { "name": "STRING_REPLACE", "params": { "target": "^(?i)(na|n/a|\\.)$", "replacement": "", "occurrence": "REGEX_ALL" } }
+                ]
+              },
+              {
+                "value": "{{payout.client.full_name}}",
+                "operations": [
+                  { "name": "STRING_REPLACE", "params": { "target": "^(?i)(na|n/a|\\.)$", "replacement": "", "occurrence": "REGEX_ALL" } }
+                ]
+              },
+              { "value": "Paysecure Beneficiary" }
+            ],
+            "operations": [
+              { "name": "GET_FIRST_NON_EMPTY_STRING" }
+            ]
+          },
+          {
+            "key": "firstName",
+            "hidden": true,
+            "storeIn": "rapydPayout",
+            "value": "{{store.rapydPayout.safeName}}",
+            "operations": [
+              { "name": "STRING_REPLACE", "params": { "target": "\\s+\\S+$", "replacement": "", "occurrence": "REGEX_ALL" } }
+            ]
+          },
+          {
+            "key": "lastName",
+            "hidden": true,
+            "storeIn": "rapydPayout",
+            "value": "{{store.rapydPayout.safeName}}",
+            "operations": [
+              { "name": "STRING_REPLACE", "params": { "target": "^.*\\s+", "replacement": "", "occurrence": "REGEX_ALL" } }
+            ]
+          },
+          {
+            "key": "ewallet",
+            "mappings": [
+              {
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "operations": [
+                  { "name": "SPLIT_STRING", "params": { "delimiter": "##" } },
+                  { "name": "GET_ELEMENT_AT_INDEX", "params": { "index": 2 } }
+                ]
+              },
+              { "value": "{{store.ep.parsed.ewallet}}" },
+              { "value": "{{extraParams.rapydEwallet}}" },
+              { "value": "{{payout.extraParam.rapydEwallet}}" }
+            ],
+            "operations": [
+              { "name": "GET_FIRST_NON_EMPTY_STRING" }
+            ],
+            "required": true
+          },
+          {
+            "key": "payout_amount",
+            "mappings": [
+              { "value": "{{payout.fx_Amount}}" },
+              { "value": "{{payout.amount}}" },
+              { "value": "" }
+            ],
+            "operations": [
+              { "name": "GET_FIRST_NON_EMPTY_STRING" },
+              { "name": "STRING_TO_DOUBLE" }
+            ],
+            "required": true
+          },
+          {
+            "key": "payout_currency",
+            "mappings": [
+              { "value": "{{payout.fx_Currency}}" },
+              { "value": "{{payout.currency}}" }
+            ],
+            "operations": [
+              { "name": "GET_FIRST_NON_EMPTY_STRING" }
+            ],
+            "required": true
+          },
+          {
+            "key": "sender_currency",
+            "mappings": [
+              { "value": "{{payout.fx_Currency}}" },
+              { "value": "{{payout.currency}}" }
+            ],
+            "operations": [
+              { "name": "GET_FIRST_NON_EMPTY_STRING" }
+            ],
+            "required": true
+          },
+          {
+            "key": "sender_country",
+            "mappings": [
+              { "value": "{{extraParams.rapydSenderCountry}}" },
+              { "value": "{{store.rapyd.benCountry}}" },
+              { "value": "GB" }
+            ],
+            "operations": [
+              { "name": "GET_FIRST_NON_EMPTY_STRING" },
+              { "name": "STRING_REPLACE", "params": { "target": "^(?i)(uk|zz)$", "replacement": "GB", "occurrence": "REGEX_ALL" } }
+            ],
+            "required": true
+          },
+          {
+            "key": "beneficiary_country",
+            "mappings": [
+              { "value": "{{payout.client.country}}" },
+              { "value": "{{payout.beneficiaryDetail.bankCountryCode}}" }
+            ],
+            "operations": [
+              { "name": "GET_FIRST_NON_EMPTY_STRING" },
+              { "name": "STRING_REPLACE", "params": { "target": "^(?i)(uk|zz)$", "replacement": "GB", "occurrence": "REGEX_ALL" } }
+            ],
+            "required": true
+          },
+          {
+            "key": "sender_entity_type",
+            "mappings": [
+              { "value": "{{store.ep.parsed.sender_entity_type}}" },
+              { "value": "company" }
+            ],
+            "operations": [
+              { "name": "GET_FIRST_NON_EMPTY_STRING" }
+            ]
+          },
+          {
+            "key": "beneficiary_entity_type",
+            "mappings": [
+              { "value": "{{store.ep.parsed.beneficiary_entity_type}}" },
+              { "value": "individual" }
+            ],
+            "operations": [
+              { "name": "GET_FIRST_NON_EMPTY_STRING" }
+            ]
+          },
+          {
+            "key": "payout_method_type",
+            "mappings": [
+              { "value": "{{store.pmtCache.cachedCfg.pspConfig.value}}" },
+              { "value": "{{store.rapyd.matchedMethodType}}" },
+              { "value": "{{payout.extraParam.rapydPayoutMethodType}}" },
+              { "value": "{{store.ep.parsed.payout_method_type}}" }
+            ],
+            "operations": [
+              { "name": "GET_FIRST_NON_EMPTY_STRING" }
+            ],
+            "required": true
+          },
+          {
+            "key": "sender",
+            "mappings": [
+              {
+                "key": "company_name",
+                "mappings": [
+                  { "value": "{{store.ep.parsed.company_name}}" },
+                  { "value": "Paysecure" }
+                ],
+                "operations": [ { "name": "GET_FIRST_NON_EMPTY_STRING" } ]
+              },
+              {
+                "key": "country",
+                "mappings": [
+                  { "value": "{{store.ep.parsed.sender_country}}" },
+                  { "value": "{{extraParams.rapydSenderCountry}}" },
+                  { "value": "GB" }
+                ],
+                "operations": [
+                  { "name": "GET_FIRST_NON_EMPTY_STRING" },
+                  { "name": "STRING_REPLACE", "params": { "target": "^(?i)(uk|zz)$", "replacement": "GB", "occurrence": "REGEX_ALL" } }
+                ]
+              },
+              {
+                "key": "currency",
+                "mappings": [
+                  { "value": "{{payout.fx_Currency}}" },
+                  { "value": "{{payout.currency}}" }
+                ],
+                "operations": [ { "name": "GET_FIRST_NON_EMPTY_STRING" } ]
+              },
+              {
+                "key": "entity_type",
+                "mappings": [
+                  { "value": "{{store.ep.parsed.sender_entity_type}}" },
+                  { "value": "company" }
+                ],
+                "operations": [ { "name": "GET_FIRST_NON_EMPTY_STRING" } ]
+              },
+              {
+                "key": "city",
+                "mappings": [
+                  { "value": "{{store.ep.parsed.city}}" },
+                  { "value": "London" }
+                ],
+                "operations": [ { "name": "GET_FIRST_NON_EMPTY_STRING" } ]
+              },
+              {
+                "key": "address",
+                "mappings": [
+                  { "value": "{{store.ep.parsed.address}}" },
+                  { "value": "HighStreet" }
+                ],
+                "operations": [ { "name": "GET_FIRST_NON_EMPTY_STRING" } ]
+              },
+              {
+                "key": "postcode",
+                "mappings": [
+                  { "value": "{{store.ep.parsed.postcode}}" },
+                  { "value": "12345" }
+                ],
+                "operations": [ { "name": "GET_FIRST_NON_EMPTY_STRING" } ]
+              }
+            ],
+            "operations": [
+              { "name": "KEY_VALUE_LIST_TO_OBJECT" }
+            ],
+            "required": true
+          },
+          {
+            "key": "beneficiary",
+            "mappings": [
+              {
+                "key": "first_name",
+                "value": "{{store.rapydPayout.firstName}}",
+                "required": true
+              },
+              {
+                "key": "last_name",
+                "value": "{{store.rapydPayout.lastName}}",
+                "required": true
+              },
+              {
+                "key": "email",
+                "mappings": [
+                  { "value": "{{payout.client.email}}" },
+                  { "value": "no-reply@paysecure.com" }
+                ],
+                "operations": [ { "name": "GET_FIRST_NON_EMPTY_STRING" } ]
+              },
+              {
+                "key": "phone_number",
+                "mappings": [
+                  { "value": "{{payout.client.phone}}" },
+                  { "value": "447911123456" }
+                ],
+                "operations": [
+                  { "name": "GET_FIRST_NON_EMPTY_STRING" },
+                  { "name": "STRING_REPLACE", "params": { "target": "[^0-9]", "replacement": "", "occurrence": "REGEX_ALL" } }
+                ],
+                "required": true
+              },
+              {
+                "key": "card_number",
+                "value": "{{payout.extraParam.cardNumber}}",
+                "required": true
+              },
+              {
+                "key": "card_expiration_month",
+                "value": "{{payout.extraParam.expiryMonth}}",
+                "required": true
+              },
+              {
+                "key": "card_expiration_year",
+                "value": "{{payout.extraParam.expiryYear}}",
+                "required": true
+              },
+              {
+                "key": "country",
+                "mappings": [
+                  { "value": "{{payout.client.country}}" },
+                  { "value": "{{payout.beneficiaryDetail.bankCountryCode}}" }
+                ],
+                "operations": [
+                  { "name": "GET_FIRST_NON_EMPTY_STRING" },
+                  { "name": "STRING_REPLACE", "params": { "target": "^(?i)(uk|zz)$", "replacement": "GB", "occurrence": "REGEX_ALL" } }
+                ]
+              }
+            ],
+            "operations": [
+              { "name": "KEY_VALUE_LIST_TO_OBJECT" }
+            ],
+            "required": true
+          },
+          {
+            "key": "description",
+            "mappings": [
+              { "value": "{{payout.merchantDescriptor}}" },
+              { "value": "{{payout.payoutId}}" }
+            ],
+            "operations": [
+              { "name": "GET_FIRST_NON_EMPTY_STRING" }
+            ]
+          },
+          {
+            "key": "merchant_reference_id",
+            "value": "{{payout.payoutId}}"
+          }
+        ],
+        "operations": [
+          { "name": "KEY_VALUE_LIST_TO_OBJECT" }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse1.data.id}}"
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse1.data.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "fail",
+                  "mappings": [
+                    { "from": "Completed", "to": "success" },
+                    { "from": "Confirmed", "to": "success" },
+                    { "from": "Created",   "to": "success" },
+                    { "from": "Active",    "to": "success" },
+                    { "from": "Pending",   "to": "success" },
+                    { "from": "InProgress","to": "success" },
+                    { "from": "Cancelled", "to": "fail" },
+                    { "from": "Canceled",  "to": "fail" },
+                    { "from": "Failed",    "to": "fail" },
+                    { "from": "Rejected",  "to": "fail" },
+                    { "from": "Expired",   "to": "fail" },
+                    { "from": "Error",     "to": "fail" }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse1.data.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "payout_in_process",
+                  "mappings": [
+                    { "from": "Completed", "to": "paid" },
+                    { "from": "Confirmed", "to": "paid" },
+                    { "from": "Created",   "to": "payout_in_process" },
+                    { "from": "Active",    "to": "payout_in_process" },
+                    { "from": "Pending",   "to": "payout_in_process" },
+                    { "from": "InProgress","to": "payout_in_process" },
+                    { "from": "Cancelled", "to": "payment_failed" },
+                    { "from": "Canceled",  "to": "payment_failed" },
+                    { "from": "Failed",    "to": "payment_failed" },
+                    { "from": "Rejected",  "to": "payment_failed" },
+                    { "from": "Expired",   "to": "payment_failed" },
+                    { "from": "Error",     "to": "payment_failed" }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              { "value": "{{pspResponse1.data.error}}" },
+              { "value": "{{pspResponse1.status.message}}" },
+              { "value": "{{pspResponse1.data.status}}" },
+              { "value": "" }
+            ],
+            "operations": [
+              { "name": "GET_FIRST_NON_EMPTY_STRING" }
+            ]
+          }
+        ],
+        "operations": [
+          { "name": "KEY_VALUE_LIST_TO_OBJECT" }
+        ]
+      }
+    }
+  }
+]

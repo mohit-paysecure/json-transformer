@@ -1,0 +1,299 @@
+[
+  {
+    "requestMapping": {
+      "method": "GET",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://sandboxapi.rapyd.net/v1/payouts/",
+            "required": true
+          },
+          {
+            "value": "{{bankTransaction.paymentTransId}}",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "access_key",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 0
+                }
+              }
+            ]
+          },
+          {
+            "key": "salt",
+            "value": "x",
+            "required": true,
+            "storeIn": "rapyd",
+            "operations": [
+              {
+                "name": "GENERATE_UUID"
+              }
+            ]
+          },
+          {
+            "key": "timestamp",
+            "value": "{{extraParams.currentTimeStamp}}",
+            "required": true,
+            "storeIn": "rapyd",
+            "operations": [
+              {
+                "name": "SUB_STRING",
+                "params": {
+                  "fromIndex": 0,
+                  "toIndex": 10
+                }
+              }
+            ]
+          },
+          {
+            "key": "signature",
+            "required": true,
+            "mappings": [
+              {
+                "key": "input",
+                "mappings": [
+                  {
+                    "value": "get"
+                  },
+                  {
+                    "value": "/v1/payouts/"
+                  },
+                  {
+                    "value": "{{bankTransaction.paymentTransId}}"
+                  },
+                  {
+                    "value": "{{store.rapyd.salt}}"
+                  },
+                  {
+                    "value": "{{store.rapyd.timestamp}}"
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 0
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 1
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  }
+                ]
+              },
+              {
+                "key": "secretKey",
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "COMPUTE_HMAC_SHA",
+                "params": {
+                  "algorithm": "HmacSHA256",
+                  "outputFormat": "HEX"
+                }
+              },
+              {
+                "name": "BASE64_TRANSFORM",
+                "params": {
+                  "mode": "ENCODE"
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": []
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse0.data.id}}"
+          },
+          {
+            "key": "code",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.data.status}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "fail",
+                  "mappings": [
+                    { "from": "Completed", "to": "success" },
+                    { "from": "Confirmed", "to": "success" },
+                    { "from": "Created",   "to": "success" },
+                    { "from": "Active",    "to": "success" },
+                    { "from": "Pending",   "to": "success" },
+                    { "from": "InProgress","to": "success" },
+                    { "from": "Cancelled", "to": "fail" },
+                    { "from": "Canceled",  "to": "fail" },
+                    { "from": "Failed",    "to": "fail" },
+                    { "from": "Rejected",  "to": "fail" },
+                    { "from": "Expired",   "to": "fail" },
+                    { "from": "Error",     "to": "fail" }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.data.status}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "payout_in_process",
+                  "mappings": [
+                    { "from": "Completed", "to": "paid" },
+                    { "from": "Confirmed", "to": "paid" },
+                    { "from": "Created",   "to": "payout_in_process" },
+                    { "from": "Active",    "to": "payout_in_process" },
+                    { "from": "Pending",   "to": "payout_in_process" },
+                    { "from": "InProgress","to": "payout_in_process" },
+                    { "from": "Cancelled", "to": "payment_failed" },
+                    { "from": "Canceled",  "to": "payment_failed" },
+                    { "from": "Failed",    "to": "payment_failed" },
+                    { "from": "Rejected",  "to": "payment_failed" },
+                    { "from": "Expired",   "to": "payment_failed" },
+                    { "from": "Error",     "to": "payment_failed" }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.data.error}}"
+              },
+              {
+                "value": "{{pspResponse0.data.gc_error_code}}"
+              },
+              {
+                "value": "{{pspResponse0.status.message}}"
+              },
+              {
+                "value": "{{pspResponse0.data.status}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]
