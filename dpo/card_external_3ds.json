@@ -658,5 +658,179 @@
         ]
       }
     }
+  },
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://secure.3gdirectpay.com/API/v6/",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/xml",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "API3G",
+            "mappings": [
+              {
+                "key": "CompanyToken",
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0
+                    }
+                  }
+                ]
+              },
+              {
+                "key": "Request",
+                "value": "verifyToken",
+                "required": true
+              },
+              {
+                "key": "TransactionToken",
+                "mappings": [
+                  {
+                    "value": "{{bankTransaction.paymentTransId}}"
+                  },
+                  {
+                    "value": "{{bankTransaction.tempObject.transToken}}"
+                  },
+                  {
+                    "value": ""
+                  }
+                ],
+                "required": true,
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              }
+            ],
+            "required": true,
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "status",
+            "value": "{{pspResponse0.API3G.Result}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "000",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "900",
+                      "to": "payment_in_process"
+                    }
+                  ],
+                  "defaultValue": "payment_failed"
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse0.API3G.Result}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "000",
+                      "to": "success"
+                    },
+                    {
+                      "from": "900",
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
+          },
+          {
+            "key": "pspTransactionId",
+            "mappings": [
+              {
+                "value": "{{bankTransaction.paymentTransId}}"
+              },
+              {
+                "value": "{{bankTransaction.tempObject.transToken}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "value": "{{pspResponse0.API3G.ResultExplanation}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
   }
 ]
