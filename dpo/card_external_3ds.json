@@ -1,0 +1,662 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://secure.3gdirectpay.com/API/v6/",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/xml",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "API3G",
+            "mappings": [
+              {
+                "key": "CompanyToken",
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0
+                    }
+                  }
+                ]
+              },
+              {
+                "key": "Request",
+                "value": "createToken",
+                "required": true
+              },
+              {
+                "key": "Transaction",
+                "mappings": [
+                  {
+                    "key": "PaymentAmount",
+                    "value": "{{purchase.fx_Amount}}",
+                    "required": true
+                  },
+                  {
+                    "key": "PaymentCurrency",
+                    "value": "{{purchase.fx_Currency}}",
+                    "required": true
+                  },
+                  {
+                    "key": "CompanyRef",
+                    "value": "{{purchase.purchaseId}}",
+                    "required": true
+                  },
+                  {
+                    "key": "CompanyRefUnique",
+                    "value": "0",
+                    "required": true
+                  },
+                  {
+                    "key": "PTL",
+                    "value": "5",
+                    "required": true
+                  },
+                  {
+                    "key": "RedirectURL",
+                    "mappings": [
+                      {
+                        "value": "{{extraParams.baseUrl}}",
+                        "required": true
+                      },
+                      {
+                        "value": "/custRedirect/",
+                        "required": true
+                      },
+                      {
+                        "value": "{{purchase.bankid}}",
+                        "required": true
+                      },
+                      {
+                        "value": "/",
+                        "required": true
+                      },
+                      {
+                        "value": "{{purchase.purchaseId}}",
+                        "required": true
+                      },
+                      {
+                        "value": "/",
+                        "required": true
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "LIST_VALUE_JOIN"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "BackURL",
+                    "mappings": [
+                      {
+                        "value": "{{extraParams.baseUrl}}",
+                        "required": true
+                      },
+                      {
+                        "value": "/webhook/",
+                        "required": true
+                      },
+                      {
+                        "value": "{{purchase.bankname}}",
+                        "required": true
+                      },
+                      {
+                        "value": "/",
+                        "required": true
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "LIST_VALUE_JOIN"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "customerEmail",
+                    "value": "{{purchase.client.email}}"
+                  },
+                  {
+                    "key": "customerFirstName",
+                    "mappings": [
+                      {
+                        "value": "{{purchase.client.full_name}}"
+                      },
+                      {
+                        "value": "{{cardInfo.cardholder_name}}"
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "GET_FIRST_NON_EMPTY_STRING"
+                      },
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "\\s+"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 0
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "key": "customerLastName",
+                    "mappings": [
+                      {
+                        "value": "{{purchase.client.full_name}}"
+                      },
+                      {
+                        "value": "{{cardInfo.cardholder_name}}"
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "GET_FIRST_NON_EMPTY_STRING"
+                      },
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "\\s+"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 0,
+                          "fromLast": true
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "required": true,
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ]
+              },
+              {
+                "key": "Services",
+                "mappings": [
+                  {
+                    "key": "Service",
+                    "mappings": [
+                      {
+                        "key": "ServiceType",
+                        "value": "{{bankTransaction.usedAuthKey}}",
+                        "required": true,
+                        "operations": [
+                          {
+                            "name": "SPLIT_STRING",
+                            "params": {
+                              "delimiter": "##"
+                            }
+                          },
+                          {
+                            "name": "GET_ELEMENT_AT_INDEX",
+                            "params": {
+                              "index": 1
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "key": "ServiceDescription",
+                        "value": "PGS Payment",
+                        "required": true
+                      },
+                      {
+                        "key": "ServiceDate",
+                        "value": "{{extraParams.currentTimeStamp}}",
+                        "required": true,
+                        "operations": [
+                          {
+                            "name": "EPOCH_TO_STRING_DATE",
+                            "params": {
+                              "dateFormat": "yyyy/MM/dd HH:mm"
+                            }
+                          }
+                        ]
+                      }
+                    ],
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }
+                    ]
+                  }
+                ],
+                "required": true,
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ]
+              }
+            ],
+            "required": true,
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "tempObject",
+            "mappings": [
+              {
+                "key": "transToken",
+                "value": "{{pspResponse0.API3G.TransToken}}",
+                "storeIn": "dpo"
+              },
+              {
+                "key": "transRef",
+                "value": "{{pspResponse0.API3G.TransRef}}",
+                "storeIn": "dpo"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse0.API3G.TransToken}}"
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse0.API3G.Result}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "000",
+                      "to": "payment_in_process"
+                    }
+                  ],
+                  "defaultValue": "payment_failed"
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse0.API3G.Result}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "000",
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "value": "{{pspResponse0.API3G.ResultExplanation}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://secure.3gdirectpay.com/API/v6/",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/xml",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "API3G",
+            "mappings": [
+              {
+                "key": "CompanyToken",
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 0
+                    }
+                  }
+                ]
+              },
+              {
+                "key": "Request",
+                "value": "chargeTokenCreditCard",
+                "required": true
+              },
+              {
+                "key": "TransactionToken",
+                "value": "{{pspResponse0.API3G.TransToken}}",
+                "required": true
+              },
+              {
+                "key": "CreditCardNumber",
+                "value": "{{cardInfo.number}}",
+                "required": true
+              },
+              {
+                "key": "CreditCardExpiry",
+                "mappings": [
+                  {
+                    "value": "{{cardInfo.expireMonth}}",
+                    "required": true
+                  },
+                  {
+                    "value": "{{cardInfo.expireYear}}",
+                    "required": true
+                  }
+                ],
+                "required": true,
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  }
+                ]
+              },
+              {
+                "key": "CreditCardCVV",
+                "value": "{{cardInfo.cvc}}",
+                "required": true
+              },
+              {
+                "key": "rawCcName",
+                "hidden": true,
+                "storeIn": "dpo",
+                "mappings": [
+                  {
+                    "value": "{{cardInfo.cardholder_name}}"
+                  },
+                  {
+                    "value": "{{purchase.client.full_name}}"
+                  },
+                  {
+                    "value": "NA"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              },
+              {
+                "key": "safeCcName",
+                "hidden": true,
+                "storeIn": "dpo",
+                "mappings": [
+                  {
+                    "value": "{{store.dpo.rawCcName}}",
+                    "operations": [
+                      {
+                        "name": "STRING_REPLACE",
+                        "params": {
+                          "target": "^(?i)(na|n/a|\\.)$",
+                          "replacement": "",
+                          "occurrence": "REGEX_ALL"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": "{{purchase.client.full_name}}",
+                    "operations": [
+                      {
+                        "name": "STRING_REPLACE",
+                        "params": {
+                          "target": "^(?i)(na|n/a|\\.)$",
+                          "replacement": "",
+                          "occurrence": "REGEX_ALL"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": "Paysecure"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              },
+              {
+                "key": "CardHolderName",
+                "value": "{{store.dpo.safeCcName}}",
+                "required": true
+              },
+              {
+                "key": "ThreeD",
+                "mappings": [
+                  {
+                    "key": "ECI",
+                    "value": "{{bankTransaction.eci}}"
+                  },
+                  {
+                    "key": "CAVV",
+                    "value": "{{bankTransaction.cavv}}"
+                  },
+                  {
+                    "key": "XID",
+                    "value": "{{bankTransaction.threeDDirectoryTransactionReference}}"
+                  },
+                  {
+                    "key": "Version",
+                    "value": "{{bankTransaction.threeDVersion}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ]
+              }
+            ],
+            "required": true,
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "tempObject",
+            "mappings": [
+              {
+                "key": "transToken",
+                "value": "{{pspResponse0.API3G.TransToken}}",
+                "storeIn": "dpo"
+              },
+              {
+                "key": "transRef",
+                "value": "{{pspResponse0.API3G.TransRef}}",
+                "storeIn": "dpo"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse0.API3G.TransToken}}"
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse1.API3G.Result}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "000",
+                      "to": "paid"
+                    }
+                  ],
+                  "defaultValue": "payment_failed"
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse1.API3G.Result}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "000",
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse1.API3G.ResultExplanation}}"
+              },
+              {
+                "value": "{{pspResponse0.API3G.ResultExplanation}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]
