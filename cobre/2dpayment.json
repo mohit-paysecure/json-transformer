@@ -886,7 +886,7 @@
                 "key": "valid_until",
                 "mappings": [
                   {
-                    "value": "{{purchase.expireInMin}}"
+                    "value": "{{purchase.purchase.expireInMin}}"
                   },
                   {
                     "value": "30"
@@ -988,12 +988,33 @@
               { "value": "##" },
               {
                 "mappings": [
-                  { "value": "{{purchase.expireInMin}}" },
-                  { "value": "30" }
+                  {
+                    "value": "{{purchase.created_on}}",
+                    "operations": [
+                      { "name": "STRING_TO_INTEGER" }
+                    ]
+                  },
+                  {
+                    "mappings": [
+                      {
+                        "mappings": [
+                          { "value": "{{purchase.purchase.expireInMin}}" },
+                          { "value": "30" }
+                        ],
+                        "operations": [
+                          { "name": "GET_FIRST_NON_EMPTY_STRING" },
+                          { "name": "STRING_TO_INTEGER" }
+                        ]
+                      },
+                      { "value": 60 }
+                    ],
+                    "operations": [
+                      { "name": "LIST_VALUE_MULTIPLY" }
+                    ]
+                  }
                 ],
                 "operations": [
-                  { "name": "GET_FIRST_NON_EMPTY_STRING" },
-                  { "name": "GENERATE_DATETIME", "params": { "offsetUnit": "MINUTES", "format": "EPOCH_SECONDS" } }
+                  { "name": "LIST_VALUE_INTEGER_ADD" }
                 ]
               }
             ],
@@ -1009,7 +1030,7 @@
             "key": "expireInMin",
             "mappings": [
               {
-                "value": "{{purchase.expireInMin}}"
+                "value": "{{purchase.purchase.expireInMin}}"
               },
               {
                 "value": "30"
