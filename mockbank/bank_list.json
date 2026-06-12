@@ -1,0 +1,222 @@
+[
+  {
+    "requestMapping": {
+      "method": "GET",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://6979b85bcc9c576a8e177659.mockapi.io/api/bank-list/dfghj"
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "isPspResponseMissing",
+            "value": "{{pspResponse0.value}}",
+            "hidden": true,
+            "storeIn": "bankList",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              }
+            ]
+          },
+          {
+            "key": "cacheContext",
+            "hidden": true,
+            "storeIn": "bankList",
+            "mappings": [
+              {
+                "key": "id",
+                "mappings": [
+                  {
+                    "value": "BANK_LIST:"
+                  },
+                  {
+                    "value": "{{extraParams.gateway}}"
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "mappings": [
+                      {
+                        "value": "{{extraParams.countryCode}}"
+                      },
+                      {
+                        "value": "{{extraParams.country}}"
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "GET_FIRST_NON_EMPTY_STRING"
+                      }
+                    ]
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "value": "{{extraParams.paymentMethod}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  }
+                ]
+              },
+              {
+                "key": "idType",
+                "value": "pspConfigId"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "GET_TRANSACTION_CONTEXT_BY_ID"
+              }
+            ]
+          },
+          {
+            "key": "lookupResponseKey",
+            "value": "bankdfghj"
+          },
+          {
+            "key": "banks",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.value}}",
+                "skipIf": "{{store.bankList.isPspResponseMissing}}",
+                "operations": [
+                  {
+                    "name": "LIST_FIELD_MAPPER",
+                    "params": {
+                      "transform": {
+                        "providerBankName": "{{name}}",
+                        "providerBankCode": "{{code}}"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "{{store.bankList.cacheContext.pspConfig.value}}"
+              },
+              {
+                "value": "[]"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              },
+              {
+                "name": "OBJECT_TO_JSON",
+                "params": {
+                  "arrayAsList": true
+                }
+              }
+            ]
+          },
+          {
+            "key": "pspConfigID",
+            "mappings": [
+              {
+                "value": "BANK_LIST:"
+              },
+              {
+                "value": "{{extraParams.gateway}}"
+              },
+              {
+                "value": ":"
+              },
+              {
+                "mappings": [
+                  {
+                    "value": "{{extraParams.countryCode}}"
+                  },
+                  {
+                    "value": "{{extraParams.country}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              },
+              {
+                "value": ":"
+              },
+              {
+                "value": "{{extraParams.paymentMethod}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
+          },
+          {
+            "key": "pspConfigData",
+            "value": "{{pspResponse0.value}}",
+            "skipIf": "{{store.bankList.isPspResponseMissing}}",
+            "operations": [
+              {
+                "name": "LIST_FIELD_MAPPER",
+                "params": {
+                  "transform": {
+                    "providerBankName": "{{name}}",
+                    "providerBankCode": "{{code}}"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "key": "pspConfigDataExpiryInMinutes",
+            "value": "1440"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]
