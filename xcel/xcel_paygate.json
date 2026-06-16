@@ -5,7 +5,7 @@
       "url": {
         "mappings": [
           {
-            "value": "https://sandbox-api.xcelapp.com/transactions-service/paygate/generate-payment-link",
+            "value": "https://api.xcelapp.com/transactions-service/paygate/generate-payment-link",
             "required": true
           }
         ],
@@ -76,8 +76,23 @@
           },
           {
             "key": "currency",
-            "value": "{{purchase.fx_Currency}}",
-            "required": true
+            "required": true,
+            "mappings": [
+              {
+                "value": "{{purchase.fx_Currency}}"
+              },
+              {
+                "value": "{{purchase.purchase.currency}}"
+              },
+              {
+                "value": "GHS"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
           },
           {
             "key": "client_transaction_id",
@@ -86,8 +101,23 @@
           },
           {
             "key": "customer_email",
-            "value": "{{purchase.client.email}}",
-            "required": true
+            "required": true,
+            "mappings": [
+              {
+                "value": "{{purchase.client.email}}"
+              },
+              {
+                "value": "{{purchase.email}}"
+              },
+              {
+                "value": "customer@example.com"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
           },
           {
             "key": "customer_name",
@@ -97,9 +127,12 @@
               },
               {
                 "value": "{{s2s.cardholder_name}}"
+              },
+              {
+                "value": "Test Customer"
               }
             ],
-            "required": true,
+            "required": false,
             "operations": [
               {
                 "name": "GET_FIRST_NON_EMPTY_STRING"
@@ -108,8 +141,23 @@
           },
           {
             "key": "customer_phone",
-            "value": "{{purchase.client.phone}}",
-            "required": true
+            "required": false,
+            "mappings": [
+              {
+                "value": "{{purchase.client.phone}}"
+              },
+              {
+                "value": "{{purchase.phone}}"
+              },
+              {
+                "value": "233244000000"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
           },
           {
             "key": "channel",
@@ -130,7 +178,8 @@
               {
                 "name": "GET_FIRST_NON_EMPTY_STRING"
               }
-            ]
+            ],
+            "required": false
           },
           {
             "key": "redirect_url",
@@ -176,7 +225,7 @@
                 "name": "LIST_VALUE_JOIN"
               }
             ],
-            "required": true
+            "required": false
           }
         ],
         "operations": [
@@ -198,10 +247,22 @@
                 "params": {
                   "defaultValue": "fail",
                   "mappings": [
-                    { "from": "PENDING",   "to": "success" },
-                    { "from": "SUCCESS",   "to": "success" },
-                    { "from": "FAILED",    "to": "fail" },
-                    { "from": "CANCELLED", "to": "fail" }
+                    {
+                      "from": "PENDING",
+                      "to": "success"
+                    },
+                    {
+                      "from": "SUCCESS",
+                      "to": "success"
+                    },
+                    {
+                      "from": "FAILED",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "CANCELLED",
+                      "to": "fail"
+                    }
                   ]
                 }
               }
@@ -216,10 +277,22 @@
                 "params": {
                   "defaultValue": "payment_failed",
                   "mappings": [
-                    { "from": "PENDING",   "to": "payment_in_process" },
-                    { "from": "SUCCESS",   "to": "paid" },
-                    { "from": "FAILED",    "to": "payment_failed" },
-                    { "from": "CANCELLED", "to": "payment_failed" }
+                    {
+                      "from": "PENDING",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "SUCCESS",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "FAILED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "CANCELLED",
+                      "to": "payment_failed"
+                    }
                   ]
                 }
               }
@@ -246,7 +319,19 @@
           },
           {
             "key": "pspTransactionId",
-            "value": "{{pspResponse0.data.transaction_id}}"
+            "mappings": [
+              {
+                "value": "{{pspResponse0.data.transaction_id}}"
+              },
+              {
+                "value": "{{pspResponse0.data.client_transaction_id}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
           },
           {
             "key": "pspToken",

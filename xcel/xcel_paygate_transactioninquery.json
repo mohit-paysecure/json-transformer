@@ -5,10 +5,25 @@
       "url": {
         "mappings": [
           {
-            "value": "https://sandbox-api.xcelapp.com/transactions-service/paygate/transaction/"
+            "value": "https://api.xcelapp.com/transactions-service/paygate/tsq/"
           },
           {
-            "value": "{{bankTransaction.paymentTransId}}"
+            "mappings": [
+              {
+                "value": "{{bankTransaction.paymentTransId}}"
+              },
+              {
+                "value": "{{bankTransaction.token}}"
+              },
+              {
+                "value": "{{purchase.purchaseId}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
           }
         ],
         "operations": [
@@ -78,17 +93,29 @@
         "mappings": [
           {
             "key": "code",
-            "value": "{{pspResponse0.data.status}}",
+            "value": "{{pspResponse0.status}}",
             "operations": [
               {
                 "name": "VALUE_MAPPER",
                 "params": {
                   "defaultValue": "fail",
                   "mappings": [
-                    { "from": "PENDING",   "to": "success" },
-                    { "from": "SUCCESS",   "to": "success" },
-                    { "from": "FAILED",    "to": "fail" },
-                    { "from": "CANCELLED", "to": "fail" }
+                    {
+                      "from": "PENDING",
+                      "to": "success"
+                    },
+                    {
+                      "from": "SUCCESS",
+                      "to": "success"
+                    },
+                    {
+                      "from": "FAILED",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "CANCELLED",
+                      "to": "fail"
+                    }
                   ]
                 }
               }
@@ -96,17 +123,29 @@
           },
           {
             "key": "status",
-            "value": "{{pspResponse0.data.status}}",
+            "value": "{{pspResponse0.status}}",
             "operations": [
               {
                 "name": "VALUE_MAPPER",
                 "params": {
                   "defaultValue": "payment_failed",
                   "mappings": [
-                    { "from": "PENDING",   "to": "payment_in_process" },
-                    { "from": "SUCCESS",   "to": "paid" },
-                    { "from": "FAILED",    "to": "payment_failed" },
-                    { "from": "CANCELLED", "to": "payment_failed" }
+                    {
+                      "from": "PENDING",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "SUCCESS",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "FAILED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "CANCELLED",
+                      "to": "payment_failed"
+                    }
                   ]
                 }
               }
@@ -119,7 +158,7 @@
                 "value": "{{pspResponse0.status_reason}}"
               },
               {
-                "value": "{{pspResponse0.data.status}}"
+                "value": "{{pspResponse0.status}}"
               },
               {
                 "value": ""
@@ -133,7 +172,19 @@
           },
           {
             "key": "pspTransactionId",
-            "value": "{{pspResponse0.data.transaction_id}}"
+            "mappings": [
+              {
+                "value": "{{pspResponse0.reference}}"
+              },
+              {
+                "value": "{{bankTransaction.paymentTransId}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
           }
         ],
         "operations": [
