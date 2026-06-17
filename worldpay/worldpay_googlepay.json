@@ -23,6 +23,11 @@
             "required": true
           },
           {
+            "key": "Accept",
+            "value": "application/vnd.worldpay.payments-v7+json",
+            "required": true
+          },
+          {
             "key": "Authorization",
             "mappings": [
               {
@@ -295,7 +300,7 @@
                 "storeIn": "worldpay",
                 "operations": [
                   {
-                    "name": "OBJECT_TO_JSON_STRING"
+                    "name": "OBJECT_TO_JSON"
                   }
                 ]
               },
