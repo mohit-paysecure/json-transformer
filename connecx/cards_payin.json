@@ -336,6 +336,148 @@
                 "key": "emailAddress",
                 "value": "{{purchase.client.email}}",
                 "required": true
+              },
+              {
+                "key": "address",
+                "required": true,
+                "mappings": [
+                  {
+                    "key": "addressLine1",
+                    "required": true,
+                    "mappings": [
+                      {
+                        "value": "{{purchase.client.street_address}}"
+                      },
+                      {
+                        "value": "NA"
+                      },
+                      {
+                        "value": ""
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "GET_FIRST_NON_EMPTY_STRING"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "cityTown",
+                    "required": true,
+                    "mappings": [
+                      {
+                        "value": "{{purchase.client.city}}"
+                      },
+                      {
+                        "value": "NA"
+                      },
+                      {
+                        "value": ""
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "GET_FIRST_NON_EMPTY_STRING"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "stateProv",
+                    "required": true,
+                    "mappings": [
+                      {
+                        "value": "{{purchase.client.stateCode}}"
+                      },
+                      {
+                        "value": "NA"
+                      },
+                      {
+                        "value": ""
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "GET_FIRST_NON_EMPTY_STRING"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "country",
+                    "required": true,
+                    "mappings": [
+                      {
+                        "value": "{{purchase.client.country}}"
+                      },
+                      {
+                        "value": "US"
+                      },
+                      {
+                        "value": ""
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "GET_FIRST_NON_EMPTY_STRING"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "postalCode",
+                    "required": true,
+                    "mappings": [
+                      {
+                        "value": "{{purchase.client.zip_code}}"
+                      },
+                      {
+                        "value": "00000"
+                      },
+                      {
+                        "value": ""
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "GET_FIRST_NON_EMPTY_STRING"
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "payInfo",
+            "required": true,
+            "mappings": [
+              {
+                "key": "cardNumber",
+                "value": "{{cardInfo.number}}",
+                "required": true
+              },
+              {
+                "key": "cardExpiryMonth",
+                "value": "{{cardInfo.expireMonth}}",
+                "required": true
+              },
+              {
+                "key": "cardExpiryYear",
+                "value": "{{cardInfo.expireYear}}",
+                "required": true
+              },
+              {
+                "key": "cardSecurity",
+                "value": "{{cardInfo.cvc}}",
+                "required": true
               }
             ],
             "operations": [
@@ -357,10 +499,17 @@
         "mappings": [
           {
             "key": "pspTransactionId",
-            "value": "{{pspResponse0.txnId}}",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.txnId}}"
+              },
+              {
+                "value": ""
+              }
+            ],
             "operations": [
               {
-                "name": "INTEGER_TO_STRING"
+                "name": "GET_FIRST_NON_EMPTY_STRING"
               }
             ]
           },
