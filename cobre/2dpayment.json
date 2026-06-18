@@ -469,13 +469,24 @@
           {
             "key": "url",
             "mappings": [
-              { "value": "{{extraParams.baseUrl}}", "required": true },
-              { "value": "/webhook/" },
-              { "value": "{{purchase.bankname}}" },
-              { "value": "/" }
+              {
+                "value": "{{extraParams.baseUrl}}",
+                "required": true
+              },
+              {
+                "value": "/webhook/"
+              },
+              {
+                "value": "{{purchase.bankname}}"
+              },
+              {
+                "value": "/"
+              }
             ],
             "operations": [
-              { "name": "LIST_VALUE_JOIN" }
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
             ],
             "required": true
           },
@@ -504,25 +515,45 @@
           {
             "key": "events",
             "mappings": [
-              { "value": "money_movements.status.initiated" },
-              { "value": "money_movements.status.processing" },
-              { "value": "money_movements.status.completed" },
-              { "value": "money_movements.status.failed" },
-              { "value": "money_movements.status.rejected" }
+              {
+                "value": "money_movements.status.initiated"
+              },
+              {
+                "value": "money_movements.status.processing"
+              },
+              {
+                "value": "money_movements.status.completed"
+              },
+              {
+                "value": "money_movements.status.failed"
+              },
+              {
+                "value": "money_movements.status.rejected"
+              }
             ],
             "operations": [
-              { "name": "MAP_LIST_TO_VALUE_LIST" }
+              {
+                "name": "MAP_LIST_TO_VALUE_LIST"
+              }
             ]
           },
           {
             "key": "event_signature_key",
             "mappings": [
-              { "value": "{{bankTransaction.bankName}}" },
-              { "value": "_" },
-              { "value": "{{bankTransaction.midName}}" }
+              {
+                "value": "{{bankTransaction.bankName}}"
+              },
+              {
+                "value": "_"
+              },
+              {
+                "value": "{{bankTransaction.midName}}"
+              }
             ],
             "operations": [
-              { "name": "LIST_VALUE_JOIN" }
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
             ],
             "required": true
           }
@@ -870,16 +901,24 @@
                   },
                   {
                     "mappings": [
-                      { "value": "{{purchase.purchaseId}}" },
-                      { "value": " payment" }
+                      {
+                        "value": "{{purchase.purchaseId}}"
+                      },
+                      {
+                        "value": " payment"
+                      }
                     ],
                     "operations": [
-                      { "name": "LIST_VALUE_JOIN" }
+                      {
+                        "name": "LIST_VALUE_JOIN"
+                      }
                     ]
                   }
                 ],
                 "operations": [
-                  { "name": "GET_FIRST_NON_EMPTY_STRING" }
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
                 ]
               },
               {
@@ -970,59 +1009,6 @@
             ]
           },
           {
-            "key": "message",
-            "skipIf": "{{store.mmResult.isMMFailed}}",
-            "mappings": [
-              { "value": "deposit##" },
-              {
-                "mappings": [
-                  { "key": "copyCLABE",      "value": "{{pspResponse4.metadata.virtual_account}}" },
-                  { "key": "copyReference",  "value": "{{purchase.purchaseId}}" },
-                  { "key": "Amount",         "value": "{{purchase.fx_Amount}}" },
-                  { "key": "Currency",       "value": "{{purchase.fx_Currency}}" }
-                ],
-                "operations": [
-                  { "name": "GENERATE_HTML", "params": { "htmlRenderMode": "TEXT_HTML" } }
-                ]
-              },
-              { "value": "##" },
-              {
-                "mappings": [
-                  {
-                    "value": "{{purchase.created_on}}",
-                    "operations": [
-                      { "name": "STRING_TO_INTEGER" }
-                    ]
-                  },
-                  {
-                    "mappings": [
-                      {
-                        "mappings": [
-                          { "value": "{{purchase.purchase.expireInMin}}" },
-                          { "value": "30" }
-                        ],
-                        "operations": [
-                          { "name": "GET_FIRST_NON_EMPTY_STRING" },
-                          { "name": "STRING_TO_INTEGER" }
-                        ]
-                      },
-                      { "value": 60 }
-                    ],
-                    "operations": [
-                      { "name": "LIST_VALUE_MULTIPLY" }
-                    ]
-                  }
-                ],
-                "operations": [
-                  { "name": "LIST_VALUE_INTEGER_ADD" }
-                ]
-              }
-            ],
-            "operations": [
-              { "name": "LIST_VALUE_JOIN" }
-            ]
-          },
-          {
             "key": "pspTransactionId",
             "value": "{{pspResponse4.id}}"
           },
@@ -1043,13 +1029,828 @@
             ]
           },
           {
+            "key": "tempObjectThird",
+            "skipIf": "{{store.mmResult.isMMFailed}}",
+            "mappings": [
+              {
+                "key": "page",
+                "mappings": [
+                  {
+                    "key": "title",
+                    "value": "Complete Your Bank Transfer"
+                  },
+                  {
+                    "key": "description",
+                    "value": "Use the details below to complete your payment, then confirm once paid."
+                  },
+                  {
+                    "key": "layout",
+                    "mappings": [
+                      {
+                        "key": "bodyStyle",
+                        "value": "background:#26135a;align-items:flex-start;justify-content:flex-start;overflow-y:auto;"
+                      },
+                      {
+                        "key": "wrapperClass",
+                        "value": "page-centered"
+                      },
+                      {
+                        "key": "containerClass",
+                        "value": "payment-card"
+                      },
+                      {
+                        "key": "containerStyle",
+                        "value": "width:min(100%,440px);margin:0 auto;"
+                      },
+                      {
+                        "key": "wrapperStyle",
+                        "value": "min-height:auto;width:100%;padding:28px 16px 24px;box-sizing:border-box;justify-content:flex-start;"
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "footer",
+                    "mappings": [
+                      {
+                        "key": "footerClass",
+                        "value": "page-footer"
+                      },
+                      {
+                        "key": "footerHtml",
+                        "value": "<div class='footer-row'><img src='/images/paysecure-payment.png' class='footer-icon' /></div>"
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ]
+              },
+              {
+                "key": "fields",
+                "mappings": [
+                  {
+                    "mappings": [
+                      {
+                        "key": "id",
+                        "value": "cardHeader"
+                      },
+                      {
+                        "key": "name",
+                        "value": "cardHeader"
+                      },
+                      {
+                        "key": "inputType",
+                        "value": "STATICTEXT"
+                      },
+                      {
+                        "key": "dataType",
+                        "value": "STRING"
+                      },
+                      {
+                        "key": "content",
+                        "value": "Bank transfer details"
+                      },
+                      {
+                        "key": "ui",
+                        "mappings": [
+                          {
+                            "key": "uiClass",
+                            "value": "crypto-card-header"
+                          },
+                          {
+                            "key": "uiStyle",
+                            "value": "font-size:18px;justify-content:center;"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "KEY_VALUE_LIST_TO_OBJECT"
+                          }
+                        ]
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }
+                    ]
+                  },
+                  {
+                    "mappings": [
+                      {
+                        "key": "id",
+                        "value": "clabe"
+                      },
+                      {
+                        "key": "name",
+                        "value": "clabe"
+                      },
+                      {
+                        "key": "label",
+                        "value": "CLABE / Account"
+                      },
+                      {
+                        "key": "inputType",
+                        "value": "STATICHTML"
+                      },
+                      {
+                        "key": "dataType",
+                        "value": "STRING"
+                      },
+                      {
+                        "key": "required",
+                        "value": "false"
+                      },
+                      {
+                        "key": "content",
+                        "mappings": [
+                          {
+                            "value": "<div style=\"margin-bottom:16px;\">"
+                          },
+                          {
+                            "value": "<div style=\"font-size:13px;font-weight:700;color:#111827;margin-bottom:7px;\">CLABE / Account</div>"
+                          },
+                          {
+                            "value": "<div style=\"display:flex;align-items:center;gap:10px;min-height:46px;border:1px solid #E5E7EB;border-radius:10px;background:#F9FAFB;padding:11px 12px;box-sizing:border-box;\">"
+                          },
+                          {
+                            "value": "<span style=\"flex:1;font-size:15px;font-weight:600;color:#111827;word-break:break-word;line-height:1.35;\">"
+                          },
+                          {
+                            "mappings": [
+                              {
+                                "value": "{{pspResponse4.metadata.virtual_account}}"
+                              },
+                              {
+                                "value": "{{pspResponse4.metadata.provider_detail.virtual_account}}"
+                              },
+                              {
+                                "value": ""
+                              }
+                            ],
+                            "operations": [
+                              {
+                                "name": "GET_FIRST_NON_EMPTY_STRING"
+                              }
+                            ]
+                          },
+                          {
+                            "value": "</span>"
+                          },
+                          {
+                            "value": "<button type=\"button\" aria-label=\"Copy CLABE / Account\" style=\"flex:0 0 auto;width:34px;height:34px;border:0;border-radius:8px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;cursor:pointer;\" onclick=\"(function(btn){var row=btn.parentElement;var text=row.querySelector('span').innerText||'';navigator.clipboard.writeText(text).then(function(){var old=btn.innerHTML;btn.innerHTML='✓';setTimeout(function(){btn.innerHTML=old;},900);});})(this)\"><img src=\"/images/copy-Icons.svg\" style=\"width:18px;height:18px;object-fit:contain;filter:brightness(0);\" /></button>"
+                          },
+                          {
+                            "value": "</div></div>"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "LIST_VALUE_JOIN"
+                          }
+                        ]
+                      },
+                      {
+                        "key": "ui",
+                        "mappings": [
+                          {
+                            "key": "uiStyle",
+                            "value": "margin-bottom:0;"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "KEY_VALUE_LIST_TO_OBJECT"
+                          }
+                        ]
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }
+                    ]
+                  },
+                  {
+                    "mappings": [
+                      {
+                        "key": "id",
+                        "value": "reference"
+                      },
+                      {
+                        "key": "name",
+                        "value": "reference"
+                      },
+                      {
+                        "key": "label",
+                        "value": "Reference"
+                      },
+                      {
+                        "key": "inputType",
+                        "value": "STATICHTML"
+                      },
+                      {
+                        "key": "dataType",
+                        "value": "STRING"
+                      },
+                      {
+                        "key": "required",
+                        "value": "false"
+                      },
+                      {
+                        "key": "content",
+                        "mappings": [
+                          {
+                            "value": "<div style=\"margin-bottom:16px;\">"
+                          },
+                          {
+                            "value": "<div style=\"font-size:13px;font-weight:700;color:#111827;margin-bottom:7px;\">Reference</div>"
+                          },
+                          {
+                            "value": "<div style=\"display:flex;align-items:center;gap:10px;min-height:46px;border:1px solid #E5E7EB;border-radius:10px;background:#F9FAFB;padding:11px 12px;box-sizing:border-box;\">"
+                          },
+                          {
+                            "value": "<span style=\"flex:1;font-size:15px;font-weight:600;color:#111827;word-break:break-word;line-height:1.35;\">"
+                          },
+                          {
+                            "mappings": [
+                              {
+                                "value": "{{pspResponse4.metadata.reference}}"
+                              },
+                              {
+                                "value": "{{purchase.purchaseId}}"
+                              }
+                            ],
+                            "operations": [
+                              {
+                                "name": "GET_FIRST_NON_EMPTY_STRING"
+                              }
+                            ]
+                          },
+                          {
+                            "value": "</span>"
+                          },
+                          {
+                            "value": "<button type=\"button\" aria-label=\"Copy Reference\" style=\"flex:0 0 auto;width:34px;height:34px;border:0;border-radius:8px;background:#EEF2FF;display:flex;align-items:center;justify-content:center;cursor:pointer;\" onclick=\"(function(btn){var row=btn.parentElement;var text=row.querySelector('span').innerText||'';navigator.clipboard.writeText(text).then(function(){var old=btn.innerHTML;btn.innerHTML='✓';setTimeout(function(){btn.innerHTML=old;},900);});})(this)\"><img src=\"/images/copy-Icons.svg\" style=\"width:18px;height:18px;object-fit:contain;filter:brightness(0);\" /></button>"
+                          },
+                          {
+                            "value": "</div></div>"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "LIST_VALUE_JOIN"
+                          }
+                        ]
+                      },
+                      {
+                        "key": "ui",
+                        "mappings": [
+                          {
+                            "key": "uiStyle",
+                            "value": "margin-bottom:0;"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "KEY_VALUE_LIST_TO_OBJECT"
+                          }
+                        ]
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }
+                    ]
+                  },
+                  {
+                    "mappings": [
+                      {
+                        "key": "id",
+                        "value": "amount"
+                      },
+                      {
+                        "key": "name",
+                        "value": "amount"
+                      },
+                      {
+                        "key": "label",
+                        "value": "Amount"
+                      },
+                      {
+                        "key": "inputType",
+                        "value": "STATICHTML"
+                      },
+                      {
+                        "key": "dataType",
+                        "value": "STRING"
+                      },
+                      {
+                        "key": "required",
+                        "value": "false"
+                      },
+                      {
+                        "key": "content",
+                        "mappings": [
+                          {
+                            "value": "<div style=\"margin-bottom:16px;\">"
+                          },
+                          {
+                            "value": "<div style=\"font-size:13px;font-weight:700;color:#111827;margin-bottom:7px;\">Amount</div>"
+                          },
+                          {
+                            "value": "<div style=\"display:flex;align-items:center;gap:10px;min-height:46px;border:1px solid #E5E7EB;border-radius:10px;background:#F9FAFB;padding:11px 12px;box-sizing:border-box;\">"
+                          },
+                          {
+                            "value": "<span style=\"flex:1;font-size:15px;font-weight:600;color:#111827;word-break:break-word;line-height:1.35;\">"
+                          },
+                          {
+                            "mappings": [
+                              {
+                                "value": "{{purchase.fx_Amount}}"
+                              }
+                            ],
+                            "operations": [
+                              {
+                                "name": "GET_FIRST_NON_EMPTY_STRING"
+                              }
+                            ]
+                          },
+                          {
+                            "value": "</span>"
+                          },
+                          {
+                            "value": "</div></div>"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "LIST_VALUE_JOIN"
+                          }
+                        ]
+                      },
+                      {
+                        "key": "ui",
+                        "mappings": [
+                          {
+                            "key": "uiStyle",
+                            "value": "margin-bottom:0;"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "KEY_VALUE_LIST_TO_OBJECT"
+                          }
+                        ]
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }
+                    ]
+                  },
+                  {
+                    "mappings": [
+                      {
+                        "key": "id",
+                        "value": "currency"
+                      },
+                      {
+                        "key": "name",
+                        "value": "currency"
+                      },
+                      {
+                        "key": "label",
+                        "value": "Currency"
+                      },
+                      {
+                        "key": "inputType",
+                        "value": "STATICHTML"
+                      },
+                      {
+                        "key": "dataType",
+                        "value": "STRING"
+                      },
+                      {
+                        "key": "required",
+                        "value": "false"
+                      },
+                      {
+                        "key": "content",
+                        "mappings": [
+                          {
+                            "value": "<div style=\"margin-bottom:16px;\">"
+                          },
+                          {
+                            "value": "<div style=\"font-size:13px;font-weight:700;color:#111827;margin-bottom:7px;\">Currency</div>"
+                          },
+                          {
+                            "value": "<div style=\"display:flex;align-items:center;gap:10px;min-height:46px;border:1px solid #E5E7EB;border-radius:10px;background:#F9FAFB;padding:11px 12px;box-sizing:border-box;\">"
+                          },
+                          {
+                            "value": "<span style=\"flex:1;font-size:15px;font-weight:600;color:#111827;word-break:break-word;line-height:1.35;\">"
+                          },
+                          {
+                            "mappings": [
+                              {
+                                "value": "{{purchase.fx_Currency}}"
+                              }
+                            ],
+                            "operations": [
+                              {
+                                "name": "GET_FIRST_NON_EMPTY_STRING"
+                              }
+                            ]
+                          },
+                          {
+                            "value": "</span>"
+                          },
+                          {
+                            "value": "</div></div>"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "LIST_VALUE_JOIN"
+                          }
+                        ]
+                      },
+                      {
+                        "key": "ui",
+                        "mappings": [
+                          {
+                            "key": "uiStyle",
+                            "value": "margin-bottom:0;"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "KEY_VALUE_LIST_TO_OBJECT"
+                          }
+                        ]
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }
+                    ]
+                  },
+                  {
+                    "mappings": [
+                      {
+                        "key": "id",
+                        "value": "expiryTimer"
+                      },
+                      {
+                        "key": "name",
+                        "value": "expiryTimer"
+                      },
+                      {
+                        "key": "inputType",
+                        "value": "EXPIRY_TIMER"
+                      },
+                      {
+                        "key": "dataType",
+                        "value": "STRING"
+                      },
+                      {
+                        "key": "expiryTimer",
+                        "mappings": [
+                          {
+                            "key": "message",
+                            "value": "Payment Expires In"
+                          },
+                          {
+                            "key": "durationSeconds",
+                            "mappings": [
+                              {
+                                "mappings": [
+                                  {
+                                    "value": "{{purchase.purchase.expireInMin}}"
+                                  },
+                                  {
+                                    "value": "30"
+                                  }
+                                ],
+                                "operations": [
+                                  {
+                                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                                  },
+                                  {
+                                    "name": "STRING_TO_INTEGER"
+                                  }
+                                ]
+                              },
+                              {
+                                "value": "60"
+                              }
+                            ],
+                            "operations": [
+                              {
+                                "name": "LIST_VALUE_MULTIPLY"
+                              }
+                            ]
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "KEY_VALUE_LIST_TO_OBJECT"
+                          }
+                        ]
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }
+                    ]
+                  },
+                  {
+                    "mappings": [
+                      {
+                        "key": "id",
+                        "value": "paidBtn"
+                      },
+                      {
+                        "key": "name",
+                        "value": "paidBtn"
+                      },
+                      {
+                        "key": "inputType",
+                        "value": "STATICHTML"
+                      },
+                      {
+                        "key": "dataType",
+                        "value": "STRING"
+                      },
+                      {
+                        "key": "content",
+                        "value": "<button type=\"button\" style=\"width:100%;height:52px;border:0;border-radius:12px;background:#5B2DBF;color:#FFFFFF;font-size:15px;font-weight:800;letter-spacing:0;box-shadow:0 12px 24px rgba(91,45,191,.28);cursor:pointer;\">Paid</button>"
+                      },
+                      {
+                        "key": "required",
+                        "value": "false"
+                      },
+                      {
+                        "key": "ui",
+                        "mappings": [
+                          {
+                            "key": "uiStyle",
+                            "value": "display:inline-block;width:calc(50% - 6px);margin-top:18px;margin-bottom:0;vertical-align:top;"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "KEY_VALUE_LIST_TO_OBJECT"
+                          }
+                        ]
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }
+                    ]
+                  },
+                  {
+                    "mappings": [
+                      {
+                        "key": "id",
+                        "value": "cancelBtn"
+                      },
+                      {
+                        "key": "name",
+                        "value": "cancelBtn"
+                      },
+                      {
+                        "key": "inputType",
+                        "value": "STATICHTML"
+                      },
+                      {
+                        "key": "dataType",
+                        "value": "STRING"
+                      },
+                      {
+                        "key": "content",
+                        "value": "<button type=\"button\" style=\"width:100%;height:52px;border:0;border-radius:12px;background:#EEF1F6;color:#344054;font-size:15px;font-weight:800;letter-spacing:0;box-shadow:inset 0 0 0 1px #D5DAE3;cursor:pointer;\">Cancel</button>"
+                      },
+                      {
+                        "key": "required",
+                        "value": "false"
+                      },
+                      {
+                        "key": "ui",
+                        "mappings": [
+                          {
+                            "key": "uiStyle",
+                            "value": "display:inline-block;width:calc(50% - 6px);margin-top:18px;margin-left:12px;margin-bottom:0;vertical-align:top;"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "KEY_VALUE_LIST_TO_OBJECT"
+                          }
+                        ]
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "MAP_LIST_TO_VALUE_LIST"
+                  }
+                ]
+              },
+              {
+                "key": "submitUri",
+                "value": "three3dsverication/submit"
+              },
+              {
+                "key": "apiCallActions",
+                "mappings": [
+                  {
+                    "mappings": [
+                      {
+                        "key": "trigger",
+                        "value": "BUTTON_CLICK"
+                      },
+                      {
+                        "key": "buttonKey",
+                        "value": "paidBtn"
+                      },
+                      {
+                        "key": "api",
+                        "value": "SUBMIT_FORM"
+                      },
+                      {
+                        "key": "additionalData",
+                        "mappings": [
+                          {
+                            "key": "actionCode",
+                            "value": "paid"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "KEY_VALUE_LIST_TO_OBJECT"
+                          }
+                        ]
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }
+                    ]
+                  },
+                  {
+                    "mappings": [
+                      {
+                        "key": "trigger",
+                        "value": "BUTTON_CLICK"
+                      },
+                      {
+                        "key": "buttonKey",
+                        "value": "cancelBtn"
+                      },
+                      {
+                        "key": "api",
+                        "value": "SUBMIT_FORM"
+                      },
+                      {
+                        "key": "additionalData",
+                        "mappings": [
+                          {
+                            "key": "actionCode",
+                            "value": "cancel"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "KEY_VALUE_LIST_TO_OBJECT"
+                          }
+                        ]
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }
+                    ]
+                  },
+                  {
+                    "mappings": [
+                      {
+                        "key": "trigger",
+                        "value": "INTERVAL"
+                      },
+                      {
+                        "key": "intervalMs",
+                        "mappings": [
+                          {
+                            "mappings": [
+                              {
+                                "value": "{{purchase.purchase.expireInMin}}"
+                              },
+                              {
+                                "value": "30"
+                              }
+                            ],
+                            "operations": [
+                              {
+                                "name": "GET_FIRST_NON_EMPTY_STRING"
+                              },
+                              {
+                                "name": "STRING_TO_INTEGER"
+                              }
+                            ]
+                          },
+                          {
+                            "value": "60000"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "LIST_VALUE_MULTIPLY"
+                          }
+                        ]
+                      },
+                      {
+                        "key": "api",
+                        "value": "SUBMIT_FORM"
+                      },
+                      {
+                        "key": "additionalData",
+                        "mappings": [
+                          {
+                            "key": "actionCode",
+                            "value": "timer"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "KEY_VALUE_LIST_TO_OBJECT"
+                          }
+                        ]
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "MAP_LIST_TO_VALUE_LIST"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
             "key": "redirectUrl",
             "skipIf": "{{store.mmResult.isMMFailed}}",
             "mappings": [
-              { "value": "/depositdetail/" },
-              { "value": "{{purchase.purchaseId}}" }
+              {
+                "value": "/showProvider/details/"
+              },
+              {
+                "value": "{{purchase.purchaseId}}"
+              }
             ],
-            "operations": [{ "name": "LIST_VALUE_JOIN" }]
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
           }
         ],
         "operations": [
