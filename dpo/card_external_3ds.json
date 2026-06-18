@@ -154,10 +154,40 @@
                     "key": "customerFirstName",
                     "mappings": [
                       {
-                        "value": "{{purchase.client.full_name}}"
+                        "value": "{{purchase.client.full_name}}",
+                        "operations": [
+                          {
+                            "name": "STRING_REPLACE",
+                            "params": {
+                              "target": "^(?i)(na|n/a|\\.)$",
+                              "replacement": "",
+                              "occurrence": "REGEX_ALL"
+                            }
+                          },
+                          {
+                            "name": "STRING_PATTERN_MATCH",
+                            "params": {
+                              "regex": "^[A-Za-z]+(?:[\\s'-][A-Za-z]+)+$",
+                              "defaultValue": ""
+                            }
+                          }
+                        ]
                       },
                       {
-                        "value": "{{cardInfo.cardholder_name}}"
+                        "value": "{{cardInfo.cardholder_name}}",
+                        "operations": [
+                          {
+                            "name": "STRING_REPLACE",
+                            "params": {
+                              "target": "^(?i)(na|n/a|\\.)$",
+                              "replacement": "",
+                              "occurrence": "REGEX_ALL"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "value": "Paysecure Customer"
                       }
                     ],
                     "operations": [
@@ -182,10 +212,40 @@
                     "key": "customerLastName",
                     "mappings": [
                       {
-                        "value": "{{purchase.client.full_name}}"
+                        "value": "{{purchase.client.full_name}}",
+                        "operations": [
+                          {
+                            "name": "STRING_REPLACE",
+                            "params": {
+                              "target": "^(?i)(na|n/a|\\.)$",
+                              "replacement": "",
+                              "occurrence": "REGEX_ALL"
+                            }
+                          },
+                          {
+                            "name": "STRING_PATTERN_MATCH",
+                            "params": {
+                              "regex": "^[A-Za-z]+(?:[\\s'-][A-Za-z]+)+$",
+                              "defaultValue": ""
+                            }
+                          }
+                        ]
                       },
                       {
-                        "value": "{{cardInfo.cardholder_name}}"
+                        "value": "{{cardInfo.cardholder_name}}",
+                        "operations": [
+                          {
+                            "name": "STRING_REPLACE",
+                            "params": {
+                              "target": "^(?i)(na|n/a|\\.)$",
+                              "replacement": "",
+                              "occurrence": "REGEX_ALL"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "value": "Paysecure Customer"
                       }
                     ],
                     "operations": [
@@ -465,13 +525,40 @@
                 "storeIn": "dpo",
                 "mappings": [
                   {
-                    "value": "{{cardInfo.cardholder_name}}"
+                    "value": "{{cardInfo.cardholder_name}}",
+                    "operations": [
+                      {
+                        "name": "STRING_REPLACE",
+                        "params": {
+                          "target": "^(?i)(na|n/a|\\.)$",
+                          "replacement": "",
+                          "occurrence": "REGEX_ALL"
+                        }
+                      }
+                    ]
                   },
                   {
-                    "value": "{{purchase.client.full_name}}"
+                    "value": "{{purchase.client.full_name}}",
+                    "operations": [
+                      {
+                        "name": "STRING_REPLACE",
+                        "params": {
+                          "target": "^(?i)(na|n/a|\\.)$",
+                          "replacement": "",
+                          "occurrence": "REGEX_ALL"
+                        }
+                      },
+                      {
+                        "name": "STRING_PATTERN_MATCH",
+                        "params": {
+                          "regex": "^[A-Za-z]+(?:[\\s'-][A-Za-z]+)+$",
+                          "defaultValue": ""
+                        }
+                      }
+                    ]
                   },
                   {
-                    "value": "NA"
+                    "value": "Paysecure"
                   }
                 ],
                 "operations": [
@@ -507,6 +594,13 @@
                           "target": "^(?i)(na|n/a|\\.)$",
                           "replacement": "",
                           "occurrence": "REGEX_ALL"
+                        }
+                      },
+                      {
+                        "name": "STRING_PATTERN_MATCH",
+                        "params": {
+                          "regex": "^[A-Za-z]+(?:[\\s'-][A-Za-z]+)+$",
+                          "defaultValue": ""
                         }
                       }
                     ]
