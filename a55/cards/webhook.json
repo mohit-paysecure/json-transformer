@@ -1,0 +1,31 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "value": "not_applicable"
+      },
+      "headers": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "deferToInquiry",
+            "value": "true"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]

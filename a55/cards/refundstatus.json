@@ -1,0 +1,421 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "value": "https://unimbued-eclectically-leon.ngrok-free.dev/oauth2/token"
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "client_id",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 0
+                }
+              }
+            ]
+          },
+          {
+            "key": "client_secret",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 1
+                }
+              }
+            ]
+          },
+          {
+            "key": "grant_type",
+            "value": "client_credentials",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          },
+          {
+            "name": "JOIN_MAP_ELEMENTS",
+            "params": {
+              "entrySeparator": "&",
+              "joinType": "KEY_VALUE",
+              "keyValueSeparator": "="
+            }
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "isAccessTokenMissing",
+            "hidden": true,
+            "storeIn": "oauthCheck",
+            "value": "{{pspResponse0.access_token}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_EMPTY"
+              }
+            ]
+          },
+          {
+            "key": "walletCacheKey",
+            "hidden": true,
+            "storeIn": "walletCache",
+            "mappings": [
+              {
+                "value": "a55:wallet:"
+              },
+              {
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 2
+                    }
+                  }
+                ]
+              },
+              {
+                "value": ":"
+              },
+              {
+                "value": "{{bankTransaction.midName}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
+          },
+          {
+            "key": "walletLookup",
+            "hidden": true,
+            "storeIn": "walletCache",
+            "mappings": [
+              {
+                "key": "id",
+                "value": "{{store.walletCache.walletCacheKey}}"
+              },
+              {
+                "key": "idType",
+                "value": "pspConfigId"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "GET_TRANSACTION_CONTEXT_BY_ID"
+              }
+            ]
+          },
+          {
+            "key": "cachedWalletUuid",
+            "hidden": true,
+            "storeIn": "walletCache",
+            "value": "{{store.walletCache.walletLookup.pspConfig.value}}"
+          },
+          {
+            "key": "code",
+            "value": "{{store.oauthCheck.isAccessTokenMissing}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": "fail"
+                    },
+                    {
+                      "from": false,
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{store.oauthCheck.isAccessTokenMissing}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": "refund_failed"
+                    },
+                    {
+                      "from": false,
+                      "to": "refund_in_process"
+                    }
+                  ],
+                  "defaultValue": "refund_failed"
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.error}}"
+              },
+              {
+                "value": "{{pspResponse0.message.0.description}}"
+              },
+              {
+                "value": "Token request processed"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "pspToken",
+            "value": "{{pspResponse0.access_token}}"
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{bankTransaction.paymentTransId}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "requestMapping": {
+      "method": "GET",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://unimbued-eclectically-leon.ngrok-free.dev/api/v1/bank/wallet/charge/?charge_uuid="
+          },
+          {
+            "value": "{{bankTransaction.refundTransId}}"
+          },
+          {
+            "value": "&wallet_uuid="
+          },
+          {
+            "value": "{{store.walletCache.cachedWalletUuid}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "Bearer "
+              },
+              {
+                "value": "{{bankTransaction.token}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "code",
+            "value": "{{pspResponse1.status}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "confirmed",
+                      "to": "success"
+                    },
+                    {
+                      "from": "refunded",
+                      "to": "success"
+                    },
+                    {
+                      "from": "refunding",
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse1.status}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "confirmed",
+                      "to": "refunded"
+                    },
+                    {
+                      "from": "refunded",
+                      "to": "refunded"
+                    },
+                    {
+                      "from": "refunding",
+                      "to": "refund_in_process"
+                    }
+                  ],
+                  "defaultValue": "refund_failed"
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse1.message.0.description}}"
+              },
+              {
+                "value": "{{pspResponse1.message.0.code}}"
+              },
+              {
+                "value": "{{pspResponse1.error}}"
+              },
+              {
+                "value": "Refund inquiry processed"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{bankTransaction.paymentTransId}}"
+          },
+          {
+            "key": "refundTransId",
+            "mappings": [
+              {
+                "value": "{{pspResponse1.charge_uuid}}"
+              },
+              {
+                "value": "{{bankTransaction.refundTransId}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]

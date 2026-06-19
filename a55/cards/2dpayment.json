@@ -1,0 +1,1668 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "value": "https://unimbued-eclectically-leon.ngrok-free.dev/oauth2/token"
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "client_id",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 0
+                }
+              }
+            ]
+          },
+          {
+            "key": "client_secret",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 1
+                }
+              }
+            ]
+          },
+          {
+            "key": "grant_type",
+            "value": "client_credentials",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          },
+          {
+            "name": "JOIN_MAP_ELEMENTS",
+            "params": {
+              "entrySeparator": "&",
+              "joinType": "KEY_VALUE",
+              "keyValueSeparator": "="
+            }
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "isAccessTokenMissing",
+            "hidden": true,
+            "storeIn": "oauthCheck",
+            "value": "{{pspResponse0.access_token}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_EMPTY"
+              }
+            ]
+          },
+          {
+            "key": "walletCacheKey",
+            "hidden": true,
+            "storeIn": "walletCache",
+            "mappings": [
+              {
+                "value": "a55:wallet:"
+              },
+              {
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 2
+                    }
+                  }
+                ]
+              },
+              {
+                "value": ":"
+              },
+              {
+                "value": "{{bankTransaction.midName}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
+          },
+          {
+            "key": "walletLookup",
+            "hidden": true,
+            "storeIn": "walletCache",
+            "mappings": [
+              {
+                "key": "id",
+                "value": "{{store.walletCache.walletCacheKey}}"
+              },
+              {
+                "key": "idType",
+                "value": "pspConfigId"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "GET_TRANSACTION_CONTEXT_BY_ID"
+              }
+            ]
+          },
+          {
+            "key": "cachedWalletUuid",
+            "hidden": true,
+            "storeIn": "walletCache",
+            "value": "{{store.walletCache.walletLookup.pspConfig.value}}"
+          },
+          {
+            "key": "code",
+            "value": "{{store.oauthCheck.isAccessTokenMissing}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": "fail"
+                    },
+                    {
+                      "from": false,
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{store.oauthCheck.isAccessTokenMissing}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": false,
+                      "to": "payment_in_process"
+                    }
+                  ],
+                  "defaultValue": "payment_failed"
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.error}}"
+              },
+              {
+                "value": "{{pspResponse0.message.0.description}}"
+              },
+              {
+                "value": "Token request processed"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "pspToken",
+            "value": "{{pspResponse0.access_token}}"
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{purchase.purchaseId}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "skipIf": "{{store.walletCache.cachedWalletUuid}}",
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://unimbued-eclectically-leon.ngrok-free.dev/api/v1/bank/wallet/"
+          },
+          {
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 2
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "Bearer "
+              },
+              {
+                "value": "{{bankTransaction.token}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "customer_id",
+            "value": "{{bankTransaction.midName}}",
+            "required": true
+          },
+          {
+            "key": "email",
+            "required": true,
+            "mappings": [
+              {
+                "value": "{{bankTransaction.midName}}"
+              },
+              {
+                "value": "@choicepay.ca"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
+          },
+          {
+            "key": "entity_uuid",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 2
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          },
+          {
+            "name": "STRINGIFY_JSON"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "isWalletMissing",
+            "hidden": true,
+            "storeIn": "walletCheck",
+            "value": "{{pspResponse1.wallet_uuid}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_EMPTY"
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{store.walletCheck.isWalletMissing}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": "fail"
+                    },
+                    {
+                      "from": false,
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{store.walletCheck.isWalletMissing}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": false,
+                      "to": "payment_in_process"
+                    }
+                  ],
+                  "defaultValue": "payment_failed"
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse1.error}}"
+              },
+              {
+                "value": "{{pspResponse1.message.0.description}}"
+              },
+              {
+                "value": "Wallet ready"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse1.wallet_uuid}}"
+          },
+          {
+            "key": "pspConfigID",
+            "value": "{{store.walletCache.walletCacheKey}}"
+          },
+          {
+            "key": "pspConfigData",
+            "value": "{{pspResponse1.wallet_uuid}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "value": "https://unimbued-eclectically-leon.ngrok-free.dev/api/v1/bank/wallet/charge"
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "Bearer "
+              },
+              {
+                "value": "{{bankTransaction.token}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "isDataOnly",
+            "hidden": true,
+            "storeIn": "authFlags",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 6
+                }
+              },
+              {
+                "name": "STRING_TO_LOWERCASE"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "dataonly",
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "isNotDataOnly",
+            "hidden": true,
+            "storeIn": "authFlags",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 6
+                }
+              },
+              {
+                "name": "STRING_TO_LOWERCASE"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "dataonly",
+                      "to": false
+                    }
+                  ],
+                  "defaultValue": true
+                }
+              }
+            ]
+          },
+          {
+            "key": "providerUuidMissing",
+            "hidden": true,
+            "storeIn": "authFlags",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 3
+                }
+              },
+              {
+                "name": "STRING_TO_LOWERCASE"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "na",
+                      "to": true
+                    },
+                    {
+                      "from": "",
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "merchantIdMissing",
+            "hidden": true,
+            "storeIn": "authFlags",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 4
+                }
+              },
+              {
+                "name": "STRING_TO_LOWERCASE"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "na",
+                      "to": true
+                    },
+                    {
+                      "from": "",
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "typeChargeAbsent",
+            "hidden": true,
+            "storeIn": "authFlags",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "operations": [
+              {
+                "name": "STRING_PATTERN_MATCH",
+                "params": {
+                  "regex": ".*type_charge.*"
+                }
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": false
+                    },
+                    {
+                      "from": false,
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": true
+                }
+              }
+            ]
+          },
+          {
+            "key": "phoneIsEmpty",
+            "hidden": true,
+            "storeIn": "clientCheck",
+            "value": "{{purchase.client.phone}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_EMPTY"
+              }
+            ]
+          },
+          {
+            "key": "deviceIdNormalized",
+            "hidden": true,
+            "storeIn": "deviceCheck",
+            "mappings": [
+              {
+                "value": "{{purchase.userDeviceId}}",
+                "operations": [
+                  {
+                    "name": "STRING_REPLACE",
+                    "params": {
+                      "target": "^NA$",
+                      "replacement": "",
+                      "occurrence": "REGEX_FIRST"
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "{{purchase.paySecureDeviceId}}",
+                "operations": [
+                  {
+                    "name": "STRING_REPLACE",
+                    "params": {
+                      "target": "^NA$",
+                      "replacement": "",
+                      "occurrence": "REGEX_FIRST"
+                    }
+                  }
+                ]
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "deviceIdEmpty",
+            "hidden": true,
+            "storeIn": "deviceCheck",
+            "value": "{{store.deviceCheck.deviceIdNormalized}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_EMPTY"
+              }
+            ]
+          },
+          {
+            "key": "descPicked",
+            "hidden": true,
+            "storeIn": "clientCheck",
+            "mappings": [
+              {
+                "value": "{{purchase.merchantDescriptor}}"
+              },
+              {
+                "value": "{{bankTransaction.desciptor}}",
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": ","
+                    }
+                  },
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              },
+              {
+                "name": "SUB_STRING",
+                "params": {
+                  "start": 0,
+                  "end": 15
+                }
+              }
+            ]
+          },
+          {
+            "key": "descIsEmpty",
+            "hidden": true,
+            "storeIn": "clientCheck",
+            "value": "{{store.clientCheck.descPicked}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_EMPTY"
+              }
+            ]
+          },
+          {
+            "key": "isTurkey",
+            "hidden": true,
+            "storeIn": "addressFlags",
+            "value": "{{purchase.client.country}}",
+            "operations": [
+              {
+                "name": "STRING_TO_UPPERCASE"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "TR",
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "isNotTurkey",
+            "hidden": true,
+            "storeIn": "addressFlags",
+            "value": "{{purchase.client.country}}",
+            "operations": [
+              {
+                "name": "STRING_TO_UPPERCASE"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "TR",
+                      "to": false
+                    }
+                  ],
+                  "defaultValue": true
+                }
+              }
+            ]
+          },
+          {
+            "key": "resolvedState",
+            "hidden": true,
+            "storeIn": "addressFlags",
+            "mappings": [
+              {
+                "skipIf": "{{store.addressFlags.isNotTurkey}}",
+                "mappings": [
+                  {
+                    "key": "country",
+                    "value": "{{purchase.client.country}}"
+                  },
+                  {
+                    "key": "stateCode",
+                    "value": "{{purchase.client.city}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_DYNAMIC_STATE",
+                    "params": {
+                      "outputType": "STATE_CODE"
+                    }
+                  }
+                ]
+              },
+              {
+                "skipIf": "{{store.addressFlags.isTurkey}}",
+                "value": "{{purchase.client.stateCode}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "cascadeRaw",
+            "hidden": true,
+            "storeIn": "cascadeFlags",
+            "mappings": [
+              {
+                "value": "{{purchase.cascade_Num}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "cascadeClean",
+            "hidden": true,
+            "storeIn": "cascadeFlags",
+            "value": "{{store.cascadeFlags.cascadeRaw}}",
+            "operations": [
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "^NA$",
+                  "replacement": "",
+                  "occurrence": "REGEX_FIRST"
+                }
+              }
+            ]
+          },
+          {
+            "key": "cascadeSuffix",
+            "hidden": true,
+            "storeIn": "cascadeFlags",
+            "mappings": [
+              {
+                "value": "_"
+              },
+              {
+                "value": "{{store.cascadeFlags.cascadeClean}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              },
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "^_$",
+                  "replacement": "",
+                  "occurrence": "REGEX_FIRST"
+                }
+              }
+            ]
+          },
+          {
+            "key": "wallet_uuid",
+            "required": true,
+            "mappings": [
+              {
+                "value": "{{store.walletCache.cachedWalletUuid}}"
+              },
+              {
+                "value": "{{pspResponse1.wallet_uuid}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "value",
+            "value": "{{purchase.fx_Amount}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "STRING_TO_DOUBLE"
+              }
+            ]
+          },
+          {
+            "key": "currency",
+            "value": "{{purchase.fx_Currency}}",
+            "required": true
+          },
+          {
+            "key": "due_date",
+            "value": "{{extraParams.currentTimeStamp}}",
+            "operations": [
+              {
+                "name": "EPOCH_TO_STRING_DATE",
+                "params": {
+                  "dateFormat": "yyyy-MM-dd"
+                }
+              }
+            ]
+          },
+          {
+            "key": "description",
+            "value": "{{purchase.productDescription}}"
+          },
+          {
+            "key": "card_name",
+            "value": "{{cardInfo.cardholder_name}}",
+            "required": true
+          },
+          {
+            "key": "card_number",
+            "value": "{{cardInfo.number}}",
+            "required": true
+          },
+          {
+            "key": "card_expiry_month",
+            "value": "{{cardInfo.expireMonth}}",
+            "required": true
+          },
+          {
+            "key": "card_expiry_year",
+            "required": true,
+            "mappings": [
+              {
+                "value": "20"
+              },
+              {
+                "value": "{{cardInfo.expireYear}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
+          },
+          {
+            "key": "card_cvv",
+            "value": "{{cardInfo.cvc}}",
+            "required": true
+          },
+          {
+            "key": "type_charge",
+            "skipIf": "{{store.authFlags.typeChargeAbsent}}",
+            "value": "{{cardInfo.type}}",
+            "operations": [
+              {
+                "name": "STRING_TO_LOWERCASE"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "debit",
+                      "to": "debit_card"
+                    },
+                    {
+                      "from": "debit_card",
+                      "to": "debit_card"
+                    },
+                    {
+                      "from": "credit",
+                      "to": "credit_card"
+                    },
+                    {
+                      "from": "credit_card",
+                      "to": "credit_card"
+                    }
+                  ],
+                  "defaultValue": "credit_card"
+                }
+              }
+            ]
+          },
+          {
+            "key": "email",
+            "value": "{{purchase.client.email}}",
+            "required": true
+          },
+          {
+            "key": "payer_name",
+            "value": "{{purchase.client.full_name}}",
+            "required": true
+          },
+          {
+            "key": "payer_email",
+            "value": "{{purchase.client.email}}"
+          },
+          {
+            "key": "payer_cell_phone",
+            "skipIf": "{{store.clientCheck.phoneIsEmpty}}",
+            "value": "{{purchase.client.phone}}"
+          },
+          {
+            "key": "payer_address",
+            "mappings": [
+              {
+                "key": "address_number",
+                "value": "0"
+              },
+              {
+                "key": "street",
+                "value": "{{purchase.client.street_address}}"
+              },
+              {
+                "key": "city",
+                "value": "{{purchase.client.city}}"
+              },
+              {
+                "key": "country",
+                "value": "{{purchase.client.country}}"
+              },
+              {
+                "key": "postal_code",
+                "value": "{{purchase.client.zip_code}}"
+              },
+              {
+                "key": "state",
+                "value": "{{store.addressFlags.resolvedState}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "shipping_address",
+            "mappings": [
+              {
+                "key": "address_number",
+                "value": "0"
+              },
+              {
+                "key": "street",
+                "value": "{{purchase.client.street_address}}"
+              },
+              {
+                "key": "city",
+                "value": "{{purchase.client.city}}"
+              },
+              {
+                "key": "country",
+                "value": "{{purchase.client.country}}"
+              },
+              {
+                "key": "postal_code",
+                "value": "{{purchase.client.zip_code}}"
+              },
+              {
+                "key": "state",
+                "value": "{{store.addressFlags.resolvedState}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "webhook_url",
+            "required": true,
+            "mappings": [
+              {
+                "value": "{{extraParams.baseUrl}}"
+              },
+              {
+                "value": "/webhook/"
+              },
+              {
+                "value": "{{purchase.bankid}}"
+              },
+              {
+                "value": "/"
+              },
+              {
+                "value": "{{purchase.purchaseId}}"
+              },
+              {
+                "value": "/"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
+          },
+          {
+            "key": "redirect_url",
+            "skipIf": "{{store.authFlags.isDataOnly}}",
+            "mappings": [
+              {
+                "value": "{{extraParams.baseUrl}}"
+              },
+              {
+                "value": "/custRedirect/"
+              },
+              {
+                "value": "{{purchase.bankid}}"
+              },
+              {
+                "value": "/"
+              },
+              {
+                "value": "{{purchase.purchaseId}}"
+              },
+              {
+                "value": "/"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
+          },
+          {
+            "key": "threeds_authentication",
+            "skipIf": "{{store.authFlags.isDataOnly}}",
+            "value": "true",
+            "operations": [
+              {
+                "name": "STRING_TO_BOOLEAN"
+              }
+            ]
+          },
+          {
+            "key": "data_only",
+            "skipIf": "{{store.authFlags.isNotDataOnly}}",
+            "value": "true",
+            "operations": [
+              {
+                "name": "STRING_TO_BOOLEAN"
+              }
+            ]
+          },
+          {
+            "key": "foreign_customer",
+            "value": "true",
+            "operations": [
+              {
+                "name": "STRING_TO_BOOLEAN"
+              }
+            ]
+          },
+          {
+            "key": "merchant_id",
+            "skipIf": "{{store.authFlags.merchantIdMissing}}",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 4
+                }
+              }
+            ]
+          },
+          {
+            "key": "providers",
+            "skipIf": "{{store.authFlags.providerUuidMissing}}",
+            "mappings": [
+              {
+                "value": "{{bankTransaction.usedAuthKey}}",
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 3
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_OBJECT_VALUE_TO_LIST_VALUE"
+              }
+            ]
+          },
+          {
+            "key": "soft_descriptor",
+            "skipIf": "{{store.clientCheck.descIsEmpty}}",
+            "value": "{{store.clientCheck.descPicked}}"
+          },
+          {
+            "key": "device_info",
+            "mappings": [
+              {
+                "key": "ip_address",
+                "value": "{{s2s.remote_ip}}"
+              },
+              {
+                "key": "user_agent",
+                "value": "{{s2s.user_agent}}"
+              },
+              {
+                "key": "http_accept_content",
+                "mappings": [
+                  {
+                    "value": "{{s2s.accept_header}}"
+                  },
+                  {
+                    "value": "*/*"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              },
+              {
+                "key": "http_browser_language",
+                "mappings": [
+                  {
+                    "value": "{{s2s.language}}"
+                  },
+                  {
+                    "value": "en-US"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              },
+              {
+                "key": "http_browser_java_enabled",
+                "value": "false",
+                "operations": [
+                  {
+                    "name": "STRING_TO_BOOLEAN"
+                  }
+                ]
+              },
+              {
+                "key": "http_browser_javascript_enabled",
+                "value": "true",
+                "operations": [
+                  {
+                    "name": "STRING_TO_BOOLEAN"
+                  }
+                ]
+              },
+              {
+                "key": "http_browser_color_depth",
+                "mappings": [
+                  {
+                    "value": "{{s2s.color_depth}}"
+                  },
+                  {
+                    "value": "24"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              },
+              {
+                "key": "http_browser_screen_height",
+                "mappings": [
+                  {
+                    "value": "{{s2s.screen_height}}"
+                  },
+                  {
+                    "value": "720"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              },
+              {
+                "key": "http_browser_screen_width",
+                "mappings": [
+                  {
+                    "value": "{{s2s.screen_width}}"
+                  },
+                  {
+                    "value": "1280"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              },
+              {
+                "key": "http_browser_time_difference",
+                "mappings": [
+                  {
+                    "value": "{{s2s.utc_offset}}"
+                  },
+                  {
+                    "value": "-330"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              },
+              {
+                "key": "http_accept_browser_value",
+                "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "items",
+            "mappings": [
+              {
+                "mappings": [
+                  {
+                    "key": "name",
+                    "value": "{{purchase.productDescription}}"
+                  },
+                  {
+                    "key": "description",
+                    "value": "{{purchase.productDescription}}"
+                  },
+                  {
+                    "key": "quantity",
+                    "value": "1",
+                    "operations": [
+                      {
+                        "name": "STRING_TO_DOUBLE"
+                      },
+                      {
+                        "name": "DOUBLE_TO_FLOOR"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "sku",
+                    "mappings": [
+                      {
+                        "value": "SKU-"
+                      },
+                      {
+                        "value": "{{purchase.purchaseId}}"
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "LIST_VALUE_JOIN"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "code",
+                    "value": "{{purchase.purchaseId}}"
+                  },
+                  {
+                    "key": "unit_amount",
+                    "value": "{{purchase.fx_Amount}}",
+                    "operations": [
+                      {
+                        "name": "STRING_TO_DOUBLE"
+                      },
+                      {
+                        "name": "DOUBLE_TO_FLOOR"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "total_amount",
+                    "value": "{{purchase.fx_Amount}}",
+                    "operations": [
+                      {
+                        "name": "STRING_TO_DOUBLE"
+                      },
+                      {
+                        "name": "DOUBLE_TO_FLOOR"
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_OBJECT_VALUE_TO_LIST_VALUE"
+              }
+            ]
+          },
+          {
+            "key": "transaction_reference",
+            "mappings": [
+              {
+                "value": "{{purchase.purchaseId}}"
+              },
+              {
+                "value": "{{store.cascadeFlags.cascadeSuffix}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
+          },
+          {
+            "key": "ip_address",
+            "value": "{{s2s.remote_ip}}"
+          },
+          {
+            "key": "device_id",
+            "skipIf": "{{store.deviceCheck.deviceIdEmpty}}",
+            "value": "{{store.deviceCheck.deviceIdNormalized}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          },
+          {
+            "name": "STRINGIFY_JSON"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "code",
+            "value": "{{pspResponse2.status}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "confirmed",
+                      "to": "success"
+                    },
+                    {
+                      "from": "pending",
+                      "to": "success"
+                    },
+                    {
+                      "from": "paid",
+                      "to": "success"
+                    },
+                    {
+                      "from": "pre_chargeback_resolution",
+                      "to": "success"
+                    },
+                    {
+                      "from": "chargeback_refunded",
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse2.status}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "confirmed",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "paid",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "pending",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "pre_chargeback_resolution",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "chargeback_refunded",
+                      "to": "chargeback"
+                    },
+                    {
+                      "from": "error",
+                      "to": "payment_failed"
+                    }
+                  ],
+                  "defaultValue": "payment_failed"
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse2.message.0.description}}"
+              },
+              {
+                "value": "{{pspResponse2.message.0.code}}"
+              },
+              {
+                "value": "{{pspResponse2.error}}"
+              },
+              {
+                "value": "Charge processed"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse2.charge_uuid}}"
+          },
+          {
+            "key": "redirectUrl",
+            "value": "{{pspResponse2.url_3ds}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]
