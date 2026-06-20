@@ -3,7 +3,7 @@
     "requestMapping": {
       "method": "POST",
       "url": {
-        "value": "https://unimbued-eclectically-leon.ngrok-free.dev/oauth2/token"
+        "value": "https://smart-capital.auth.us-east-1.amazoncognito.com/oauth2/token"
       },
       "headers": {
         "mappings": [
@@ -67,14 +67,6 @@
         "operations": [
           {
             "name": "KEY_VALUE_LIST_TO_OBJECT"
-          },
-          {
-            "name": "JOIN_MAP_ELEMENTS",
-            "params": {
-              "entrySeparator": "&",
-              "joinType": "KEY_VALUE",
-              "keyValueSeparator": "="
-            }
           }
         ]
       }
@@ -92,73 +84,6 @@
                 "name": "CHECK_IF_EMPTY"
               }
             ]
-          },
-          {
-            "key": "walletCacheKey",
-            "hidden": true,
-            "storeIn": "walletCache",
-            "mappings": [
-              {
-                "value": "a55:wallet:"
-              },
-              {
-                "value": "{{bankTransaction.usedAuthKey}}",
-                "operations": [
-                  {
-                    "name": "SPLIT_STRING",
-                    "params": {
-                      "delimiter": "##"
-                    }
-                  },
-                  {
-                    "name": "GET_ELEMENT_AT_INDEX",
-                    "params": {
-                      "index": 2
-                    }
-                  }
-                ]
-              },
-              {
-                "value": ":"
-              },
-              {
-                "value": "{{bankTransaction.midName}}"
-              }
-            ],
-            "operations": [
-              {
-                "name": "LIST_VALUE_JOIN"
-              }
-            ]
-          },
-          {
-            "key": "walletLookup",
-            "hidden": true,
-            "storeIn": "walletCache",
-            "mappings": [
-              {
-                "key": "id",
-                "value": "{{store.walletCache.walletCacheKey}}"
-              },
-              {
-                "key": "idType",
-                "value": "pspConfigId"
-              }
-            ],
-            "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              },
-              {
-                "name": "GET_TRANSACTION_CONTEXT_BY_ID"
-              }
-            ]
-          },
-          {
-            "key": "cachedWalletUuid",
-            "hidden": true,
-            "storeIn": "walletCache",
-            "value": "{{store.walletCache.walletLookup.pspConfig.value}}"
           },
           {
             "key": "code",
@@ -216,6 +141,9 @@
                 "value": "{{pspResponse0.message.0.description}}"
               },
               {
+                "value": "{{pspResponse0.code}}"
+              },
+              {
                 "value": "Token request processed"
               },
               {
@@ -231,10 +159,6 @@
           {
             "key": "pspToken",
             "value": "{{pspResponse0.access_token}}"
-          },
-          {
-            "key": "pspTransactionId",
-            "value": "{{purchase.purchaseId}}"
           }
         ],
         "operations": [
@@ -246,30 +170,168 @@
     }
   },
   {
-    "skipIf": "{{store.walletCache.cachedWalletUuid}}",
+    "requestMapping": {
+      "method": "GET",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://core-manager.a55.tech/api/v1/bank/wallet/?email=",
+            "required": true
+          },
+          {
+            "mappings": [
+              {
+                "value": "paysecure_",
+                "required": true
+              },
+              {
+                "value": "{{bankTransaction.midName}}",
+                "required": true
+              },
+              {
+                "value": "@payment.com",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "Bearer "
+              },
+              {
+                "value": "{{pspResponse0.access_token}}",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "tempObject",
+            "mappings": [
+              {
+                "key": "wallet_uuid",
+                "value": "{{pspResponse1.wallet_uuid}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "skipPspCount",
+            "value": "{{pspResponse1.wallet_uuid}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": 1
+                    },
+                    {
+                      "from": true,
+                      "to": 0
+                    }
+                  ],
+                  "defaultValue": 0
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "payment_in_process"
+          },
+          {
+            "key": "code",
+            "value": "success"
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse1.error}}"
+              },
+              {
+                "value": "{{pspResponse1.description}}"
+              },
+              {
+                "value": "{{pspResponse1.wallet_uuid}}"
+              },
+              {
+                "value": "{{pspResponse1.code}}"
+              },
+              {
+                "value": "wallet lookup"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  },
+  {
     "requestMapping": {
       "method": "POST",
       "url": {
         "mappings": [
           {
-            "value": "https://unimbued-eclectically-leon.ngrok-free.dev/api/v1/bank/wallet/"
-          },
-          {
-            "value": "{{bankTransaction.usedAuthKey}}",
-            "operations": [
-              {
-                "name": "SPLIT_STRING",
-                "params": {
-                  "delimiter": "##"
-                }
-              },
-              {
-                "name": "GET_ELEMENT_AT_INDEX",
-                "params": {
-                  "index": 2
-                }
-              }
-            ]
+            "value": "https://core-manager.a55.tech/api/v1/bank/wallet/",
+            "required": true
           }
         ],
         "operations": [
@@ -282,11 +344,13 @@
         "mappings": [
           {
             "key": "Content-Type",
-            "value": "application/json"
+            "value": "application/json",
+            "required": true
           },
           {
             "key": "Accept",
-            "value": "application/json"
+            "value": "application/json",
+            "required": true
           },
           {
             "key": "Authorization",
@@ -295,14 +359,16 @@
                 "value": "Bearer "
               },
               {
-                "value": "{{bankTransaction.token}}"
+                "value": "{{pspResponse0.access_token}}",
+                "required": true
               }
             ],
             "operations": [
               {
                 "name": "LIST_VALUE_JOIN"
               }
-            ]
+            ],
+            "required": true
           }
         ],
         "operations": [
@@ -313,28 +379,6 @@
       },
       "body": {
         "mappings": [
-          {
-            "key": "customer_id",
-            "value": "{{bankTransaction.midName}}",
-            "required": true
-          },
-          {
-            "key": "email",
-            "required": true,
-            "mappings": [
-              {
-                "value": "{{bankTransaction.midName}}"
-              },
-              {
-                "value": "@choicepay.ca"
-              }
-            ],
-            "operations": [
-              {
-                "name": "LIST_VALUE_JOIN"
-              }
-            ]
-          },
           {
             "key": "entity_uuid",
             "value": "{{bankTransaction.usedAuthKey}}",
@@ -353,14 +397,116 @@
                 }
               }
             ]
+          },
+          {
+            "key": "merchant_uuid",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 4
+                }
+              }
+            ]
+          },
+          {
+            "key": "customer_id",
+            "mappings": [
+              {
+                "value": "paysecure_",
+                "required": true
+              },
+              {
+                "value": "{{bankTransaction.midName}}",
+                "required": true
+              },
+              {
+                "value": "@payment.com",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "currency",
+            "mappings": [
+              {
+                "value": "{{purchase.fx_Currency}}"
+              },
+              {
+                "value": "{{purchase.purchase.currency}}"
+              },
+              {
+                "value": "{{purchase.setCurr}}"
+              },
+              {
+                "value": "BRL"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "name",
+            "mappings": [
+              {
+                "value": "{{purchase.client.full_name}}"
+              },
+              {
+                "value": "PGS Wallet"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "email",
+            "mappings": [
+              {
+                "value": "paysecure_",
+                "required": true
+              },
+              {
+                "value": "{{bankTransaction.midName}}",
+                "required": true
+              },
+              {
+                "value": "@payment.com",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
           }
         ],
         "operations": [
           {
             "name": "KEY_VALUE_LIST_TO_OBJECT"
-          },
-          {
-            "name": "STRINGIFY_JSON"
           }
         ]
       }
@@ -369,44 +515,26 @@
       "body": {
         "mappings": [
           {
-            "key": "isWalletMissing",
-            "hidden": true,
-            "storeIn": "walletCheck",
-            "value": "{{pspResponse1.wallet_uuid}}",
-            "operations": [
+            "key": "tempObject",
+            "mappings": [
               {
-                "name": "CHECK_IF_EMPTY"
+                "key": "wallet_uuid",
+                "value": "{{pspResponse2.wallet_uuid}}"
               }
-            ]
-          },
-          {
-            "key": "code",
-            "value": "{{store.walletCheck.isWalletMissing}}",
-            "required": true,
+            ],
             "operations": [
               {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "mappings": [
-                    {
-                      "from": true,
-                      "to": "fail"
-                    },
-                    {
-                      "from": false,
-                      "to": "success"
-                    }
-                  ],
-                  "defaultValue": "fail"
-                }
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
               }
             ]
           },
           {
             "key": "status",
-            "value": "{{store.walletCheck.isWalletMissing}}",
-            "required": true,
+            "value": "{{pspResponse2.wallet_uuid}}",
             "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
               {
                 "name": "VALUE_MAPPER",
                 "params": {
@@ -426,19 +554,47 @@
             ]
           },
           {
+            "key": "code",
+            "value": "{{pspResponse2.wallet_uuid}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": "fail"
+                    },
+                    {
+                      "from": false,
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
+          },
+          {
             "key": "message",
             "mappings": [
               {
-                "value": "{{pspResponse1.error}}"
+                "value": "{{pspResponse2.error}}"
               },
               {
-                "value": "{{pspResponse1.message.0.description}}"
+                "value": "{{pspResponse2.description}}"
               },
               {
-                "value": "Wallet ready"
+                "value": "{{pspResponse2.wallet_uuid}}"
               },
               {
-                "value": ""
+                "value": "{{pspResponse2.code}}"
+              },
+              {
+                "value": "wallet create failed"
               }
             ],
             "operations": [
@@ -446,18 +602,6 @@
                 "name": "GET_FIRST_NON_EMPTY_STRING"
               }
             ]
-          },
-          {
-            "key": "pspTransactionId",
-            "value": "{{pspResponse1.wallet_uuid}}"
-          },
-          {
-            "key": "pspConfigID",
-            "value": "{{store.walletCache.walletCacheKey}}"
-          },
-          {
-            "key": "pspConfigData",
-            "value": "{{pspResponse1.wallet_uuid}}"
           }
         ],
         "operations": [
@@ -472,7 +616,7 @@
     "requestMapping": {
       "method": "POST",
       "url": {
-        "value": "https://unimbued-eclectically-leon.ngrok-free.dev/api/v1/bank/wallet/charge"
+        "value": "https://core-manager.a55.tech/api/v1/bank/wallet/charge/"
       },
       "headers": {
         "mappings": [
@@ -491,7 +635,7 @@
                 "value": "Bearer "
               },
               {
-                "value": "{{bankTransaction.token}}"
+                "value": "{{pspResponse0.access_token}}"
               }
             ],
             "operations": [
@@ -524,7 +668,8 @@
               {
                 "name": "GET_ELEMENT_AT_INDEX",
                 "params": {
-                  "index": 6
+                  "index": 6,
+                  "defaultValue": "na"
                 }
               },
               {
@@ -559,7 +704,8 @@
               {
                 "name": "GET_ELEMENT_AT_INDEX",
                 "params": {
-                  "index": 6
+                  "index": 6,
+                  "defaultValue": "na"
                 }
               },
               {
@@ -575,6 +721,192 @@
                     }
                   ],
                   "defaultValue": true
+                }
+              }
+            ]
+          },
+          {
+            "key": "isOnlyTwoD",
+            "hidden": true,
+            "storeIn": "authFlags",
+            "value": "{{bankTransaction.onlyTwoD}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": 1,
+                      "to": true
+                    },
+                    {
+                      "from": "1",
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "isNotOnlyTwoD",
+            "hidden": true,
+            "storeIn": "authFlags",
+            "value": "{{bankTransaction.onlyTwoD}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": 1,
+                      "to": false
+                    },
+                    {
+                      "from": "1",
+                      "to": false
+                    }
+                  ],
+                  "defaultValue": true
+                }
+              }
+            ]
+          },
+          {
+            "key": "isRetryUsing3DSEnabled",
+            "hidden": true,
+            "storeIn": "authFlags",
+            "value": "{{bankTransaction.retryUsing3DS}}",
+            "operations": [
+              {
+                "name": "STRING_TO_LOWERCASE"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "yes",
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "isRetryUsing3DSDisabled",
+            "hidden": true,
+            "storeIn": "authFlags",
+            "value": "{{bankTransaction.retryUsing3DS}}",
+            "operations": [
+              {
+                "name": "STRING_TO_LOWERCASE"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "yes",
+                      "to": false
+                    }
+                  ],
+                  "defaultValue": true
+                }
+              }
+            ]
+          },
+          {
+            "key": "skipThreeDSFields",
+            "hidden": true,
+            "storeIn": "authFlags",
+            "mappings": [
+              {
+                "key": "left",
+                "value": "{{store.authFlags.isOnlyTwoD}}"
+              },
+              {
+                "key": "right",
+                "value": "{{store.authFlags.isNotDataOnly}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LOGICAL_OPERATION",
+                "params": {
+                  "operator": "AND"
+                }
+              }
+            ]
+          },
+          {
+            "key": "skipRedirectUrl",
+            "hidden": true,
+            "storeIn": "authFlags",
+            "mappings": [
+              {
+                "key": "left",
+                "value": "{{store.authFlags.isOnlyTwoD}}"
+              },
+              {
+                "key": "right",
+                "value": "{{store.authFlags.isDataOnly}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LOGICAL_OPERATION",
+                "params": {
+                  "operator": "OR"
+                }
+              }
+            ]
+          },
+          {
+            "key": "skipAutoRetry",
+            "hidden": true,
+            "storeIn": "authFlags",
+            "mappings": [
+              {
+                "key": "left",
+                "value": "{{store.authFlags.isNotOnlyTwoD}}"
+              },
+              {
+                "key": "right",
+                "value": "{{store.authFlags.isRetryUsing3DSDisabled}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LOGICAL_OPERATION",
+                "params": {
+                  "operator": "OR"
+                }
+              }
+            ]
+          },
+          {
+            "key": "skipResponseRedirect",
+            "hidden": true,
+            "storeIn": "authFlags",
+            "mappings": [
+              {
+                "key": "left",
+                "value": "{{store.authFlags.isOnlyTwoD}}"
+              },
+              {
+                "key": "right",
+                "value": "{{store.authFlags.isRetryUsing3DSDisabled}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LOGICAL_OPERATION",
+                "params": {
+                  "operator": "AND"
                 }
               }
             ]
@@ -666,7 +998,8 @@
               {
                 "name": "STRING_PATTERN_MATCH",
                 "params": {
-                  "regex": ".*type_charge.*"
+                  "regex": ".*type_charge.*",
+                  "defaultValue": "type_charge_absent"
                 }
               },
               {
@@ -674,15 +1007,11 @@
                 "params": {
                   "mappings": [
                     {
-                      "from": true,
-                      "to": false
-                    },
-                    {
-                      "from": false,
+                      "from": "type_charge_absent",
                       "to": true
                     }
                   ],
-                  "defaultValue": true
+                  "defaultValue": false
                 }
               }
             ]
@@ -773,7 +1102,7 @@
                 ]
               },
               {
-                "value": ""
+                "value": "__EMPTY_DESC__"
               }
             ],
             "operations": [
@@ -783,8 +1112,16 @@
               {
                 "name": "SUB_STRING",
                 "params": {
-                  "start": 0,
-                  "end": 15
+                  "fromIndex": 0,
+                  "toIndex": 15
+                }
+              },
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "^__EMPTY_DESC__$",
+                  "replacement": "",
+                  "occurrence": "REGEX_FIRST"
                 }
               }
             ]
@@ -951,10 +1288,10 @@
             "required": true,
             "mappings": [
               {
-                "value": "{{store.walletCache.cachedWalletUuid}}"
+                "value": "{{pspResponse1.wallet_uuid}}"
               },
               {
-                "value": "{{pspResponse1.wallet_uuid}}"
+                "value": "{{pspResponse2.wallet_uuid}}"
               }
             ],
             "operations": [
@@ -992,7 +1329,33 @@
           },
           {
             "key": "description",
-            "value": "{{purchase.productDescription}}"
+            "mappings": [
+              {
+                "value": "{{bankTransaction.product_info}}"
+              },
+              {
+                "mappings": [
+                  {
+                    "value": "Order #"
+                  },
+                  {
+                    "value": "{{purchase.purchaseId}}",
+                    "required": true
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "required": true
           },
           {
             "key": "card_name",
@@ -1077,11 +1440,12 @@
           },
           {
             "key": "payer_email",
-            "value": "{{purchase.client.email}}"
+            "value": "{{purchase.client.email}}",
+            "skipIf": "{{store.authFlags.skipThreeDSFields}}"
           },
           {
             "key": "payer_cell_phone",
-            "skipIf": "{{store.clientCheck.phoneIsEmpty}}",
+            "skipIf": "{{store.authFlags.skipThreeDSFields}}",
             "value": "{{purchase.client.phone}}"
           },
           {
@@ -1183,7 +1547,7 @@
           },
           {
             "key": "redirect_url",
-            "skipIf": "{{store.authFlags.isDataOnly}}",
+            "skipIf": "{{store.authFlags.skipRedirectUrl}}",
             "mappings": [
               {
                 "value": "{{extraParams.baseUrl}}"
@@ -1212,7 +1576,7 @@
           },
           {
             "key": "threeds_authentication",
-            "skipIf": "{{store.authFlags.isDataOnly}}",
+            "skipIf": "{{store.authFlags.skipRedirectUrl}}",
             "value": "true",
             "operations": [
               {
@@ -1223,6 +1587,16 @@
           {
             "key": "data_only",
             "skipIf": "{{store.authFlags.isNotDataOnly}}",
+            "value": "true",
+            "operations": [
+              {
+                "name": "STRING_TO_BOOLEAN"
+              }
+            ]
+          },
+          {
+            "key": "auto_retry",
+            "skipIf": "{{store.authFlags.skipAutoRetry}}",
             "value": "true",
             "operations": [
               {
@@ -1282,7 +1656,7 @@
             ],
             "operations": [
               {
-                "name": "LIST_OBJECT_VALUE_TO_LIST_VALUE"
+                "name": "MAP_LIST_TO_VALUE_LIST"
               }
             ]
           },
@@ -1425,7 +1799,8 @@
               {
                 "name": "KEY_VALUE_LIST_TO_OBJECT"
               }
-            ]
+            ],
+            "skipIf": "{{store.authFlags.skipThreeDSFields}}"
           },
           {
             "key": "items",
@@ -1434,11 +1809,61 @@
                 "mappings": [
                   {
                     "key": "name",
-                    "value": "{{purchase.productDescription}}"
+                    "mappings": [
+                      {
+                        "value": "{{bankTransaction.product_info}}"
+                      },
+                      {
+                        "mappings": [
+                          {
+                            "value": "Purchase is made with id "
+                          },
+                          {
+                            "value": "{{purchase.purchaseId}}",
+                            "required": true
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "LIST_VALUE_JOIN"
+                          }
+                        ]
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "GET_FIRST_NON_EMPTY_STRING"
+                      }
+                    ]
                   },
                   {
                     "key": "description",
-                    "value": "{{purchase.productDescription}}"
+                    "mappings": [
+                      {
+                        "value": "{{bankTransaction.product_info}}"
+                      },
+                      {
+                        "mappings": [
+                          {
+                            "value": "Order #"
+                          },
+                          {
+                            "value": "{{purchase.purchaseId}}",
+                            "required": true
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "LIST_VALUE_JOIN"
+                          }
+                        ]
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "GET_FIRST_NON_EMPTY_STRING"
+                      }
+                    ]
                   },
                   {
                     "key": "quantity",
@@ -1508,7 +1933,8 @@
               {
                 "name": "LIST_OBJECT_VALUE_TO_LIST_VALUE"
               }
-            ]
+            ],
+            "skipIf": "{{store.authFlags.skipThreeDSFields}}"
           },
           {
             "key": "transaction_reference",
@@ -1539,9 +1965,6 @@
         "operations": [
           {
             "name": "KEY_VALUE_LIST_TO_OBJECT"
-          },
-          {
-            "name": "STRINGIFY_JSON"
           }
         ]
       }
@@ -1551,7 +1974,7 @@
         "mappings": [
           {
             "key": "code",
-            "value": "{{pspResponse2.status}}",
+            "value": "{{pspResponse3.status}}",
             "required": true,
             "operations": [
               {
@@ -1586,7 +2009,7 @@
           },
           {
             "key": "status",
-            "value": "{{pspResponse2.status}}",
+            "value": "{{pspResponse3.status}}",
             "required": true,
             "operations": [
               {
@@ -1627,13 +2050,16 @@
             "key": "message",
             "mappings": [
               {
-                "value": "{{pspResponse2.message.0.description}}"
+                "value": "{{pspResponse3.message.0.description}}"
               },
               {
-                "value": "{{pspResponse2.message.0.code}}"
+                "value": "{{pspResponse3.message.0.code}}"
               },
               {
-                "value": "{{pspResponse2.error}}"
+                "value": "{{pspResponse3.error}}"
+              },
+              {
+                "value": "{{pspResponse3.code}}"
               },
               {
                 "value": "Charge processed"
@@ -1650,11 +2076,24 @@
           },
           {
             "key": "pspTransactionId",
-            "value": "{{pspResponse2.charge_uuid}}"
+            "value": "{{pspResponse3.charge_uuid}}"
           },
           {
             "key": "redirectUrl",
-            "value": "{{pspResponse2.url_3ds}}"
+            "mappings": [
+              {
+                "value": "{{pspResponse3.action_url}}"
+              },
+              {
+                "value": "{{pspResponse3.url_3ds}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "skipIf": "{{store.authFlags.skipResponseRedirect}}"
           }
         ],
         "operations": [

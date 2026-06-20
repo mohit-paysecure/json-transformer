@@ -3,7 +3,7 @@
     "requestMapping": {
       "method": "POST",
       "url": {
-        "value": "https://unimbued-eclectically-leon.ngrok-free.dev/oauth2/token"
+        "value": "https://smart-capital.auth.us-east-1.amazoncognito.com/oauth2/token"
       },
       "headers": {
         "mappings": [
@@ -67,14 +67,6 @@
         "operations": [
           {
             "name": "KEY_VALUE_LIST_TO_OBJECT"
-          },
-          {
-            "name": "JOIN_MAP_ELEMENTS",
-            "params": {
-              "entrySeparator": "&",
-              "joinType": "KEY_VALUE",
-              "keyValueSeparator": "="
-            }
           }
         ]
       }
@@ -92,73 +84,6 @@
                 "name": "CHECK_IF_EMPTY"
               }
             ]
-          },
-          {
-            "key": "walletCacheKey",
-            "hidden": true,
-            "storeIn": "walletCache",
-            "mappings": [
-              {
-                "value": "a55:wallet:"
-              },
-              {
-                "value": "{{bankTransaction.usedAuthKey}}",
-                "operations": [
-                  {
-                    "name": "SPLIT_STRING",
-                    "params": {
-                      "delimiter": "##"
-                    }
-                  },
-                  {
-                    "name": "GET_ELEMENT_AT_INDEX",
-                    "params": {
-                      "index": 2
-                    }
-                  }
-                ]
-              },
-              {
-                "value": ":"
-              },
-              {
-                "value": "{{bankTransaction.midName}}"
-              }
-            ],
-            "operations": [
-              {
-                "name": "LIST_VALUE_JOIN"
-              }
-            ]
-          },
-          {
-            "key": "walletLookup",
-            "hidden": true,
-            "storeIn": "walletCache",
-            "mappings": [
-              {
-                "key": "id",
-                "value": "{{store.walletCache.walletCacheKey}}"
-              },
-              {
-                "key": "idType",
-                "value": "pspConfigId"
-              }
-            ],
-            "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              },
-              {
-                "name": "GET_TRANSACTION_CONTEXT_BY_ID"
-              }
-            ]
-          },
-          {
-            "key": "cachedWalletUuid",
-            "hidden": true,
-            "storeIn": "walletCache",
-            "value": "{{store.walletCache.walletLookup.pspConfig.value}}"
           },
           {
             "key": "code",
@@ -216,6 +141,9 @@
                 "value": "{{pspResponse0.message.0.description}}"
               },
               {
+                "value": "{{pspResponse0.code}}"
+              },
+              {
                 "value": "Refund token request processed"
               },
               {
@@ -247,11 +175,154 @@
   },
   {
     "requestMapping": {
+      "method": "GET",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://core-manager.a55.tech/api/v1/bank/wallet/?email=",
+            "required": true
+          },
+          {
+            "mappings": [
+              {
+                "value": "paysecure_",
+                "required": true
+              },
+              {
+                "value": "{{bankTransaction.midName}}",
+                "required": true
+              },
+              {
+                "value": "@payment.com",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "Bearer "
+              },
+              {
+                "value": "{{pspResponse0.access_token}}",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "code",
+            "value": "{{pspResponse1.wallet_uuid}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": "fail"
+                    },
+                    {
+                      "from": false,
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse1.error}}"
+              },
+              {
+                "value": "{{pspResponse1.description}}"
+              },
+              {
+                "value": "{{pspResponse1.wallet_uuid}}"
+              },
+              {
+                "value": "{{pspResponse1.code}}"
+              },
+              {
+                "value": "wallet lookup"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "requestMapping": {
       "method": "POST",
       "url": {
         "mappings": [
           {
-            "value": "https://unimbued-eclectically-leon.ngrok-free.dev/api/v1/bank/wallet/charge/"
+            "value": "https://core-manager.a55.tech/api/v1/bank/wallet/charge/"
           },
           {
             "value": "{{bankTransaction.paymentTransId}}"
@@ -260,7 +331,7 @@
             "value": "/refund/"
           },
           {
-            "value": "{{store.walletCache.cachedWalletUuid}}"
+            "value": "{{pspResponse1.wallet_uuid}}"
           },
           {
             "value": "/"
@@ -289,7 +360,7 @@
                 "value": "Bearer "
               },
               {
-                "value": "{{bankTransaction.token}}"
+                "value": "{{pspResponse0.access_token}}"
               }
             ],
             "operations": [
@@ -306,13 +377,12 @@
         ]
       },
       "body": {
-        "mappings": [],
+        "mappings": [
+
+        ],
         "operations": [
           {
             "name": "KEY_VALUE_LIST_TO_OBJECT"
-          },
-          {
-            "name": "STRINGIFY_JSON"
           }
         ]
       }
@@ -322,7 +392,7 @@
         "mappings": [
           {
             "key": "code",
-            "value": "{{pspResponse1.status}}",
+            "value": "{{pspResponse2.status}}",
             "required": true,
             "operations": [
               {
@@ -349,7 +419,7 @@
           },
           {
             "key": "status",
-            "value": "{{pspResponse1.status}}",
+            "value": "{{pspResponse2.status}}",
             "required": true,
             "operations": [
               {
@@ -378,13 +448,16 @@
             "key": "message",
             "mappings": [
               {
-                "value": "{{pspResponse1.message.0.description}}"
+                "value": "{{pspResponse2.message.0.description}}"
               },
               {
-                "value": "{{pspResponse1.message.0.code}}"
+                "value": "{{pspResponse2.message.0.code}}"
               },
               {
-                "value": "{{pspResponse1.error}}"
+                "value": "{{pspResponse2.error}}"
+              },
+              {
+                "value": "{{pspResponse2.code}}"
               },
               {
                 "value": "Refund Fail"
@@ -405,7 +478,7 @@
           },
           {
             "key": "refundTransId",
-            "value": "{{pspResponse1.charge_uuid}}"
+            "value": "{{pspResponse2.charge_uuid}}"
           }
         ],
         "operations": [
