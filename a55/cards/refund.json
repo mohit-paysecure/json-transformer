@@ -3,13 +3,29 @@
     "requestMapping": {
       "method": "POST",
       "url": {
-        "value": "https://smart-capital.auth.us-east-1.amazoncognito.com/oauth2/token"
+        "mappings": [
+          {
+            "value": "https://smart-capital.auth.us-east-1.amazoncognito.com/oauth2/token",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
       },
       "headers": {
         "mappings": [
           {
             "key": "Content-Type",
-            "value": "application/x-www-form-urlencoded"
+            "value": "application/x-www-form-urlencoded",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "required": true
           }
         ],
         "operations": [
@@ -20,6 +36,11 @@
       },
       "body": {
         "mappings": [
+          {
+            "key": "grant_type",
+            "value": "client_credentials",
+            "required": true
+          },
           {
             "key": "client_id",
             "value": "{{bankTransaction.usedAuthKey}}",
@@ -57,11 +78,6 @@
                 }
               }
             ]
-          },
-          {
-            "key": "grant_type",
-            "value": "client_credentials",
-            "required": true
           }
         ],
         "operations": [
@@ -75,21 +91,37 @@
       "body": {
         "mappings": [
           {
-            "key": "isAccessTokenMissing",
-            "hidden": true,
-            "storeIn": "oauthCheck",
+            "key": "status",
             "value": "{{pspResponse0.access_token}}",
             "operations": [
               {
-                "name": "CHECK_IF_EMPTY"
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": false,
+                      "to": "payment_in_process"
+                    }
+                  ],
+                  "defaultValue": "payment_failed"
+                }
               }
             ]
           },
           {
             "key": "code",
-            "value": "{{store.oauthCheck.isAccessTokenMissing}}",
-            "required": true,
+            "value": "{{pspResponse0.access_token}}",
             "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
               {
                 "name": "VALUE_MAPPER",
                 "params": {
@@ -109,45 +141,16 @@
             ]
           },
           {
-            "key": "status",
-            "value": "{{store.oauthCheck.isAccessTokenMissing}}",
-            "required": true,
-            "operations": [
-              {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "mappings": [
-                    {
-                      "from": true,
-                      "to": "refund_failed"
-                    },
-                    {
-                      "from": false,
-                      "to": "refund_in_process"
-                    }
-                  ],
-                  "defaultValue": "refund_failed"
-                }
-              }
-            ]
-          },
-          {
             "key": "message",
             "mappings": [
+              {
+                "value": "{{pspResponse0.error_description}}"
+              },
               {
                 "value": "{{pspResponse0.error}}"
               },
               {
-                "value": "{{pspResponse0.message.0.description}}"
-              },
-              {
-                "value": "{{pspResponse0.code}}"
-              },
-              {
-                "value": "Refund token request processed"
-              },
-              {
-                "value": ""
+                "value": "empty message"
               }
             ],
             "operations": [
@@ -159,10 +162,6 @@
           {
             "key": "pspToken",
             "value": "{{pspResponse0.access_token}}"
-          },
-          {
-            "key": "pspTransactionId",
-            "value": "{{bankTransaction.paymentTransId}}"
           }
         ],
         "operations": [
@@ -244,9 +243,7 @@
         ]
       },
       "body": {
-        "mappings": [
-
-        ],
+        "mappings": [],
         "operations": [
           {
             "name": "KEY_VALUE_LIST_TO_OBJECT"
@@ -295,9 +292,6 @@
                 "value": "{{pspResponse1.wallet_uuid}}"
               },
               {
-                "value": "{{pspResponse1.code}}"
-              },
-              {
                 "value": "wallet lookup"
               }
             ],
@@ -322,19 +316,24 @@
       "url": {
         "mappings": [
           {
-            "value": "https://core-manager.a55.tech/api/v1/bank/wallet/charge/"
+            "value": "https://core-manager.a55.tech/api/v1/bank/wallet/charge/",
+            "required": true
           },
           {
-            "value": "{{bankTransaction.paymentTransId}}"
+            "value": "{{bankTransaction.paymentTransId}}",
+            "required": true
           },
           {
-            "value": "/refund/"
+            "value": "/refund/",
+            "required": true
           },
           {
-            "value": "{{pspResponse1.wallet_uuid}}"
+            "value": "{{pspResponse1.wallet_uuid}}",
+            "required": true
           },
           {
-            "value": "/"
+            "value": "/",
+            "required": true
           }
         ],
         "operations": [
@@ -347,27 +346,32 @@
         "mappings": [
           {
             "key": "Content-Type",
-            "value": "application/json"
+            "value": "application/json",
+            "required": true
           },
           {
             "key": "Accept",
-            "value": "application/json"
+            "value": "application/json",
+            "required": true
           },
           {
             "key": "Authorization",
             "mappings": [
               {
-                "value": "Bearer "
+                "value": "Bearer ",
+                "required": true
               },
               {
-                "value": "{{pspResponse0.access_token}}"
+                "value": "{{pspResponse0.access_token}}",
+                "required": true
               }
             ],
             "operations": [
               {
                 "name": "LIST_VALUE_JOIN"
               }
-            ]
+            ],
+            "required": true
           }
         ],
         "operations": [
@@ -377,9 +381,7 @@
         ]
       },
       "body": {
-        "mappings": [
-
-        ],
+        "mappings": [],
         "operations": [
           {
             "name": "KEY_VALUE_LIST_TO_OBJECT"
@@ -391,36 +393,8 @@
       "body": {
         "mappings": [
           {
-            "key": "code",
-            "value": "{{pspResponse2.status}}",
-            "required": true,
-            "operations": [
-              {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "mappings": [
-                    {
-                      "from": "confirmed",
-                      "to": "success"
-                    },
-                    {
-                      "from": "refunded",
-                      "to": "success"
-                    },
-                    {
-                      "from": "refunding",
-                      "to": "success"
-                    }
-                  ],
-                  "defaultValue": "fail"
-                }
-              }
-            ]
-          },
-          {
             "key": "status",
             "value": "{{pspResponse2.status}}",
-            "required": true,
             "operations": [
               {
                 "name": "VALUE_MAPPER",
@@ -445,8 +419,46 @@
             ]
           },
           {
+            "key": "code",
+            "value": "{{pspResponse2.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "confirmed",
+                      "to": "success"
+                    },
+                    {
+                      "from": "refunded",
+                      "to": "success"
+                    },
+                    {
+                      "from": "refunding",
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
+          },
+          {
             "key": "message",
             "mappings": [
+              {
+                "value": "{{pspResponse2.error}}"
+              },
+              {
+                "value": "{{pspResponse2.description}}"
+              },
+              {
+                "value": "{{pspResponse2.status}}"
+              },
+              {
+                "value": "{{pspResponse2.refunds.0.status}}"
+              },
               {
                 "value": "{{pspResponse2.message.0.description}}"
               },
@@ -454,16 +466,7 @@
                 "value": "{{pspResponse2.message.0.code}}"
               },
               {
-                "value": "{{pspResponse2.error}}"
-              },
-              {
                 "value": "{{pspResponse2.code}}"
-              },
-              {
-                "value": "Refund Fail"
-              },
-              {
-                "value": ""
               }
             ],
             "operations": [
@@ -473,12 +476,20 @@
             ]
           },
           {
-            "key": "pspTransactionId",
-            "value": "{{bankTransaction.paymentTransId}}"
-          },
-          {
             "key": "refundTransId",
-            "value": "{{pspResponse2.charge_uuid}}"
+            "mappings": [
+              {
+                "value": "{{pspResponse2.refunds.0.refund_uuid}}"
+              },
+              {
+                "value": "{{pspResponse2.charge_uuid}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
           }
         ],
         "operations": [

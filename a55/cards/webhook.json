@@ -3,21 +3,17 @@
     "requestMapping": {
       "method": "POST",
       "url": {
-        "value": "not_applicable"
+        "mappings": []
       },
       "headers": {
-        "mappings": [],
-        "operations": [
-          {
-            "name": "KEY_VALUE_LIST_TO_OBJECT"
-          }
-        ]
+        "mappings": []
       },
       "body": {
         "mappings": [
           {
-            "key": "deferToInquiry",
-            "value": "true"
+            "key": "pspTransactionId",
+            "value": "{{webhookRequest.charge_uuid}}",
+            "required": true
           }
         ],
         "operations": [

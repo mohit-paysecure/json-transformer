@@ -1028,6 +1028,202 @@
             ]
           },
           {
+            "key": "cardNameSanitized",
+            "hidden": true,
+            "storeIn": "sanitized",
+            "value": "{{cardInfo.cardholder_name}}",
+            "operations": [
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "^(?i)(na|n/a|\\.)$",
+                  "replacement": "",
+                  "occurrence": "REGEX_ALL"
+                }
+              },
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "[^\\x00-\\x7F]",
+                  "replacement": "",
+                  "occurrence": "REGEX_ALL"
+                }
+              },
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "[^A-Za-z ]",
+                  "replacement": "",
+                  "occurrence": "REGEX_ALL"
+                }
+              },
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "\\s+",
+                  "replacement": " ",
+                  "occurrence": "REGEX_ALL"
+                }
+              },
+              {
+                "name": "STRING_TRIM"
+              },
+              {
+                "name": "STRING_PATTERN_MATCH",
+                "params": {
+                  "regex": "^[A-Za-z]+(?:\\s+[A-Za-z]+)+$",
+                  "defaultValue": ""
+                }
+              }
+            ]
+          },
+          {
+            "key": "fullNameSanitized",
+            "hidden": true,
+            "storeIn": "sanitized",
+            "value": "{{purchase.client.full_name}}",
+            "operations": [
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "^(?i)(na|n/a|\\.)$",
+                  "replacement": "",
+                  "occurrence": "REGEX_ALL"
+                }
+              },
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "[^\\x00-\\x7F]",
+                  "replacement": "",
+                  "occurrence": "REGEX_ALL"
+                }
+              },
+              {
+                "name": "STRING_TRIM"
+              },
+              {
+                "name": "STRING_PATTERN_MATCH",
+                "params": {
+                  "regex": "^[A-Za-z]+(?:[\\s'-][A-Za-z]+)+$",
+                  "defaultValue": ""
+                }
+              }
+            ]
+          },
+          {
+            "key": "emailSanitized",
+            "hidden": true,
+            "storeIn": "sanitized",
+            "value": "{{purchase.client.email}}",
+            "operations": [
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "[^\\x00-\\x7F]",
+                  "replacement": "",
+                  "occurrence": "REGEX_ALL"
+                }
+              }
+            ]
+          },
+          {
+            "key": "streetSanitized",
+            "hidden": true,
+            "storeIn": "sanitized",
+            "value": "{{purchase.client.street_address}}",
+            "operations": [
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "[^\\x00-\\x7F]",
+                  "replacement": "",
+                  "occurrence": "REGEX_ALL"
+                }
+              }
+            ]
+          },
+          {
+            "key": "citySanitized",
+            "hidden": true,
+            "storeIn": "sanitized",
+            "value": "{{purchase.client.city}}",
+            "operations": [
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "[^\\x00-\\x7F]",
+                  "replacement": "",
+                  "occurrence": "REGEX_ALL"
+                }
+              }
+            ]
+          },
+          {
+            "key": "countrySanitized",
+            "hidden": true,
+            "storeIn": "sanitized",
+            "value": "{{purchase.client.country}}",
+            "operations": [
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "[^\\x00-\\x7F]",
+                  "replacement": "",
+                  "occurrence": "REGEX_ALL"
+                }
+              }
+            ]
+          },
+          {
+            "key": "zipSanitized",
+            "hidden": true,
+            "storeIn": "sanitized",
+            "value": "{{purchase.client.zip_code}}",
+            "operations": [
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "[^\\x00-\\x7F]",
+                  "replacement": "",
+                  "occurrence": "REGEX_ALL"
+                }
+              }
+            ]
+          },
+          {
+            "key": "stateSanitized",
+            "hidden": true,
+            "storeIn": "sanitized",
+            "value": "{{purchase.client.stateCode}}",
+            "operations": [
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "[^\\x00-\\x7F]",
+                  "replacement": "",
+                  "occurrence": "REGEX_ALL"
+                }
+              }
+            ]
+          },
+          {
+            "key": "phoneSanitized",
+            "hidden": true,
+            "storeIn": "sanitized",
+            "value": "{{purchase.client.phone}}",
+            "operations": [
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "[^\\x00-\\x7F]",
+                  "replacement": "",
+                  "occurrence": "REGEX_ALL"
+                }
+              }
+            ]
+          },
+          {
             "key": "deviceIdNormalized",
             "hidden": true,
             "storeIn": "deviceCheck",
@@ -1141,7 +1337,7 @@
             "key": "isTurkey",
             "hidden": true,
             "storeIn": "addressFlags",
-            "value": "{{purchase.client.country}}",
+            "value": "{{store.sanitized.countrySanitized}}",
             "operations": [
               {
                 "name": "STRING_TO_UPPERCASE"
@@ -1164,7 +1360,7 @@
             "key": "isNotTurkey",
             "hidden": true,
             "storeIn": "addressFlags",
-            "value": "{{purchase.client.country}}",
+            "value": "{{store.sanitized.countrySanitized}}",
             "operations": [
               {
                 "name": "STRING_TO_UPPERCASE"
@@ -1193,11 +1389,11 @@
                 "mappings": [
                   {
                     "key": "country",
-                    "value": "{{purchase.client.country}}"
+                    "value": "{{store.sanitized.countrySanitized}}"
                   },
                   {
                     "key": "stateCode",
-                    "value": "{{purchase.client.city}}"
+                    "value": "{{store.sanitized.citySanitized}}"
                   }
                 ],
                 "operations": [
@@ -1211,7 +1407,7 @@
               },
               {
                 "skipIf": "{{store.addressFlags.isTurkey}}",
-                "value": "{{purchase.client.stateCode}}"
+                "value": "{{store.sanitized.stateSanitized}}"
               },
               {
                 "value": ""
@@ -1359,7 +1555,19 @@
           },
           {
             "key": "card_name",
-            "value": "{{cardInfo.cardholder_name}}",
+            "mappings": [
+              {
+                "value": "{{store.sanitized.cardNameSanitized}}"
+              },
+              {
+                "value": "{{store.sanitized.fullNameSanitized}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
             "required": true
           },
           {
@@ -1430,23 +1638,35 @@
           },
           {
             "key": "email",
-            "value": "{{purchase.client.email}}",
+            "value": "{{store.sanitized.emailSanitized}}",
             "required": true
           },
           {
             "key": "payer_name",
-            "value": "{{purchase.client.full_name}}",
+            "mappings": [
+              {
+                "value": "{{store.sanitized.cardNameSanitized}}"
+              },
+              {
+                "value": "{{store.sanitized.fullNameSanitized}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
             "required": true
           },
           {
             "key": "payer_email",
-            "value": "{{purchase.client.email}}",
+            "value": "{{store.sanitized.emailSanitized}}",
             "skipIf": "{{store.authFlags.skipThreeDSFields}}"
           },
           {
             "key": "payer_cell_phone",
             "skipIf": "{{store.authFlags.skipThreeDSFields}}",
-            "value": "{{purchase.client.phone}}"
+            "value": "{{store.sanitized.phoneSanitized}}"
           },
           {
             "key": "payer_address",
@@ -1457,19 +1677,19 @@
               },
               {
                 "key": "street",
-                "value": "{{purchase.client.street_address}}"
+                "value": "{{store.sanitized.streetSanitized}}"
               },
               {
                 "key": "city",
-                "value": "{{purchase.client.city}}"
+                "value": "{{store.sanitized.citySanitized}}"
               },
               {
                 "key": "country",
-                "value": "{{purchase.client.country}}"
+                "value": "{{store.sanitized.countrySanitized}}"
               },
               {
                 "key": "postal_code",
-                "value": "{{purchase.client.zip_code}}"
+                "value": "{{store.sanitized.zipSanitized}}"
               },
               {
                 "key": "state",
@@ -1491,19 +1711,19 @@
               },
               {
                 "key": "street",
-                "value": "{{purchase.client.street_address}}"
+                "value": "{{store.sanitized.streetSanitized}}"
               },
               {
                 "key": "city",
-                "value": "{{purchase.client.city}}"
+                "value": "{{store.sanitized.citySanitized}}"
               },
               {
                 "key": "country",
-                "value": "{{purchase.client.country}}"
+                "value": "{{store.sanitized.countrySanitized}}"
               },
               {
                 "key": "postal_code",
-                "value": "{{purchase.client.zip_code}}"
+                "value": "{{store.sanitized.zipSanitized}}"
               },
               {
                 "key": "state",
@@ -1527,16 +1747,7 @@
                 "value": "/webhook/"
               },
               {
-                "value": "{{purchase.bankid}}"
-              },
-              {
-                "value": "/"
-              },
-              {
-                "value": "{{purchase.purchaseId}}"
-              },
-              {
-                "value": "/"
+                "value": "{{bankTransaction.bankName}}"
               }
             ],
             "operations": [
@@ -2086,6 +2297,9 @@
               },
               {
                 "value": "{{pspResponse3.url_3ds}}"
+              },
+              {
+                "value": ""
               }
             ],
             "operations": [
