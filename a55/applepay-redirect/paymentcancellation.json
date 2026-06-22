@@ -330,6 +330,10 @@
           {
             "value": "{{pspResponse1.wallet_uuid}}",
             "required": true
+          },
+          {
+            "value": "/",
+            "required": true
           }
         ],
         "operations": [
@@ -377,50 +381,7 @@
         ]
       },
       "body": {
-        "mappings": [
-          {
-            "key": "isFullRefund",
-            "hidden": true,
-            "storeIn": "requestType",
-            "mappings": [
-              {
-                "value": "{{bankTransaction.refundAmt}}",
-                "operations": [
-                  {
-                    "name": "CHECK_IF_EMPTY"
-                  }
-                ]
-              },
-              {
-                "value": "{{bankTransaction.refundId}}",
-                "operations": [
-                  {
-                    "name": "CHECK_IF_EMPTY"
-                  }
-                ]
-              }
-            ],
-            "operations": [
-              {
-                "name": "LOGICAL_OPERATION",
-                "params": {
-                  "operator": "OR"
-                }
-              }
-            ]
-          },
-          {
-            "key": "amount",
-            "skipIf": "{{store.requestType.isFullRefund}}",
-            "value": "{{bankTransaction.refundAmt}}",
-            "operations": [
-              {
-                "name": "STRING_TO_DOUBLE"
-              }
-            ],
-            "required": true
-          }
-        ],
+        "mappings": [],
         "operations": [
           {
             "name": "KEY_VALUE_LIST_TO_OBJECT"
@@ -433,33 +394,23 @@
         "mappings": [
           {
             "key": "status",
-            "mappings": [
-              {
-                "value": "{{pspResponse2.refunds.0.status}}"
-              },
-              {
-                "value": "{{pspResponse2.status}}"
-              }
-            ],
+            "value": "{{pspResponse2.status}}",
             "operations": [
-              {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
-              },
               {
                 "name": "VALUE_MAPPER",
                 "params": {
                   "mappings": [
                     {
+                      "from": "confirmed",
+                      "to": "refunded"
+                    },
+                    {
                       "from": "refunded",
                       "to": "refunded"
                     },
                     {
-                      "from": "partially_refunded",
-                      "to": "refunded"
-                    },
-                    {
-                      "from": "refund_error",
-                      "to": "refund_failed"
+                      "from": "refunding",
+                      "to": "refund_in_process"
                     }
                   ],
                   "defaultValue": "refund_failed"
@@ -469,21 +420,22 @@
           },
           {
             "key": "code",
-            "value": "{{pspResponse2.charge_uuid}}",
+            "value": "{{pspResponse2.status}}",
             "operations": [
-              {
-                "name": "CHECK_IF_NULL"
-              },
               {
                 "name": "VALUE_MAPPER",
                 "params": {
                   "mappings": [
                     {
-                      "from": true,
-                      "to": "fail"
+                      "from": "confirmed",
+                      "to": "success"
                     },
                     {
-                      "from": false,
+                      "from": "refunded",
+                      "to": "success"
+                    },
+                    {
+                      "from": "refunding",
                       "to": "success"
                     }
                   ],
@@ -506,6 +458,15 @@
               },
               {
                 "value": "{{pspResponse2.refunds.0.status}}"
+              },
+              {
+                "value": "{{pspResponse2.message.0.description}}"
+              },
+              {
+                "value": "{{pspResponse2.message.0.code}}"
+              },
+              {
+                "value": "{{pspResponse2.code}}"
               }
             ],
             "operations": [
