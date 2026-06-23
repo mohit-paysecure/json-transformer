@@ -43,7 +43,7 @@
                   {
                     "name": "GET_ELEMENT_AT_INDEX",
                     "params": {
-                      "index": 0
+                      "index": 1
                     }
                   }
                 ]
@@ -72,7 +72,7 @@
                   {
                     "name": "GET_ELEMENT_AT_INDEX",
                     "params": {
-                      "index": 1
+                      "index": 5
                     }
                   }
                 ]
@@ -101,7 +101,7 @@
                   {
                     "name": "GET_ELEMENT_AT_INDEX",
                     "params": {
-                      "index": 2
+                      "index": 6
                     }
                   }
                 ]
@@ -130,7 +130,7 @@
                   {
                     "name": "GET_ELEMENT_AT_INDEX",
                     "params": {
-                      "index": 3
+                      "index": 7
                     }
                   }
                 ]
@@ -234,7 +234,7 @@
                   {
                     "name": "GET_ELEMENT_AT_INDEX",
                     "params": {
-                      "index": 0
+                      "index": 1
                     }
                   }
                 ]
@@ -263,7 +263,7 @@
                   {
                     "name": "GET_ELEMENT_AT_INDEX",
                     "params": {
-                      "index": 1
+                      "index": 5
                     }
                   }
                 ]
@@ -292,7 +292,7 @@
                   {
                     "name": "GET_ELEMENT_AT_INDEX",
                     "params": {
-                      "index": 2
+                      "index": 6
                     }
                   }
                 ]
@@ -321,7 +321,7 @@
                   {
                     "name": "GET_ELEMENT_AT_INDEX",
                     "params": {
-                      "index": 3
+                      "index": 7
                     }
                   }
                 ]
@@ -500,7 +500,7 @@
                   {
                     "name": "GET_ELEMENT_AT_INDEX",
                     "params": {
-                      "index": 0
+                      "index": 1
                     }
                   }
                 ]
@@ -526,8 +526,7 @@
         ]
       },
       "body": {
-        "mappings": [
-        ]
+        "mappings": []
       }
     },
     "responseMapping": {
@@ -619,8 +618,26 @@
       "url": {
         "mappings": [
           {
-            "value": "https://api-sandbox.coinflow.cash/api/checkout/card/paysecure",
+            "value": "https://api-sandbox.coinflow.cash/api/checkout/card/",
             "required": true
+          },
+          {
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 0
+                }
+              }
+            ]
           }
         ],
         "operations": [
@@ -988,7 +1005,8 @@
                           {
                             "name": "GET_ELEMENT_AT_INDEX",
                             "params": {
-                              "index": 4
+                              "index": 8,
+                              "defaultValue": "inGameProduct"
                             }
                           }
                         ]
@@ -1110,7 +1128,9 @@
                   }
                 ]
               },
-              {"value" : "error"}
+              {
+                "value": "error"
+              }
             ],
             "operations": [
               {
@@ -1159,7 +1179,9 @@
                   }
                 ]
               },
-              {"value" : "fail"}
+              {
+                "value": "fail"
+              }
             ],
             "operations": [
               {

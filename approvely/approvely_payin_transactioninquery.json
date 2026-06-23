@@ -47,7 +47,7 @@
                   {
                     "name": "GET_ELEMENT_AT_INDEX",
                     "params": {
-                      "index": 0
+                      "index": 1
                     }
                   }
                 ]
@@ -96,7 +96,7 @@
                       "to": "refunded"
                     },
                     {
-                     "from": "AUTHORIZED",
+                      "from": "AUTHORIZED",
                       "to": "paid"
                     }
                   ],
