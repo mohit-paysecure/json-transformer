@@ -12,7 +12,7 @@
         "mappings": [
           {
             "key": "postRedirectFlowRequired",
-            "value": "true"
+            "value": true
           }
         ],
         "operations": [

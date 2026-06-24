@@ -732,30 +732,9 @@
             "key": "webhookInfo",
             "mappings": [
               {
-                "key": "example",
-                "mappings": [
-                  {
-                    "value": "{{extraParams.baseUrl}}",
-                    "required": true
-                  },
-                  {
-                    "value": "/webhook/",
-                    "required": true
-                  },
-                  {
-                    "value": "{{purchase.bankname}}",
-                    "required": true
-                  },
-                  {
-                    "value": "/",
-                    "required": true
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "LIST_VALUE_JOIN"
-                  }
-                ]
+                "key": "purchaseId",
+                "value": "{{purchase.purchaseId}}",
+                "required": true
               }
             ],
             "operations": [

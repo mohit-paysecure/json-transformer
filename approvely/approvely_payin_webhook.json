@@ -11,9 +11,334 @@
       "body": {
         "mappings": [
           {
+            "key": "purchaseIdFromWebhook",
+            "mappings": [
+              {
+                "value": "{{webhookRequest.data.webhookInfo.purchaseId}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "storeIn": "approvelyWebhook",
+            "hidden": true
+          },
+          {
+            "key": "isPurchaseIdMissing",
+            "value": "{{store.approvelyWebhook.purchaseIdFromWebhook}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_EMPTY"
+              }
+            ],
+            "storeIn": "approvelyWebhook",
+            "hidden": true
+          },
+          {
+            "key": "transactionContext",
+            "mappings": [
+              {
+                "key": "id",
+                "mappings": [
+                  {
+                    "value": "{{store.approvelyWebhook.purchaseIdFromWebhook}}"
+                  },
+                  {
+                    "value": "{{webhookRequest.data.id}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ],
+                "required": true
+              },
+              {
+                "key": "idType",
+                "value": "{{store.approvelyWebhook.isPurchaseIdMissing}}",
+                "operations": [
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": true,
+                          "to": "pspTransactionId"
+                        },
+                        {
+                          "from": false,
+                          "to": "purchaseId"
+                        }
+                      ],
+                      "defaultValue": "pspTransactionId"
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "GET_TRANSACTION_CONTEXT_BY_ID"
+              }
+            ],
+            "storeIn": "approvelyWebhook",
+            "hidden": true
+          },
+          {
+            "key": "signatureHeader",
+            "mappings": [
+              {
+                "value": "{{webhookRequestHeader.coinflow-signature}}"
+              },
+              {
+                "value": "{{webhookRequestHeader.Coinflow-Signature}}"
+              },
+              {
+                "value": "{{webhookRequestHeader.COINFLOW-SIGNATURE}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "storeIn": "approvelyWebhook",
+            "hidden": true
+          },
+          {
+            "key": "signatureTimestamp",
+            "value": "{{store.approvelyWebhook.signatureHeader}}",
+            "operations": [
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "^t=([^,]+),v1=.*$",
+                  "replacement": "$1",
+                  "occurrence": "REGEX_FIRST"
+                }
+              }
+            ],
+            "storeIn": "approvelyWebhook",
+            "hidden": true
+          },
+          {
+            "key": "receivedSignatureValue",
+            "value": "{{store.approvelyWebhook.signatureHeader}}",
+            "operations": [
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "^t=[^,]+,v1=(.+)$",
+                  "replacement": "$1",
+                  "occurrence": "REGEX_FIRST"
+                }
+              }
+            ],
+            "storeIn": "approvelyWebhook",
+            "hidden": true
+          },
+          {
+            "key": "signedPayload",
+            "mappings": [
+              {
+                "value": "{{store.approvelyWebhook.signatureTimestamp}}"
+              },
+              {
+                "value": "."
+              },
+              {
+                "value": "{{webhookRequestHeader.x-raw-body}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "storeIn": "approvelyWebhook",
+            "hidden": true
+          },
+          {
+            "key": "generatedSignature",
+            "mappings": [
+              {
+                "key": "input",
+                "value": "{{store.approvelyWebhook.signedPayload}}"
+              },
+              {
+                "key": "secretKey",
+                "value": "{{store.approvelyWebhook.transactionContext.bankTransaction.usedAuthKey}}",
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 4,
+                      "defaultValue": ""
+                    }
+                  }
+                ],
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "COMPUTE_HMAC_SHA",
+                "params": {
+                  "algorithm": "HmacSHA256",
+                  "outputFormat": "HEX"
+                }
+              }
+            ]
+          },
+          {
+            "key": "receivedSignature",
+            "value": "{{store.approvelyWebhook.receivedSignatureValue}}",
+            "required": true
+          },
+          {
+            "key": "purchaseId",
+            "value": "{{store.approvelyWebhook.transactionContext.purchase.purchaseId}}"
+          },
+          {
             "key": "pspTransactionId",
             "value": "{{webhookRequest.data.id}}",
             "required": true
+          },
+          {
+            "key": "status",
+            "value": "{{webhookRequest.eventType}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "Settled",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "Card Payment Authorized",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "Card Payment Declined",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "Card Payment Suspected Fraud",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "Payment Pending Review",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "Payment Expiration",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "Refund",
+                      "to": "refunded"
+                    },
+                    {
+                      "from": "ACH Initiated",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "ACH Batched",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "ACH Returned",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "ACH Failed",
+                      "to": "payment_failed"
+                    }
+                  ],
+                  "defaultValue": "payment_in_process"
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{webhookRequest.eventType}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "Settled",
+                      "to": "success"
+                    },
+                    {
+                      "from": "Card Payment Authorized",
+                      "to": "success"
+                    },
+                    {
+                      "from": "Payment Pending Review",
+                      "to": "success"
+                    },
+                    {
+                      "from": "Refund",
+                      "to": "success"
+                    },
+                    {
+                      "from": "ACH Initiated",
+                      "to": "success"
+                    },
+                    {
+                      "from": "ACH Batched",
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{webhookRequest.data.reasonMessage}}"
+              },
+              {
+                "value": "{{webhookRequest.eventType}}"
+              },
+              {
+                "value": "Webhook received"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
           }
         ],
         "operations": [
