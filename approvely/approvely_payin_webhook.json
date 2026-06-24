@@ -222,7 +222,19 @@
           },
           {
             "key": "pspTransactionId",
-            "value": "{{webhookRequest.data.id}}",
+            "mappings": [
+              {
+                "value": "{{webhookRequest.data.id}}"
+              },
+              {
+                "value": "{{webhookRequest.data.paymentId}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
             "required": true
           },
           {
@@ -258,8 +270,16 @@
                       "to": "payment_failed"
                     },
                     {
-                      "from": "Refund",
+                      "from": "Refunded",
                       "to": "refunded"
+                    },
+                    {
+                      "from": "Refund Complete",
+                      "to": "refunded"
+                    },
+                    {
+                      "from": "Refund Failed",
+                      "to": "refund_failed"
                     },
                     {
                       "from": "ACH Initiated",
@@ -304,8 +324,16 @@
                       "to": "success"
                     },
                     {
-                      "from": "Refund",
+                      "from": "Refunded",
                       "to": "success"
+                    },
+                    {
+                      "from": "Refund Complete",
+                      "to": "success"
+                    },
+                    {
+                      "from": "Refund Failed",
+                      "to": "fail"
                     },
                     {
                       "from": "ACH Initiated",
