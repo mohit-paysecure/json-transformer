@@ -887,6 +887,14 @@
                   "replacement": "",
                   "occurrence": "REGEX_ALL"
                 }
+              },
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "^.*([0-9]{10})$",
+                  "replacement": "$1",
+                  "occurrence": "REGEX_FIRST"
+                }
               }
             ]
           }
@@ -902,51 +910,60 @@
       "body": {
         "mappings": [
           {
-            "key": "code",
-            "value": "{{pspResponse2.error}}",
+            "key": "hasLinkError",
+            "hidden": true,
+            "storeIn": "approvelyVenmo",
+            "value": "{{pspResponse2.debugId}}",
             "operations": [
               {
-                "name": "CHECK_IF_NULL"
+                "name": "CHECK_IF_EMPTY"
               },
               {
                 "name": "VALUE_MAPPER",
                 "params": {
                   "mappings": [
                     {
-                      "from": true,
-                      "to": "success"
-                    },
-                    {
                       "from": false,
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{store.approvelyVenmo.hasLinkError}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
                       "to": "fail"
                     }
                   ],
-                  "defaultValue": "fail"
+                  "defaultValue": "success"
                 }
               }
             ]
           },
           {
             "key": "status",
-            "value": "{{pspResponse2.error}}",
+            "value": "{{store.approvelyVenmo.hasLinkError}}",
             "operations": [
-              {
-                "name": "CHECK_IF_NULL"
-              },
               {
                 "name": "VALUE_MAPPER",
                 "params": {
                   "mappings": [
                     {
                       "from": true,
-                      "to": "payout_in_process"
-                    },
-                    {
-                      "from": false,
                       "to": "payment_failed"
                     }
                   ],
-                  "defaultValue": "payment_failed"
+                  "defaultValue": "payout_in_process"
                 }
               }
             ]
@@ -955,10 +972,10 @@
             "key": "message",
             "mappings": [
               {
-                "value": "{{pspResponse2.detailMessage}}"
+                "value": "{{pspResponse2.details.body.phoneNumber.message}}"
               },
               {
-                "value": "{{pspResponse2.details}}"
+                "value": "{{pspResponse2.detailMessage}}"
               },
               {
                 "value": "{{pspResponse2.message}}"
