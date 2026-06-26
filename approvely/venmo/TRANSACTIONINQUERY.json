@@ -89,9 +89,12 @@
             "mappings": [
               {
                 "value": "{{pspResponse0.withdrawal.status}}",
-                "operations": [
-                  {
-                    "name": "VALUE_MAPPER",
+	                "operations": [
+	                  {
+	                    "name": "STRING_TO_LOWERCASE"
+	                  },
+	                  {
+	                    "name": "VALUE_MAPPER",
                     "params": {
                       "defaultValue": "",
                       "mappings": [
@@ -103,18 +106,18 @@
                           "from": "pending",
                           "to": "success"
                         },
-                        {
-                          "from": "Processing",
-                          "to": "success"
-                        },
-                        {
-                          "from": "Initiated",
-                          "to": "success"
-                        },
-                        {
-                          "from": "Settled",
-                          "to": "success"
-                        },
+	                        {
+	                          "from": "processing",
+	                          "to": "success"
+	                        },
+	                        {
+	                          "from": "initiated",
+	                          "to": "success"
+	                        },
+	                        {
+	                          "from": "settled",
+	                          "to": "success"
+	                        },
                         {
                           "from": "Success",
                           "to": "success"
@@ -123,26 +126,26 @@
                           "from": "success",
                           "to": "success"
                         },
-                        {
-                          "from": "Completed",
-                          "to": "success"
-                        },
-                        {
-                          "from": "Failed",
-                          "to": "fail"
-                        },
-                        {
-                          "from": "Failure",
-                          "to": "fail"
-                        },
-                        {
-                          "from": "Returned",
-                          "to": "fail"
-                        },
-                        {
-                          "from": "Rejected",
-                          "to": "fail"
-                        }
+	                        {
+	                          "from": "completed",
+	                          "to": "success"
+	                        },
+	                        {
+	                          "from": "failed",
+	                          "to": "fail"
+	                        },
+	                        {
+	                          "from": "failure",
+	                          "to": "fail"
+	                        },
+	                        {
+	                          "from": "returned",
+	                          "to": "fail"
+	                        },
+	                        {
+	                          "from": "rejected",
+	                          "to": "fail"
+	                        }
                       ]
                     }
                   }
@@ -150,9 +153,12 @@
               },
               {
                 "value": "{{store.approvelyVenmoInquiry.hasWithdrawal}}",
-                "operations": [
-                  {
-                    "name": "VALUE_MAPPER",
+	                "operations": [
+	                  {
+	                    "name": "STRING_TO_LOWERCASE"
+	                  },
+	                  {
+	                    "name": "VALUE_MAPPER",
                     "params": {
                       "mappings": [
                         {
@@ -194,18 +200,18 @@
                           "from": "pending",
                           "to": "payout_in_process"
                         },
-                        {
-                          "from": "Processing",
-                          "to": "payout_in_process"
-                        },
-                        {
-                          "from": "Initiated",
-                          "to": "payout_in_process"
-                        },
-                        {
-                          "from": "Settled",
-                          "to": "paid"
-                        },
+	                        {
+	                          "from": "processing",
+	                          "to": "payout_in_process"
+	                        },
+	                        {
+	                          "from": "initiated",
+	                          "to": "payout_in_process"
+	                        },
+	                        {
+	                          "from": "settled",
+	                          "to": "paid"
+	                        },
                         {
                           "from": "Success",
                           "to": "paid"
@@ -214,26 +220,30 @@
                           "from": "success",
                           "to": "paid"
                         },
+	                        {
+	                          "from": "completed",
+	                          "to": "paid"
+	                        },
                         {
-                          "from": "Completed",
+                          "from": "completed",
                           "to": "paid"
                         },
-                        {
-                          "from": "Failed",
-                          "to": "payment_failed"
-                        },
-                        {
-                          "from": "Failure",
-                          "to": "payment_failed"
-                        },
-                        {
-                          "from": "Returned",
-                          "to": "payment_failed"
-                        },
-                        {
-                          "from": "Rejected",
-                          "to": "payment_failed"
-                        }
+	                        {
+	                          "from": "failed",
+	                          "to": "payment_failed"
+	                        },
+	                        {
+	                          "from": "failure",
+	                          "to": "payment_failed"
+	                        },
+	                        {
+	                          "from": "returned",
+	                          "to": "payment_failed"
+	                        },
+	                        {
+	                          "from": "rejected",
+	                          "to": "payment_failed"
+	                        }
                       ]
                     }
                   }

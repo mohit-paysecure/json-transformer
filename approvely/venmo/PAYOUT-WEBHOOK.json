@@ -21,12 +21,12 @@
             "mappings": [
               {
                 "key": "id",
-                "value": "{{webhookRequest.data.signature}}",
+                "value": "{{webhookRequest.data.idempotencyKey}}",
                 "required": true
               },
               {
                 "key": "idType",
-                "value": "pspTransactionId",
+                "value": "payoutId",
                 "required": true
               }
             ],
@@ -54,7 +54,7 @@
                 "value": "{{webhookRequestHeader.COINFLOW-SIGNATURE}}"
               },
               {
-                "value": ""
+                "value": "NO_SIGNATURE_HEADER"
               }
             ],
             "operations": [
@@ -169,7 +169,19 @@
           },
           {
             "key": "pspTransactionId",
-            "value": "{{webhookRequest.data.signature}}",
+            "mappings": [
+              {
+                "value": "{{webhookRequest.data.signature}}"
+              },
+              {
+                "value": "{{webhookRequest.data.idempotencyKey}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
             "required": true
           },
           {
