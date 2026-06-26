@@ -138,6 +138,9 @@
                 "value": "{{pspResponse0.error}}"
               },
               {
+                "value": "{{pspResponse0.message.0.message}}"
+              },
+              {
                 "value": "{{pspResponse0.message.0.description}}"
               },
               {
@@ -2262,6 +2265,9 @@
             "mappings": [
               {
                 "value": "{{pspResponse3.message.0.description}}"
+              },
+              {
+                "value": "{{pspResponse3.message.0.message}}"
               },
               {
                 "value": "{{pspResponse3.message.0.code}}"
