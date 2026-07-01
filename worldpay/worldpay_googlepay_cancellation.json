@@ -18,11 +18,6 @@
       "headers": {
         "mappings": [
           {
-            "key": "Content-Type",
-            "value": "application/vnd.worldpay.payments-v7+json",
-            "required": true
-          },
-          {
             "key": "Authorization",
             "mappings": [
               {
@@ -90,6 +85,16 @@
               }
             ],
             "required": true
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "WP-Api-Version",
+            "value": "2024-06-01",
+            "required": true
           }
         ],
         "operations": [
@@ -130,7 +135,7 @@
                       "to": "CANCELLED"
                     },
                     {
-                      "from": "Sent for Settlement",
+                      "from": "sentForSettlement",
                       "to": "CANCELLED"
                     }
                   ]
@@ -152,7 +157,7 @@
                       "to": "success"
                     },
                     {
-                      "from": "Sent for Settlement",
+                      "from": "sentForSettlement",
                       "to": "success"
                     }
                   ]

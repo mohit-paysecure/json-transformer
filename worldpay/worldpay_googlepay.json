@@ -5,7 +5,7 @@
       "url": {
         "mappings": [
           {
-            "value": "https://try.access.worldpay.com/cardPayments/customerInitiatedTransactions",
+            "value": "https://try.access.worldpay.com/api/payments",
             "required": true
           }
         ],
@@ -17,16 +17,6 @@
       },
       "headers": {
         "mappings": [
-          {
-            "key": "Content-Type",
-            "value": "application/vnd.worldpay.payments-v7+json",
-            "required": true
-          },
-          {
-            "key": "Accept",
-            "value": "application/vnd.worldpay.payments-v7+json",
-            "required": true
-          },
           {
             "key": "Authorization",
             "mappings": [
@@ -95,6 +85,16 @@
               }
             ],
             "required": true
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "WP-Api-Version",
+            "value": "2024-06-01",
+            "required": true
           }
         ],
         "operations": [
@@ -111,11 +111,6 @@
             "required": true
           },
           {
-            "key": "channel",
-            "value": "ecom",
-            "required": true
-          },
-          {
             "key": "merchant",
             "mappings": [
               {
@@ -124,35 +119,45 @@
                 "required": true
               }
             ],
-            "required": true,
             "operations": [
               {
                 "name": "KEY_VALUE_LIST_TO_OBJECT"
               }
-            ]
+            ],
+            "required": true
+          },
+          {
+            "key": "orderReference",
+            "value": "{{purchase.merchantRef}}"
           },
           {
             "key": "instruction",
             "mappings": [
               {
-                "key": "requestAutoSettlement",
+                "key": "method",
+                "value": "googlepay",
+                "required": true
+              },
+              {
+                "key": "paymentInstrument",
                 "mappings": [
                   {
-                    "key": "enabled",
-                    "value": "true",
-                    "required": true,
-                    "operations": [
-                      {
-                        "name": "STRING_TO_BOOLEAN"
-                      }
-                    ]
+                    "key": "type",
+                    "value": "encrypted",
+                    "required": true
+                  },
+                  {
+                    "key": "walletToken",
+                    "value": "{{bankTransaction.gpayEncryptedToken}}",
+                    "required": true
                   }
                 ],
                 "operations": [
                   {
                     "name": "KEY_VALUE_LIST_TO_OBJECT"
                   }
-                ]
+                ],
+                "required": true
               },
               {
                 "key": "narrative",
@@ -171,15 +176,16 @@
                       {
                         "name": "GET_FIRST_NON_EMPTY_STRING"
                       }
-                    ]
+                    ],
+                    "required": true
                   }
                 ],
-                "required": true,
                 "operations": [
                   {
                     "name": "KEY_VALUE_LIST_TO_OBJECT"
                   }
-                ]
+                ],
+                "required": true
               },
               {
                 "key": "value",
@@ -191,59 +197,34 @@
                   },
                   {
                     "key": "amount",
-                    "value": "{{purchase.fx_Amount}}",
-                    "required": true,
-                    "operations": [
+                    "mappings": [
                       {
-                        "name": "STRING_TO_DOUBLE"
-                      },
-                      {
-                        "name": "LIST_VALUE_MULTIPLY",
-                        "params": {
-                          "multiplyBy": 100
-                        }
-                      },
-                      {
-                        "name": "DOUBLE_TO_FLOOR"
+                        "value": "{{purchase.fx_Amount}}",
+                        "required": true,
+                        "operations": [
+                          {
+                            "name": "STRING_TO_DOUBLE"
+                          }
+                        ]
                       }
-                    ]
+                    ],
+                    "required": true
                   }
                 ],
-                "required": true,
                 "operations": [
                   {
                     "name": "KEY_VALUE_LIST_TO_OBJECT"
                   }
-                ]
-              },
-              {
-                "key": "paymentInstrument",
-                "mappings": [
-                  {
-                    "key": "type",
-                    "value": "card/wallet+googlepay",
-                    "required": true
-                  },
-                  {
-                    "key": "walletToken",
-                    "value": "{{bankTransaction.gpayEncryptedToken}}",
-                    "required": true
-                  }
                 ],
-                "required": true,
-                "operations": [
-                  {
-                    "name": "KEY_VALUE_LIST_TO_OBJECT"
-                  }
-                ]
+                "required": true
               }
             ],
-            "required": true,
             "operations": [
               {
                 "name": "KEY_VALUE_LIST_TO_OBJECT"
               }
-            ]
+            ],
+            "required": true
           }
         ],
         "operations": [
@@ -281,28 +262,13 @@
               },
               {
                 "key": "cancelHref",
-                "value": "{{pspResponse0._links.cardPayments:cancel.href}}",
+                "value": "{{pspResponse0._links.cancelPayment.href}}",
                 "storeIn": "worldpay"
               },
               {
                 "key": "settleHref",
-                "value": "{{pspResponse0._links.cardPayments:settle.href}}",
+                "value": "{{pspResponse0._links.settlePayment.href}}",
                 "storeIn": "worldpay"
-              },
-              {
-                "key": "tokenHref",
-                "value": "{{pspResponse0._embedded.token.tokenPaymentInstrument.href}}",
-                "storeIn": "worldpay"
-              },
-              {
-                "key": "rawResponse",
-                "value": "{{pspResponse0}}",
-                "storeIn": "worldpay",
-                "operations": [
-                  {
-                    "name": "OBJECT_TO_JSON"
-                  }
-                ]
               },
               {
                 "key": "cardBin",
@@ -318,6 +284,16 @@
                 "key": "cardBrand",
                 "value": "{{pspResponse0.paymentInstrument.cardBrand}}",
                 "storeIn": "worldpay"
+              },
+              {
+                "key": "rawResponse",
+                "value": "{{pspResponse0}}",
+                "storeIn": "worldpay",
+                "operations": [
+                  {
+                    "name": "OBJECT_TO_JSON"
+                  }
+                ]
               }
             ],
             "operations": [
@@ -340,7 +316,7 @@
                       "to": "AUTHORIZED"
                     },
                     {
-                      "from": "Sent for Settlement",
+                      "from": "sentForSettlement",
                       "to": "AUTHORIZED"
                     },
                     {
@@ -366,7 +342,7 @@
                       "to": "success"
                     },
                     {
-                      "from": "Sent for Settlement",
+                      "from": "sentForSettlement",
                       "to": "success"
                     },
                     {
@@ -375,6 +351,25 @@
                     }
                   ]
                 }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.refusalDescription}}"
+              },
+              {
+                "value": "{{store.worldpay.outcome}}"
+              },
+              {
+                "value": "Google Pay payment processed"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
               }
             ]
           },
@@ -403,31 +398,8 @@
             "value": "{{store.worldpay.cardBrand}}"
           },
           {
-            "key": "redirect_url",
-            "value": "{{store.worldpay.settleHref}}"
-          },
-          {
             "key": "raw_response",
             "value": "{{store.worldpay.rawResponse}}"
-          },
-          {
-            "key": "message",
-            "mappings": [
-              {
-                "value": "{{pspResponse0.refusalDescription}}"
-              },
-              {
-                "value": "{{store.worldpay.outcome}}"
-              },
-              {
-                "value": "Google Pay payment processed"
-              }
-            ],
-            "operations": [
-              {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
-              }
-            ]
           }
         ],
         "operations": [
