@@ -1,0 +1,323 @@
+[
+  {
+    "requestMapping": {
+      "method": "GET",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://api-sandbox.coinflow.cash/api/merchant/withdraws/",
+            "required": true
+          },
+          {
+            "value": "{{bankTransaction.paymentTransId}}",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Authorization",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 1
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "hasWithdrawal",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{pspResponse0.withdrawal}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.withdrawal.status}}",
+                "operations": [
+                  {
+                    "name": "STRING_TO_LOWERCASE"
+                  },
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "defaultValue": "",
+                      "mappings": [
+                        {
+                          "from": "pending",
+                          "to": "success"
+                        },
+                        {
+                          "from": "processing",
+                          "to": "success"
+                        },
+                        {
+                          "from": "initiated",
+                          "to": "success"
+                        },
+                        {
+                          "from": "settled",
+                          "to": "success"
+                        },
+                        {
+                          "from": "success",
+                          "to": "success"
+                        },
+                        {
+                          "from": "completed",
+                          "to": "success"
+                        },
+                        {
+                          "from": "failed",
+                          "to": "fail"
+                        },
+                        {
+                          "from": "failure",
+                          "to": "fail"
+                        },
+                        {
+                          "from": "returned",
+                          "to": "fail"
+                        },
+                        {
+                          "from": "rejected",
+                          "to": "fail"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "{{store.approvelyAch.hasWithdrawal}}",
+                "operations": [
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": true,
+                          "to": "success"
+                        }
+                      ],
+                      "defaultValue": ""
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "fail"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.withdrawal.status}}",
+                "operations": [
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "defaultValue": "",
+                      "mappings": [
+                        {
+                          "from": "Pending",
+                          "to": "payout_in_process"
+                        },
+                        {
+                          "from": "pending",
+                          "to": "payout_in_process"
+                        },
+                        {
+                          "from": "processing",
+                          "to": "payout_in_process"
+                        },
+                        {
+                          "from": "initiated",
+                          "to": "payout_in_process"
+                        },
+                        {
+                          "from": "settled",
+                          "to": "paid"
+                        },
+                        {
+                          "from": "Success",
+                          "to": "paid"
+                        },
+                        {
+                          "from": "success",
+                          "to": "paid"
+                        },
+                        {
+                          "from": "completed",
+                          "to": "paid"
+                        },
+                        {
+                          "from": "failed",
+                          "to": "payment_failed"
+                        },
+                        {
+                          "from": "failure",
+                          "to": "payment_failed"
+                        },
+                        {
+                          "from": "returned",
+                          "to": "payment_failed"
+                        },
+                        {
+                          "from": "rejected",
+                          "to": "payment_failed"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "{{store.approvelyAch.hasWithdrawal}}",
+                "operations": [
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": true,
+                          "to": "payout_in_process"
+                        }
+                      ],
+                      "defaultValue": ""
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "payment_failed"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.detailMessage}}"
+              },
+              {
+                "value": "{{pspResponse0.details}}"
+              },
+              {
+                "value": "{{pspResponse0.message}}"
+              },
+              {
+                "value": "{{pspResponse0.error}}"
+              },
+              {
+                "value": "{{pspResponse0.withdrawal.detailMessage}}"
+              },
+              {
+                "value": "{{pspResponse0.withdrawal.returnStatus}}"
+              },
+              {
+                "value": "{{pspResponse0.withdrawal.status}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse0.withdrawal.transferId}}"
+          },
+          {
+            "key": "paysecureId",
+            "value": "{{pspResponse0.withdrawal.idempotencyKey}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]

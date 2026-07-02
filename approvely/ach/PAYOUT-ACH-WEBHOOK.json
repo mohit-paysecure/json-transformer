@@ -1,0 +1,266 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": []
+      },
+      "headers": {
+        "mappings": []
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "transactionContext",
+            "hidden": true,
+            "storeIn": "approvelyAchWebhook",
+            "mappings": [
+              {
+                "key": "id",
+                "value": "{{webhookRequest.data.idempotencyKey}}",
+                "required": true
+              },
+              {
+                "key": "idType",
+                "value": "payoutId",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "GET_TRANSACTION_CONTEXT_BY_ID"
+              }
+            ]
+          },
+          {
+            "key": "signatureHeader",
+            "hidden": true,
+            "storeIn": "approvelyAchWebhook",
+            "mappings": [
+              {
+                "value": "{{webhookRequestHeader.coinflow-signature}}"
+              },
+              {
+                "value": "{{webhookRequestHeader.Coinflow-Signature}}"
+              },
+              {
+                "value": "{{webhookRequestHeader.COINFLOW-SIGNATURE}}"
+              },
+              {
+                "value": "NO_SIGNATURE_HEADER"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "signatureTimestamp",
+            "hidden": true,
+            "storeIn": "approvelyAchWebhook",
+            "value": "{{store.approvelyAchWebhook.signatureHeader}}",
+            "operations": [
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "^t=([^,]+),v1=.*$",
+                  "replacement": "$1",
+                  "occurrence": "REGEX_FIRST"
+                }
+              }
+            ]
+          },
+          {
+            "key": "receivedSignatureValue",
+            "hidden": true,
+            "storeIn": "approvelyAchWebhook",
+            "value": "{{store.approvelyAchWebhook.signatureHeader}}",
+            "operations": [
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "^t=[^,]+,v1=(.+)$",
+                  "replacement": "$1",
+                  "occurrence": "REGEX_FIRST"
+                }
+              }
+            ]
+          },
+          {
+            "key": "signedPayload",
+            "hidden": true,
+            "storeIn": "approvelyAchWebhook",
+            "mappings": [
+              {
+                "value": "{{store.approvelyAchWebhook.signatureTimestamp}}"
+              },
+              {
+                "value": "."
+              },
+              {
+                "value": "{{webhookRequestHeader.x-raw-body}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
+          },
+          {
+            "key": "generatedSignature",
+            "mappings": [
+              {
+                "key": "input",
+                "value": "{{store.approvelyAchWebhook.signedPayload}}"
+              },
+              {
+                "key": "secretKey",
+                "value": "{{store.approvelyAchWebhook.transactionContext.bankTransaction.usedAuthKey}}",
+                "operations": [
+                  {
+                    "name": "SPLIT_STRING",
+                    "params": {
+                      "delimiter": "##"
+                    }
+                  },
+                  {
+                    "name": "GET_ELEMENT_AT_INDEX",
+                    "params": {
+                      "index": 4,
+                      "defaultValue": ""
+                    }
+                  }
+                ],
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "COMPUTE_HMAC_SHA",
+                "params": {
+                  "algorithm": "HmacSHA256",
+                  "outputFormat": "HEX"
+                }
+              }
+            ]
+          },
+          {
+            "key": "receivedSignature",
+            "value": "{{store.approvelyAchWebhook.receivedSignatureValue}}",
+            "required": true
+          },
+          {
+            "key": "payoutId",
+            "value": "{{store.approvelyAchWebhook.transactionContext.payout.payoutId}}",
+            "required": true
+          },
+          {
+            "key": "pspTransactionId",
+            "mappings": [
+              {
+                "value": "{{webhookRequest.data.signature}}"
+              },
+              {
+                "value": "{{webhookRequest.data.idempotencyKey}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "status",
+            "value": "{{webhookRequest.eventType}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "Withdraw Success",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "Withdraw Failure",
+                      "to": "payment_failed"
+                    }
+                  ],
+                  "defaultValue": "payout_in_process"
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{webhookRequest.eventType}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "Withdraw Success",
+                      "to": "success"
+                    },
+                    {
+                      "from": "Withdraw Failure",
+                      "to": "fail"
+                    }
+                  ],
+                  "defaultValue": "success"
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{webhookRequest.data.reasonMessage}}"
+              },
+              {
+                "value": "{{webhookRequest.data.message}}"
+              },
+              {
+                "value": "{{webhookRequest.data.detailMessage}}"
+              },
+              {
+                "value": "{{webhookRequest.eventType}}"
+              },
+              {
+                "value": "Webhook received"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": []
+      }
+    }
+  }
+]
