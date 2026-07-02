@@ -674,6 +674,18 @@
               }
             ],
             "required": true
+          },
+          {
+            "key": "postRedirectFlowRequired",
+            "value": true
+          },
+          {
+            "key": "postRedirectFlow",
+            "value": "PAYOUT-ACH-POSTREDIRECT"
+          },
+          {
+            "key": "allowedRedirectionCount",
+            "value": 2
           }
         ],
         "operations": [
@@ -1149,7 +1161,7 @@
                 ]
               },
               {
-                "value": "/link/"
+                "value": "/solana/withdraw/"
               },
               {
                 "value": "{{bankTransaction.usedAuthKey}}",

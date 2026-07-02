@@ -1264,7 +1264,7 @@
       "url": {
         "mappings": [
           {
-            "value": "https://api-sandbox.coinflow.cash/api/withdraw",
+            "value": "https://api-sandbox.coinflow.cash/api/auth/session-key",
             "required": true
           }
         ],
@@ -1536,7 +1536,7 @@
                 ]
               },
               {
-                "value": "/link/"
+                "value": "/solana/withdraw/"
               },
               {
                 "value": "{{bankTransaction.usedAuthKey}}",
