@@ -78,6 +78,9 @@
             "storeIn": "approvelyAch",
             "mappings": [
               {
+                "value": "{{store.approvelyAch.previouslyUsedContext.customer.customerId}}"
+              },
+              {
                 "value": "{{payout.extraParam.approvelyVenmoUserId}}"
               },
               {
@@ -159,7 +162,7 @@
             ]
           },
           {
-            "key": "existingAccountToken",
+            "key": "existingAccountTokenByFullAccount",
             "hidden": true,
             "storeIn": "approvelyAch",
             "mappings": [
@@ -178,6 +181,50 @@
               },
               {
                 "name": "GET_MAP_VALUE"
+              }
+            ]
+          },
+          {
+            "key": "existingAccountTokenByLast4",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "mappings": [
+              {
+                "key": "map",
+                "value": "{{store.approvelyAch.previouslyUsedContext.customer.financialDetails}}"
+              },
+              {
+                "key": "key",
+                "value": "{{store.approvelyAch.accountLast4}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "GET_MAP_VALUE"
+              }
+            ]
+          },
+          {
+            "key": "existingAccountToken",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "mappings": [
+              {
+                "value": "{{store.approvelyAch.existingAccountTokenByFullAccount}}"
+              },
+              {
+                "value": "{{store.approvelyAch.existingAccountTokenByLast4}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
               }
             ]
           },
@@ -209,6 +256,9 @@
             "hidden": true,
             "storeIn": "approvelyAch",
             "mappings": [
+              {
+                "value": "{{pspResponse0.withdrawer.bankAccounts.0.token}}"
+              },
               {
                 "value": "{{store.approvelyAch.existingAccountToken}}"
               },
@@ -246,6 +296,12 @@
             ]
           },
           {
+            "key": "resolvedAccountToken",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{store.approvelyAch.resolvedResponseToken}}"
+          },
+          {
             "key": "canUseResolvedToken",
             "hidden": true,
             "storeIn": "approvelyAch",
@@ -256,7 +312,7 @@
               },
               {
                 "key": "right",
-                "value": "{{store.approvelyAch.isBankAlreadyLinked}}"
+                "value": "{{store.approvelyAch.hasResolvedToken}}"
               }
             ],
             "operations": [
@@ -674,18 +730,6 @@
               }
             ],
             "required": true
-          },
-          {
-            "key": "postRedirectFlowRequired",
-            "value": true
-          },
-          {
-            "key": "postRedirectFlow",
-            "value": "PAYOUT-ACH-POSTREDIRECT"
-          },
-          {
-            "key": "allowedRedirectionCount",
-            "value": 2
           }
         ],
         "operations": [
@@ -889,7 +933,7 @@
       "url": {
         "mappings": [
           {
-            "value": "https://api-sandbox.coinflow.cash/api/withdraw",
+            "value": "https://api-sandbox.coinflow.cash/api/auth/session-key",
             "required": true
           }
         ],
@@ -967,6 +1011,9 @@
             "mappings": [
               {
                 "value": "{{pspResponse2.withdrawer.bankAccounts.0.token}}"
+              },
+              {
+                "value": "{{store.approvelyAch.resolvedResponseToken}}"
               },
               {
                 "value": "{{store.approvelyAch.existingAccountToken}}"

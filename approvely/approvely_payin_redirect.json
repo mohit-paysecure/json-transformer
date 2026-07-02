@@ -13,6 +13,72 @@
           {
             "key": "postRedirectFlowRequired",
             "value": true
+          },
+          {
+            "key": "allowedRedirectionCount",
+            "value": "{{redirectRequest.value}}",
+            "operations": [
+              {
+                "name": "STRING_PATTERN_MATCH",
+                "params": {
+                  "regex": "^stage=bank_link.*$",
+                  "defaultValue": "no_match"
+                }
+              },
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "^stage=bank_link.*$",
+                  "replacement": "bank_link",
+                  "occurrence": "REGEX_FIRST"
+                }
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "bank_link",
+                      "to": 1
+                    }
+                  ],
+                  "defaultValue": 0
+                }
+              }
+            ]
+          },
+          {
+            "key": "postRedirectFlow",
+            "value": "{{redirectRequest.value}}",
+            "operations": [
+              {
+                "name": "STRING_PATTERN_MATCH",
+                "params": {
+                  "regex": "^stage=bank_link.*$",
+                  "defaultValue": "no_match"
+                }
+              },
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "^stage=bank_link.*$",
+                  "replacement": "bank_link",
+                  "occurrence": "REGEX_FIRST"
+                }
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "bank_link",
+                      "to": "PAYOUT-ACH-POSTREDIRECT"
+                    }
+                  ],
+                  "defaultValue": ""
+                }
+              }
+            ]
           }
         ],
         "operations": [
