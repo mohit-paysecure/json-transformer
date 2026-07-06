@@ -458,7 +458,7 @@
   },
   {
     "requestMapping": {
-      "method": "POST",
+      "method": "GET",
       "url": {
         "mappings": [
           {
@@ -548,7 +548,7 @@
                       "to": "payment_in_process"
                     }
                   ],
-                  "defaultValue": "fail"
+                  "defaultValue": "payment_failed"
                 }
               }
             ]
@@ -780,10 +780,31 @@
                 "key": "firstName",
                 "mappings": [
                   {
-                    "value": "{{purchase.client.full_name}}"
+                    "value": "{{cardInfo.cardholder_name}}",
+                    "operations": [
+                      {
+                        "name": "STRING_PATTERN_MATCH",
+                        "params": {
+                          "regex": "^[A-Za-z]+(?:[\\s'-][A-Za-z]+)+$",
+                          "defaultValue": ""
+                        }
+                      }
+                    ]
                   },
                   {
-                    "value": "{{cardInfo.cardholder_name}}"
+                    "value": "{{purchase.client.full_name}}",
+                    "operations": [
+                      {
+                        "name": "STRING_PATTERN_MATCH",
+                        "params": {
+                          "regex": "^[A-Za-z]+(?:[\\s'-][A-Za-z]+)+$",
+                          "defaultValue": ""
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": "Paysecure Customer"
                   }
                 ],
                 "operations": [
@@ -808,10 +829,31 @@
                 "key": "lastName",
                 "mappings": [
                   {
-                    "value": "{{purchase.client.full_name}}"
+                    "value": "{{cardInfo.cardholder_name}}",
+                    "operations": [
+                      {
+                        "name": "STRING_PATTERN_MATCH",
+                        "params": {
+                          "regex": "^[A-Za-z]+(?:[\\s'-][A-Za-z]+)+$",
+                          "defaultValue": ""
+                        }
+                      }
+                    ]
                   },
                   {
-                    "value": "{{cardInfo.cardholder_name}}"
+                    "value": "{{purchase.client.full_name}}",
+                    "operations": [
+                      {
+                        "name": "STRING_PATTERN_MATCH",
+                        "params": {
+                          "regex": "^[A-Za-z]+(?:[\\s'-][A-Za-z]+)+$",
+                          "defaultValue": ""
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": "Paysecure Customer"
                   }
                 ],
                 "operations": [
@@ -946,6 +988,46 @@
             "required": true
           },
           {
+            "key": "merchantCbpdMissing",
+            "hidden": true,
+            "storeIn": "approvelyCbpd",
+            "value": "{{purchase.extraParam.chargebackProtectionData}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              }
+            ]
+          },
+          {
+            "key": "merchantCbpdProvided",
+            "hidden": true,
+            "storeIn": "approvelyCbpd",
+            "value": "{{store.approvelyCbpd.merchantCbpdMissing}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": false
+                    },
+                    {
+                      "from": false,
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "chargebackProtectionData",
+            "skipIf": "{{store.approvelyCbpd.merchantCbpdMissing}}",
+            "value": "{{purchase.extraParam.chargebackProtectionData}}"
+          },
+          {
             "key": "chargebackProtectionData",
             "mappings": [
               {
@@ -1036,7 +1118,8 @@
               {
                 "name": "LIST_OBJECT_VALUE_TO_LIST_VALUE"
               }
-            ]
+            ],
+            "skipIf": "{{store.approvelyCbpd.merchantCbpdProvided}}"
           }
         ],
         "operations": [
@@ -1058,6 +1141,9 @@
               },
               {
                 "value": "{{pspResponse3.transactionId}}"
+              },
+              {
+                "value": ""
               }
             ],
             "operations": [
@@ -1159,7 +1245,7 @@
                 ]
               },
               {
-                "value": "fail"
+                "value": "payment_failed"
               }
             ],
             "operations": [
@@ -1171,6 +1257,9 @@
           {
             "key": "message",
             "mappings": [
+              {
+                "value": "{{pspResponse3.msg}}"
+              },
               {
                 "value": "{{pspResponse3.action}}"
               },
