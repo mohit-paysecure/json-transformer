@@ -777,6 +777,9 @@
                     "key": "productName",
                     "mappings": [
                       {
+                        "value": "{{purchase.extraParam.chargebackProtectionData.productName}}"
+                      },
+                      {
                         "value": "{{bankTransaction.product_info}}"
                       },
                       {
@@ -794,8 +797,10 @@
                     "key": "productType",
                     "mappings": [
                       {
+                        "value": "{{purchase.extraParam.chargebackProtectionData.productType}}"
+                      },
+                      {
                         "value": "{{bankTransaction.usedAuthKey}}",
-                        "required": true,
                         "operations": [
                           {
                             "name": "SPLIT_STRING",
@@ -815,7 +820,7 @@
                     ],
                     "operations": [
                       {
-                        "name": "LIST_VALUE_JOIN"
+                        "name": "GET_FIRST_NON_EMPTY_STRING"
                       }
                     ],
                     "required": true
