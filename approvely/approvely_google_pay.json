@@ -247,11 +247,11 @@
                 "value": "paysecure-device"
               }
             ],
-          "operations": [
-            {
-              "name": "GET_FIRST_NON_EMPTY_STRING"
-            }
-          ]
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
           }
         ],
         "operations": [
@@ -734,6 +734,41 @@
             "required": true
           },
           {
+            "key": "merchantRawProductDataMissing",
+            "hidden": true,
+            "storeIn": "approvelyCbpd",
+            "value": "{{purchase.extraParam.chargebackProtectionData.rawProductData}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              }
+            ]
+          },
+          {
+            "key": "merchantRawProductDataProvided",
+            "hidden": true,
+            "storeIn": "approvelyCbpd",
+            "value": "{{store.approvelyCbpd.merchantRawProductDataMissing}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": false
+                    },
+                    {
+                      "from": false,
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": false
+                }
+              }
+            ]
+          },
+          {
             "key": "chargebackProtectionData",
             "mappings": [
               {
@@ -787,13 +822,29 @@
                   },
                   {
                     "key": "quantity",
-                    "value": "1",
                     "required": true,
+                    "mappings": [
+                      {
+                        "value": "{{purchase.extraParam.chargebackProtectionData.quantity}}"
+                      },
+                      {
+                        "value": "1"
+                      }
+                    ],
                     "operations": [
+                      {
+                        "name": "GET_FIRST_NON_EMPTY_STRING"
+                      },
                       {
                         "name": "STRING_TO_INTEGER"
                       }
                     ]
+                  },
+                  {
+                    "key": "rawProductData",
+                    "skipIf": "{{store.approvelyCbpd.merchantRawProductDataMissing}}",
+                    "value": "{{purchase.extraParam.chargebackProtectionData.rawProductData}}",
+                    "required": true
                   },
                   {
                     "key": "rawProductData",
@@ -809,7 +860,8 @@
                       {
                         "name": "KEY_VALUE_LIST_TO_OBJECT"
                       }
-                    ]
+                    ],
+                    "skipIf": "{{store.approvelyCbpd.merchantRawProductDataProvided}}"
                   }
                 ],
                 "operations": [
@@ -845,6 +897,9 @@
               },
               {
                 "value": "{{pspResponse1.transactionId}}"
+              },
+              {
+                "value": ""
               }
             ],
             "operations": [
@@ -895,72 +950,72 @@
                     }
                   }
                 ]
-            },
-            {
-              "value": "error"
-            }
-          ],
-          "operations": [
-            {
-              "name": "GET_FIRST_NON_EMPTY_STRING"
-            }
-          ]
-        },
-        {
-          "key": "status",
-          "mappings": [
-            {
-              "value": "{{pspResponse1.paymentId}}",
-              "operations": [
-                {
-                  "name": "CHECK_IF_NULL"
-                },
-                {
-                  "name": "VALUE_MAPPER",
-                  "params": {
-                    "mappings": [
-                      {
-                        "from": false,
-                        "to": "payment_in_process"
-                      }
-                    ],
-                    "defaultValue": ""
+              },
+              {
+                "value": "error"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "mappings": [
+              {
+                "value": "{{pspResponse1.paymentId}}",
+                "operations": [
+                  {
+                    "name": "CHECK_IF_NULL"
+                  },
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": false,
+                          "to": "payment_in_process"
+                        }
+                      ],
+                      "defaultValue": ""
+                    }
                   }
-                }
-              ]
-            },
-            {
-              "value": "{{pspResponse1.transactionId}}",
-              "operations": [
-                {
-                  "name": "CHECK_IF_NULL"
-                },
-                {
-                  "name": "VALUE_MAPPER",
-                  "params": {
-                    "mappings": [
-                      {
-                        "from": false,
-                        "to": "payment_in_process"
-                      }
-                    ],
-                    "defaultValue": ""
+                ]
+              },
+              {
+                "value": "{{pspResponse1.transactionId}}",
+                "operations": [
+                  {
+                    "name": "CHECK_IF_NULL"
+                  },
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": false,
+                          "to": "payment_in_process"
+                        }
+                      ],
+                      "defaultValue": ""
+                    }
                   }
-                }
-              ]
-            },
-            {
-              "value": "payment_failed"
-            }
-          ],
-          "operations": [
-            {
-              "name": "GET_FIRST_NON_EMPTY_STRING"
-            }
-          ]
-        },
-        {
-          "key": "message",
+                ]
+              },
+              {
+                "value": "payment_failed"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "message",
             "mappings": [
               {
                 "value": "{{pspResponse1.action}}"

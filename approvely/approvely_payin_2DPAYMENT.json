@@ -988,10 +988,10 @@
             "required": true
           },
           {
-            "key": "merchantCbpdMissing",
+            "key": "merchantRawProductDataMissing",
             "hidden": true,
             "storeIn": "approvelyCbpd",
-            "value": "{{purchase.extraParam.chargebackProtectionData}}",
+            "value": "{{purchase.extraParam.chargebackProtectionData.rawProductData}}",
             "operations": [
               {
                 "name": "CHECK_IF_NULL"
@@ -999,10 +999,10 @@
             ]
           },
           {
-            "key": "merchantCbpdProvided",
+            "key": "merchantRawProductDataProvided",
             "hidden": true,
             "storeIn": "approvelyCbpd",
-            "value": "{{store.approvelyCbpd.merchantCbpdMissing}}",
+            "value": "{{store.approvelyCbpd.merchantRawProductDataMissing}}",
             "operations": [
               {
                 "name": "VALUE_MAPPER",
@@ -1021,11 +1021,6 @@
                 }
               }
             ]
-          },
-          {
-            "key": "chargebackProtectionData",
-            "skipIf": "{{store.approvelyCbpd.merchantCbpdMissing}}",
-            "value": "{{purchase.extraParam.chargebackProtectionData}}"
           },
           {
             "key": "chargebackProtectionData",
@@ -1082,13 +1077,29 @@
                   },
                   {
                     "key": "quantity",
-                    "value": "1",
                     "required": true,
+                    "mappings": [
+                      {
+                        "value": "{{purchase.extraParam.chargebackProtectionData.quantity}}"
+                      },
+                      {
+                        "value": "1"
+                      }
+                    ],
                     "operations": [
+                      {
+                        "name": "GET_FIRST_NON_EMPTY_STRING"
+                      },
                       {
                         "name": "STRING_TO_INTEGER"
                       }
                     ]
+                  },
+                  {
+                    "key": "rawProductData",
+                    "skipIf": "{{store.approvelyCbpd.merchantRawProductDataMissing}}",
+                    "value": "{{purchase.extraParam.chargebackProtectionData.rawProductData}}",
+                    "required": true
                   },
                   {
                     "key": "rawProductData",
@@ -1104,7 +1115,8 @@
                       {
                         "name": "KEY_VALUE_LIST_TO_OBJECT"
                       }
-                    ]
+                    ],
+                    "skipIf": "{{store.approvelyCbpd.merchantRawProductDataProvided}}"
                   }
                 ],
                 "operations": [
@@ -1118,8 +1130,7 @@
               {
                 "name": "LIST_OBJECT_VALUE_TO_LIST_VALUE"
               }
-            ],
-            "skipIf": "{{store.approvelyCbpd.merchantCbpdProvided}}"
+            ]
           }
         ],
         "operations": [
