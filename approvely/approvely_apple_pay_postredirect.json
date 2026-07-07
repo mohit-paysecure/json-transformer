@@ -686,15 +686,14 @@
                         "value": "{{bankTransaction.product_info}}"
                       },
                       {
-                        "value": "test product"
+                        "value": ""
                       }
                     ],
                     "operations": [
                       {
                         "name": "GET_FIRST_NON_EMPTY_STRING"
                       }
-                    ],
-                    "required": true
+                    ]
                   },
                   {
                     "key": "productType",
