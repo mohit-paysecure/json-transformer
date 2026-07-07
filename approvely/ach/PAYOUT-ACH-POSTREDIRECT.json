@@ -1819,6 +1819,133 @@
       "body": {
         "mappings": [
           {
+            "key": "rtpIdentifier",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 9,
+                  "defaultValue": ""
+                }
+              }
+            ]
+          },
+          {
+            "key": "isRtpMode",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{store.approvelyAch.rtpIdentifier}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "RTP",
+                      "to": true
+                    },
+                    {
+                      "from": "rtp",
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "isNotRtpMode",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{store.approvelyAch.isRtpMode}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": false
+                    },
+                    {
+                      "from": false,
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": true
+                }
+              }
+            ]
+          },
+          {
+            "key": "asapQuoteMissing",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{pspResponse4.asap}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              }
+            ]
+          },
+          {
+            "key": "rtpUnsupported",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "mappings": [
+              {
+                "key": "left",
+                "value": "{{store.approvelyAch.isRtpMode}}"
+              },
+              {
+                "key": "right",
+                "value": "{{store.approvelyAch.asapQuoteMissing}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LOGICAL_OPERATION",
+                "params": {
+                  "operator": "AND"
+                }
+              }
+            ]
+          },
+          {
+            "key": "rtpQuoteAcceptable",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{store.approvelyAch.rtpUnsupported}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": false
+                    },
+                    {
+                      "from": false,
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": true
+                }
+              }
+            ]
+          },
+          {
             "key": "requestedSpeed",
             "hidden": true,
             "storeIn": "approvelyAch",
@@ -1879,6 +2006,10 @@
             "storeIn": "approvelyAch",
             "mappings": [
               {
+                "value": "asap",
+                "skipIf": "{{store.approvelyAch.isNotRtpMode}}"
+              },
+              {
                 "value": "{{store.approvelyAch.requestedSpeed}}",
                 "skipIf": "{{store.approvelyAch.requestedSpeedMissing}}"
               },
@@ -1894,15 +2025,45 @@
           },
           {
             "key": "code",
-            "value": "success"
+            "mappings": [
+              {
+                "value": "fail",
+                "skipIf": "{{store.approvelyAch.rtpQuoteAcceptable}}"
+              },
+              {
+                "value": "success"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
           },
           {
             "key": "status",
-            "value": "payout_in_process"
+            "mappings": [
+              {
+                "value": "payment_failed",
+                "skipIf": "{{store.approvelyAch.rtpQuoteAcceptable}}"
+              },
+              {
+                "value": "payout_in_process"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
           },
           {
             "key": "message",
             "mappings": [
+              {
+                "value": "RTP payout cannot be processed: the beneficiary bank or account does not support Real-Time Payments.",
+                "skipIf": "{{store.approvelyAch.rtpQuoteAcceptable}}"
+              },
               {
                 "value": "{{pspResponse4.detailMessage}}"
               },

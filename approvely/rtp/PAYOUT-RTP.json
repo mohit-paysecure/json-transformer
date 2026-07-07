@@ -1304,7 +1304,7 @@
                 "required": true
               },
               {
-                "value": "/?stage=bank_link",
+                "value": "/?stage=rtp_bank_link",
                 "required": true
               }
             ],
@@ -1443,22 +1443,7 @@
             "key": "rtpIdentifier",
             "hidden": true,
             "storeIn": "approvelyAch",
-            "value": "{{bankTransaction.usedAuthKey}}",
-            "operations": [
-              {
-                "name": "SPLIT_STRING",
-                "params": {
-                  "delimiter": "##"
-                }
-              },
-              {
-                "name": "GET_ELEMENT_AT_INDEX",
-                "params": {
-                  "index": 9,
-                  "defaultValue": ""
-                }
-              }
-            ]
+            "value": "RTP"
           },
           {
             "key": "isRtpMode",
