@@ -348,7 +348,27 @@
                 "value": "{{pspResponse0.detailMessage}}"
               },
               {
-                "value": "{{pspResponse0.details}}"
+                "value": "{{pspResponse0}}",
+                "operations": [
+                  {
+                    "name": "STRINGIFY_JSON"
+                  },
+                  {
+                    "name": "STRING_PATTERN_MATCH",
+                    "params": {
+                      "regex": "^.*\"details\":\"[^\"]+\".*$",
+                      "defaultValue": ""
+                    }
+                  },
+                  {
+                    "name": "STRING_REPLACE",
+                    "params": {
+                      "target": "^.*\"details\":\"([^\"]+)\".*$",
+                      "replacement": "$1",
+                      "occurrence": "REGEX_FIRST"
+                    }
+                  }
+                ]
               },
               {
                 "value": "{{pspResponse0.message}}"
@@ -844,7 +864,27 @@
                 "value": "{{pspResponse1.detailMessage}}"
               },
               {
-                "value": "{{pspResponse1.details}}"
+                "value": "{{pspResponse1}}",
+                "operations": [
+                  {
+                    "name": "STRINGIFY_JSON"
+                  },
+                  {
+                    "name": "STRING_PATTERN_MATCH",
+                    "params": {
+                      "regex": "^.*\"details\":\"[^\"]+\".*$",
+                      "defaultValue": ""
+                    }
+                  },
+                  {
+                    "name": "STRING_REPLACE",
+                    "params": {
+                      "target": "^.*\"details\":\"([^\"]+)\".*$",
+                      "replacement": "$1",
+                      "occurrence": "REGEX_FIRST"
+                    }
+                  }
+                ]
               },
               {
                 "value": "{{pspResponse1.message}}"
@@ -1137,9 +1177,7 @@
         ]
       },
       "body": {
-        "mappings": [
-
-        ],
+        "mappings": [],
         "operations": [
           {
             "name": "KEY_VALUE_LIST_TO_OBJECT"
@@ -1221,7 +1259,27 @@
                 "value": "{{pspResponse3.detailMessage}}"
               },
               {
-                "value": "{{pspResponse3.details}}"
+                "value": "{{pspResponse3}}",
+                "operations": [
+                  {
+                    "name": "STRINGIFY_JSON"
+                  },
+                  {
+                    "name": "STRING_PATTERN_MATCH",
+                    "params": {
+                      "regex": "^.*\"details\":\"[^\"]+\".*$",
+                      "defaultValue": ""
+                    }
+                  },
+                  {
+                    "name": "STRING_REPLACE",
+                    "params": {
+                      "target": "^.*\"details\":\"([^\"]+)\".*$",
+                      "replacement": "$1",
+                      "occurrence": "REGEX_FIRST"
+                    }
+                  }
+                ]
               },
               {
                 "value": "{{pspResponse3.message}}"
@@ -1571,7 +1629,27 @@
                 "value": "{{pspResponse4.detailMessage}}"
               },
               {
-                "value": "{{pspResponse4.details}}"
+                "value": "{{pspResponse4}}",
+                "operations": [
+                  {
+                    "name": "STRINGIFY_JSON"
+                  },
+                  {
+                    "name": "STRING_PATTERN_MATCH",
+                    "params": {
+                      "regex": "^.*\"details\":\"[^\"]+\".*$",
+                      "defaultValue": ""
+                    }
+                  },
+                  {
+                    "name": "STRING_REPLACE",
+                    "params": {
+                      "target": "^.*\"details\":\"([^\"]+)\".*$",
+                      "replacement": "$1",
+                      "occurrence": "REGEX_FIRST"
+                    }
+                  }
+                ]
               },
               {
                 "value": "{{pspResponse4.message}}"

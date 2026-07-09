@@ -423,7 +423,27 @@
                 "value": "{{pspResponse0.detailMessage}}"
               },
               {
-                "value": "{{pspResponse0.details}}"
+                "value": "{{pspResponse0}}",
+                "operations": [
+                  {
+                    "name": "STRINGIFY_JSON"
+                  },
+                  {
+                    "name": "STRING_PATTERN_MATCH",
+                    "params": {
+                      "regex": "^.*\"details\":\"[^\"]+\".*$",
+                      "defaultValue": ""
+                    }
+                  },
+                  {
+                    "name": "STRING_REPLACE",
+                    "params": {
+                      "target": "^.*\"details\":\"([^\"]+)\".*$",
+                      "replacement": "$1",
+                      "occurrence": "REGEX_FIRST"
+                    }
+                  }
+                ]
               },
               {
                 "value": "{{pspResponse0.message}}"
@@ -688,7 +708,7 @@
                   }
                 ]
               },
-          {
+              {
                 "value": "{{store.approvelyVenmo.isKycPending}}",
                 "operations": [
                   {
@@ -786,7 +806,27 @@
                 "value": "{{pspResponse1.detailMessage}}"
               },
               {
-                "value": "{{pspResponse1.details}}"
+                "value": "{{pspResponse1}}",
+                "operations": [
+                  {
+                    "name": "STRINGIFY_JSON"
+                  },
+                  {
+                    "name": "STRING_PATTERN_MATCH",
+                    "params": {
+                      "regex": "^.*\"details\":\"[^\"]+\".*$",
+                      "defaultValue": ""
+                    }
+                  },
+                  {
+                    "name": "STRING_REPLACE",
+                    "params": {
+                      "target": "^.*\"details\":\"([^\"]+)\".*$",
+                      "replacement": "$1",
+                      "occurrence": "REGEX_FIRST"
+                    }
+                  }
+                ]
               },
               {
                 "value": "{{pspResponse1.message}}"
@@ -1166,7 +1206,27 @@
                 "value": "{{pspResponse2.detailMessage}}"
               },
               {
-                "value": "{{pspResponse2.details}}"
+                "value": "{{pspResponse2}}",
+                "operations": [
+                  {
+                    "name": "STRINGIFY_JSON"
+                  },
+                  {
+                    "name": "STRING_PATTERN_MATCH",
+                    "params": {
+                      "regex": "^.*\"details\":\"[^\"]+\".*$",
+                      "defaultValue": ""
+                    }
+                  },
+                  {
+                    "name": "STRING_REPLACE",
+                    "params": {
+                      "target": "^.*\"details\":\"([^\"]+)\".*$",
+                      "replacement": "$1",
+                      "occurrence": "REGEX_FIRST"
+                    }
+                  }
+                ]
               },
               {
                 "value": "{{pspResponse2.message}}"
@@ -1570,7 +1630,27 @@
                 "value": "{{pspResponse4.detailMessage}}"
               },
               {
-                "value": "{{pspResponse4.details}}"
+                "value": "{{pspResponse4}}",
+                "operations": [
+                  {
+                    "name": "STRINGIFY_JSON"
+                  },
+                  {
+                    "name": "STRING_PATTERN_MATCH",
+                    "params": {
+                      "regex": "^.*\"details\":\"[^\"]+\".*$",
+                      "defaultValue": ""
+                    }
+                  },
+                  {
+                    "name": "STRING_REPLACE",
+                    "params": {
+                      "target": "^.*\"details\":\"([^\"]+)\".*$",
+                      "replacement": "$1",
+                      "occurrence": "REGEX_FIRST"
+                    }
+                  }
+                ]
               },
               {
                 "value": "{{pspResponse4.message}}"
@@ -1954,7 +2034,27 @@
                 "value": "{{pspResponse5.detailMessage}}"
               },
               {
-                "value": "{{pspResponse5.details}}"
+                "value": "{{pspResponse5}}",
+                "operations": [
+                  {
+                    "name": "STRINGIFY_JSON"
+                  },
+                  {
+                    "name": "STRING_PATTERN_MATCH",
+                    "params": {
+                      "regex": "^.*\"details\":\"[^\"]+\".*$",
+                      "defaultValue": ""
+                    }
+                  },
+                  {
+                    "name": "STRING_REPLACE",
+                    "params": {
+                      "target": "^.*\"details\":\"([^\"]+)\".*$",
+                      "replacement": "$1",
+                      "occurrence": "REGEX_FIRST"
+                    }
+                  }
+                ]
               },
               {
                 "value": "{{pspResponse5.message}}"
