@@ -180,6 +180,15 @@
           {
             "key": "code",
             "value": "success"
+          },
+          {
+            "key": "sanitizeDotKey",
+            "value": "true",
+            "operations": [
+              {
+                "name": "STRING_TO_BOOLEAN"
+              }
+            ]
           }
         ],
         "operations": [
@@ -446,6 +455,15 @@
                 "name": "KEY_VALUE_LIST_TO_OBJECT"
               }
             ]
+          },
+          {
+            "key": "sanitizeDotKey",
+            "value": "true",
+            "operations": [
+              {
+                "name": "STRING_TO_BOOLEAN"
+              }
+            ]
           }
         ],
         "operations": [
@@ -622,6 +640,15 @@
           {
             "key": "pspToken",
             "value": "{{pspResponse2.key}}"
+          },
+          {
+            "key": "sanitizeDotKey",
+            "value": "true",
+            "operations": [
+              {
+                "name": "STRING_TO_BOOLEAN"
+              }
+            ]
           }
         ],
         "operations": [
@@ -1403,6 +1430,15 @@
               }
             ],
             "skipIf": "{{store.iframe.url}}"
+          },
+          {
+            "key": "sanitizeDotKey",
+            "value": "true",
+            "operations": [
+              {
+                "name": "STRING_TO_BOOLEAN"
+              }
+            ]
           }
         ],
         "operations": [

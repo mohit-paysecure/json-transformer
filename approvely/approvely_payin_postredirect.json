@@ -624,6 +624,15 @@
                 "name": "GET_FIRST_NON_EMPTY_STRING"
               }
             ]
+          },
+          {
+            "key": "sanitizeDotKey",
+            "value": "true",
+            "operations": [
+              {
+                "name": "STRING_TO_BOOLEAN"
+              }
+            ]
           }
         ],
         "operations": [
