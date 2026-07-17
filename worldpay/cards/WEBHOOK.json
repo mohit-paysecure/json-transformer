@@ -1,0 +1,241 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "pspTransactionId",
+            "mappings": [
+              {
+                "value": "{{webhookRequest.eventDetails.paymentId}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{webhookRequest.eventDetails.type}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "fail",
+                  "mappings": [
+                    {
+                      "from": "authorized",
+                      "to": "success"
+                    },
+                    {
+                      "from": "sentForAuthorization",
+                      "to": "success"
+                    },
+                    {
+                      "from": "sentForSettlement",
+                      "to": "success"
+                    },
+                    {
+                      "from": "settled",
+                      "to": "success"
+                    },
+                    {
+                      "from": "sentForRefund",
+                      "to": "success"
+                    },
+                    {
+                      "from": "refunded",
+                      "to": "success"
+                    },
+                    {
+                      "from": "refused",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "error",
+                      "to": "error"
+                    },
+                    {
+                      "from": "expired",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "cancelled",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "cancelledByCustomer",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "requestExpired",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "settlementFailed",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "refundFailed",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "chargedBack",
+                      "to": "fail"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{webhookRequest.eventDetails.type}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "payment_in_process",
+                  "mappings": [
+                    {
+                      "from": "authorized",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "sentForSettlement",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "settled",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "refunded",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "sentForAuthorization",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "sentForRefund",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "refused",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "error",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "expired",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "cancelled",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "cancelledByCustomer",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "requestExpired",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "settlementFailed",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "refundFailed",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "chargedBack",
+                      "to": "payment_failed"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{webhookRequest.eventDetails.refund.refusal.description}}"
+              },
+              {
+                "value": "{{webhookRequest.eventDetails.type}}"
+              },
+              {
+                "value": "Payment status updated via webhook"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "errorCode",
+            "mappings": [
+              {
+                "value": "{{webhookRequest.eventDetails.refund.refusal.code}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]
