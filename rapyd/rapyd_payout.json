@@ -213,11 +213,11 @@
                   {
                     "name": "VALUE_MAPPER",
                     "params": {
-                      "defaultValue": "Visa",
+                      "defaultValue": "Push funds to Visa Card",
                       "mappings": [
-                        { "from": "VISA", "to": "Visa" },
-                        { "from": "MASTER", "to": "Mastercard" },
-                        { "from": "MAESTRO", "to": "Mastercard" }
+                        { "from": "VISA", "to": "Push funds to Visa Card" },
+                        { "from": "MASTER", "to": "Push funds to Mastercard Card" },
+                        { "from": "MAESTRO", "to": "Push funds to Mastercard Card" }
                       ]
                     }
                   }
@@ -576,6 +576,10 @@
             "operations": [
               { "name": "GET_FIRST_NON_EMPTY_STRING" }
             ]
+          },
+          {
+            "key": "beneficiary_relationship",
+            "value": "self"
           },
           {
             "key": "payout_method_type",
