@@ -1,0 +1,124 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "value": "not_applicable"
+      },
+      "headers": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "purchaseId",
+            "mappings": [
+              {
+                "value": "{{webhookRequest.order.id}}"
+              },
+              {
+                "value": "{{webhookRequest.order.reference}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "pspTransactionId",
+            "mappings": [
+              {
+                "value": "{{webhookRequest.transaction.authorizationCode}}"
+              },
+              {
+                "value": "{{webhookRequest.transaction.id}}"
+              },
+              {
+                "value": "{{webhookRequest.order.id}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{webhookRequest.order.status}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "CAPTURED",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "AUTHORIZED",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "REFUNDED",
+                      "to": "refunded"
+                    },
+                    {
+                      "from": "FAILED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "CANCELLED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "AUTHENTICATION_UNSUCCESSFUL",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "AUTHENTICATION_INITIATED",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "AUTHENTICATION_IN_PROGRESS",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "AUTHENTICATION_SUCCESSFUL",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "AUTHENTICATION_PENDING",
+                      "to": "payment_in_process"
+                    }
+                  ],
+                  "defaultValue": "payment_in_process"
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]

@@ -1,0 +1,755 @@
+[
+  {
+    "requestMapping": {
+      "method": "PUT",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://na-gateway.mastercard.com/api/rest/version/80/merchant/"
+          },
+          {
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 0,
+                  "defaultValue": ""
+                }
+              }
+            ]
+          },
+          {
+            "value": "/order/"
+          },
+          {
+            "value": "{{purchase.purchaseId}}"
+          },
+          {
+            "value": "/transaction/"
+          },
+          {
+            "value": "{{purchase.purchaseId}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "Basic "
+              },
+              {
+                "mappings": [
+                  {
+                    "value": "merchant."
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 0,
+                          "defaultValue": ""
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 1,
+                          "defaultValue": ""
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  },
+                    {
+                        "name": "BASE64_TRANSFORM",
+                        "params": {
+                            "mode": "ENCODE"
+                        }
+                    }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "isNetworkTokenNull",
+            "value": "{{bankTransaction.networkToken.number}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              }
+            ],
+            "storeIn": "requestType",
+            "hidden": true
+          },
+          {
+            "key": "isEciNull",
+            "value": "{{bankTransaction.eci}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              }
+            ],
+            "storeIn": "requestType",
+            "hidden": true
+          },
+          {
+            "key": "apiOperation",
+            "value": "PAY",
+            "required": true
+          },
+          {
+            "key": "correlationId",
+            "value": "{{purchase.purchaseId}}"
+          },
+          {
+            "key": "order",
+            "mappings": [
+              {
+                "key": "amount",
+                "value": "{{purchase.fx_Amount}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "STRING_TO_DOUBLE"
+                  }
+                ]
+              },
+              {
+                "key": "currency",
+                "value": "{{purchase.fx_Currency}}",
+                "required": true
+              },
+              {
+                "key": "reference",
+                "value": "{{purchase.purchaseId}}"
+              },
+              {
+                "key": "notificationUrl",
+                "mappings": [
+                  {
+                    "value": "{{extraParams.baseUrl}}"
+                  },
+                  {
+                    "value": "/webhook/"
+                  },
+                  {
+                    "value": "{{purchase.bankid}}"
+                  },
+                  {
+                    "value": "/"
+                  },
+                  {
+                    "value": "{{purchase.purchaseId}}"
+                  },
+                  {
+                    "value": "/"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "transaction",
+            "mappings": [
+              {
+                "key": "reference",
+                "value": "{{purchase.purchaseId}}"
+              },
+              {
+                "key": "source",
+                "value": "INTERNET"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "sourceOfFunds",
+            "mappings": [
+              {
+                "key": "type",
+                "value": "CARD",
+                "required": true
+              },
+              {
+                "key": "provided",
+                "mappings": [
+                  {
+                    "key": "card",
+                    "mappings": [
+                      {
+                        "key": "nameOnCard",
+                        "value": "{{cardInfo.cardholder_name}}"
+                      },
+                      {
+                        "key": "number",
+                        "value": "{{cardInfo.number}}"
+                      },
+                      {
+                        "key": "securityCode",
+                        "value": "{{cardInfo.cvc}}"
+                      },
+                      {
+                        "key": "expiry",
+                        "mappings": [
+                          {
+                            "key": "month",
+                            "value": "{{cardInfo.expireMonth}}"
+                          },
+                          {
+                            "key": "year",
+                            "value": "{{cardInfo.expireYear}}"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "KEY_VALUE_LIST_TO_OBJECT"
+                          }
+                        ]
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "sourceOfFunds",
+            "skipIf": "{{store.requestType.isNetworkTokenNull}}",
+            "mappings": [
+              {
+                "key": "type",
+                "value": "SCHEME_TOKEN",
+                "required": true
+              },
+              {
+                "key": "provided",
+                "mappings": [
+                  {
+                    "key": "card",
+                    "mappings": [
+                      {
+                        "key": "number",
+                        "value": "{{bankTransaction.networkToken.number}}",
+                        "operations": [
+                          {
+                            "name": "CARD_TOKEN_ENCRYPT_DECRYPT"
+                          }
+                        ],
+                        "required": true
+                      },
+                      {
+                        "key": "expiry",
+                        "mappings": [
+                          {
+                            "key": "month",
+                            "value": "{{bankTransaction.networkToken.exp_month}}",
+                            "required": true
+                          },
+                          {
+                            "key": "year",
+                            "value": "{{bankTransaction.networkToken.exp_year}}",
+                            "required": true
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "KEY_VALUE_LIST_TO_OBJECT"
+                          }
+                        ]
+                      },
+                      {
+                        "key": "storedOnFile",
+                        "value": "TO_BE_STORED"
+                      },
+                      {
+                        "key": "devicePayment",
+                        "mappings": [
+                          {
+                            "key": "onlinePaymentCryptogram",
+                            "value": "{{bankTransaction.networkToken.cryptograms.0}}",
+                            "required": true
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "KEY_VALUE_LIST_TO_OBJECT"
+                          }
+                        ]
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "authentication",
+            "skipIf": "{{store.requestType.isEciNull}}",
+            "mappings": [
+              {
+                "key": "3ds",
+                "mappings": [
+                  {
+                    "key": "acsEci",
+                    "value": "{{bankTransaction.eci}}",
+                    "required": true
+                  },
+                  {
+                    "key": "authenticationToken",
+                    "value": "{{bankTransaction.cavv}}",
+                    "required": true
+                  },
+                  {
+                    "key": "transactionId",
+                    "value": "{{bankTransaction.threeDDirectoryTransactionReference}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ]
+              },
+              {
+                "key": "3ds2",
+                "mappings": [
+                  {
+                    "key": "protocolVersion",
+                    "value": "{{bankTransaction.threeDVersion}}"
+                  },
+                  {
+                    "key": "transactionStatus",
+                    "value": "{{bankTransaction.transStatus}}",
+                    "required": true
+                  },
+                  {
+                    "key": "authenticationScheme",
+                    "value": "{{purchase.paymentMethod}}",
+                    "operations": [
+                      {
+                        "name": "VALUE_MAPPER",
+                        "params": {
+                          "mappings": [
+                            {
+                              "from": "VISA",
+                              "to": "VISA"
+                            },
+                            {
+                              "from": "MASTERCARD",
+                              "to": "MASTERCARD"
+                            },
+                            {
+                              "from": "MASTER",
+                              "to": "MASTERCARD"
+                            },
+                            {
+                              "from": "AMEX",
+                              "to": "AMEX"
+                            },
+                            {
+                              "from": "AMERICAN_EXPRESS",
+                              "to": "AMEX"
+                            },
+                            {
+                              "from": "DISCOVER",
+                              "to": "DISCOVER"
+                            },
+                            {
+                              "from": "DINERS",
+                              "to": "DISCOVER"
+                            },
+                            {
+                              "from": "JCB",
+                              "to": "JCB"
+                            },
+                            {
+                              "from": "UNIONPAY",
+                              "to": "UNIONPAY"
+                            }
+                          ],
+                          "defaultValue": "MASTERCARD"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "key": "acsTransactionId",
+                    "value": "{{bankTransaction.acsTransactionId}}"
+                  },
+                  {
+                    "key": "statusReasonCode",
+                    "value": "{{bankTransaction.enrolled}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "code",
+            "value": "{{pspResponse0.result}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "SUCCESS",
+                      "to": "success"
+                    },
+                    {
+                      "from": "PENDING",
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse0.order.status}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "CAPTURED",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "AUTHORIZED",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "REFUNDED",
+                      "to": "refunded"
+                    },
+                    {
+                      "from": "FAILED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "CANCELLED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "AUTHENTICATION_UNSUCCESSFUL",
+                      "to": "payment_failed"
+                    }
+                  ],
+                  "defaultValue": "payment_in_process"
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.response.acquirerMessage}}"
+              },
+              {
+                "value": "{{pspResponse0.response.gatewayCode}}",
+                "operations": [
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": "BLOCKED",
+                          "to": "Transaction blocked"
+                        },
+                        {
+                          "from": "DECLINED",
+                          "to": "Transaction declined by issuer"
+                        },
+                        {
+                          "from": "INSUFFICIENT_FUNDS",
+                          "to": "Insufficient funds"
+                        },
+                        {
+                          "from": "EXPIRED_CARD",
+                          "to": "Card expired"
+                        },
+                        {
+                          "from": "TIMED_OUT",
+                          "to": "Transaction timed out"
+                        },
+                        {
+                          "from": "ACQUIRER_SYSTEM_ERROR",
+                          "to": "Bank system error, please try again"
+                        },
+                        {
+                          "from": "UNSPECIFIED_FAILURE",
+                          "to": "Transaction failed"
+                        },
+                        {
+                          "from": "UNKNOWN",
+                          "to": "Unknown error, please try again"
+                        },
+                        {
+                          "from": "REFERRED",
+                          "to": "Please contact your bank"
+                        },
+                        {
+                          "from": "DO_NOT_HONOR",
+                          "to": "Transaction declined"
+                        },
+                        {
+                          "from": "NOT_SUPPORTED",
+                          "to": "Card not supported"
+                        },
+                        {
+                          "from": "INVALID_CSC",
+                          "to": "Invalid CVV"
+                        },
+                        {
+                          "from": "SCHEME_TOKENIZATION_DECLINED",
+                          "to": "Network token declined"
+                        },
+                        {
+                          "from": "SCHEME_TOKENIZATION_ERROR",
+                          "to": "Network token processing error"
+                        }
+                      ],
+                      "defaultValue": ""
+                    }
+                  }
+                ]
+              },
+              {
+                "mappings": [
+                  {
+                    "value": "{{pspResponse0.response.gatewayCode}}"
+                  },
+                  {
+                    "value": " "
+                  },
+                  {
+                    "value": "{{pspResponse0.response.gatewayRecommendation}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  }
+                ]
+              },
+              {
+                "value": "{{pspResponse0.error.explanation}}"
+              },
+              {
+                "value": "{{pspResponse0.error.cause}}"
+              },
+              {
+                "value": "{{pspResponse0.result}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "pspTransactionId",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.transaction.authorizationCode}}"
+              },
+              {
+                "value": "{{pspResponse0.order.id}}"
+              },
+              {
+                "value": "{{purchase.purchaseId}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "networkTokenPan",
+            "hidden": true,
+            "value": "{{pspResponse0.sourceOfFunds.provided.card.deviceSpecificNumber}}"
+          },
+          {
+            "key": "paymentAccountReference",
+            "hidden": true,
+            "value": "{{pspResponse0.sourceOfFunds.provided.card.paymentAccountReference}}"
+          },
+          {
+            "key": "skipPspCount",
+            "hidden": true,
+            "value": "{{pspResponse0.result}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "SUCCESS",
+                      "to": 0
+                    },
+                    {
+                      "from": "PENDING",
+                      "to": 1
+                    }
+                  ],
+                  "defaultValue": 0
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]

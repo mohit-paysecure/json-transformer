@@ -1,0 +1,246 @@
+[
+  {
+    "requestMapping": {
+      "method": "GET",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://na-gateway.mastercard.com/api/rest/version/80/merchant/"
+          },
+          {
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 0,
+                  "defaultValue": ""
+                }
+              }
+            ]
+          },
+          {
+            "value": "/order/"
+          },
+          {
+            "value": "{{purchase.purchaseId}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "Basic "
+              },
+              {
+                "mappings": [
+                  {
+                    "value": "merchant."
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 0,
+                          "defaultValue": ""
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 1,
+                          "defaultValue": ""
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  },
+                  {
+                    "name": "BASE64_TRANSFORM",
+                    "params": {
+                      "action": "ENCODE"
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "code",
+            "value": "{{pspResponse0.result}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "SUCCESS",
+                      "to": "success"
+                    },
+                    {
+                      "from": "PENDING",
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse0.order.status}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "CAPTURED",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "AUTHORIZED",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "REFUNDED",
+                      "to": "refunded"
+                    },
+                    {
+                      "from": "FAILED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "CANCELLED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "AUTHENTICATION_UNSUCCESSFUL",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "AUTHENTICATION_INITIATED",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "AUTHENTICATION_IN_PROGRESS",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "AUTHENTICATION_SUCCESSFUL",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "AUTHENTICATION_PENDING",
+                      "to": "payment_in_process"
+                    }
+                  ],
+                  "defaultValue": "payment_in_process"
+                }
+              }
+            ]
+          },
+          {
+            "key": "pspTransactionId",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.transaction.0.transaction.authorizationCode}}"
+              },
+              {
+                "value": "{{pspResponse0.transaction.1.transaction.authorizationCode}}"
+              },
+              {
+                "value": "{{purchase.purchaseId}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]
