@@ -1,0 +1,265 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "{{bankTransaction.tempObject.complete3dsChallengeHref}}",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "Basic ",
+                "required": true
+              },
+              {
+                "mappings": [
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 0
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "required": true,
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 1
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  },
+                  {
+                    "name": "BASE64_TRANSFORM",
+                    "params": {
+                      "mode": "ENCODE"
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "WP-Api-Version",
+            "value": "2024-06-01",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "tempObject",
+            "mappings": [
+              {
+                "key": "finalOutcome",
+                "value": "{{pspResponse0.outcome}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "paymentId",
+                "value": "{{pspResponse0.paymentId}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "schemeReference",
+                "value": "{{pspResponse0.scheme.reference}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "cardBin",
+                "value": "{{pspResponse0.paymentInstrument.cardBin}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "lastFour",
+                "value": "{{pspResponse0.paymentInstrument.lastFour}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "cardBrand",
+                "value": "{{pspResponse0.paymentInstrument.cardBrand}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "authorizationCode",
+                "value": "{{pspResponse0.issuer.authorizationCode}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "threeDSOutcome",
+                "value": "{{pspResponse0.threeDS.outcome}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "issuerResponse",
+                "value": "{{pspResponse0.threeDS.issuerResponse}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "cancelHref",
+                "value": "{{pspResponse0._actions.cancelPayment.href}}",
+                "storeIn": "worldpay"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse0.outcome}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "fail",
+                  "mappings": [
+                    {
+                      "from": "authorized",
+                      "to": "success"
+                    },
+                    {
+                      "from": "sentForSettlement",
+                      "to": "success"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse0.outcome}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "payment_failed",
+                  "mappings": [
+                    {
+                      "from": "authorized",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "sentForSettlement",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "3dsAuthenticationFailed",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "refused",
+                      "to": "payment_failed"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.refusalDescription}}"
+              },
+              {
+                "value": "{{pspResponse0.threeDS.outcome}}"
+              },
+              {
+                "value": "{{pspResponse0.outcome}}"
+              },
+              {
+                "value": "Google Pay 3DS challenge completed"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "transaction_id",
+            "value": "{{pspResponse0.paymentId}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]

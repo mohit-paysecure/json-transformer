@@ -1409,6 +1409,10 @@
                   {
                     "value": "/",
                     "required": true
+                  },
+                  {
+                    "value": "?stage=3ds_return&pm=cards",
+                    "required": true
                   }
                 ],
                 "required": true,

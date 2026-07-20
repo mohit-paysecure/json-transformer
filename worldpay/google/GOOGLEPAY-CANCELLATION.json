@@ -5,7 +5,7 @@
       "url": {
         "mappings": [
           {
-            "value": "{{store.worldpay.cancelHref}}",
+            "value": "{{bankTransaction.tempObject.cancelHref}}",
             "required": true
           }
         ],

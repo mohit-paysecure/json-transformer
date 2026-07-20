@@ -5,7 +5,7 @@
       "url": {
         "mappings": [
           {
-            "value": "https://try.access.worldpay.com/api/payments",
+            "value": "{{bankTransaction.tempObject.supplyDeviceDataHref}}",
             "required": true
           }
         ],
@@ -106,125 +106,17 @@
       "body": {
         "mappings": [
           {
-            "key": "transactionReference",
-            "value": "{{purchase.purchaseId}}",
-            "required": true
-          },
-          {
-            "key": "merchant",
+            "key": "collectionReference",
             "mappings": [
               {
-                "key": "entity",
-                "value": "default",
-                "required": true
+                "value": "{{extraParams.collectionReference}}"
               }
             ],
             "operations": [
               {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
+                "name": "GET_FIRST_NON_EMPTY_STRING"
               }
-            ],
-            "required": true
-          },
-          {
-            "key": "orderReference",
-            "value": "{{purchase.merchantRef}}"
-          },
-          {
-            "key": "instruction",
-            "mappings": [
-              {
-                "key": "method",
-                "value": "googlepay",
-                "required": true
-              },
-              {
-                "key": "paymentInstrument",
-                "mappings": [
-                  {
-                    "key": "type",
-                    "value": "encrypted",
-                    "required": true
-                  },
-                  {
-                    "key": "walletToken",
-                    "value": "{{bankTransaction.gpayEncryptedToken}}",
-                    "required": true
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "KEY_VALUE_LIST_TO_OBJECT"
-                  }
-                ],
-                "required": true
-              },
-              {
-                "key": "narrative",
-                "mappings": [
-                  {
-                    "key": "line1",
-                    "mappings": [
-                      {
-                        "value": "{{bankTransaction.product_info}}"
-                      },
-                      {
-                        "value": "PGS Payment"
-                      }
-                    ],
-                    "operations": [
-                      {
-                        "name": "GET_FIRST_NON_EMPTY_STRING"
-                      }
-                    ],
-                    "required": true
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "KEY_VALUE_LIST_TO_OBJECT"
-                  }
-                ],
-                "required": true
-              },
-              {
-                "key": "value",
-                "mappings": [
-                  {
-                    "key": "currency",
-                    "value": "{{purchase.fx_Currency}}",
-                    "required": true
-                  },
-                  {
-                    "key": "amount",
-                    "mappings": [
-                      {
-                        "value": "{{purchase.fx_Amount}}",
-                        "required": true,
-                        "operations": [
-                          {
-                            "name": "STRING_TO_DOUBLE"
-                          }
-                        ]
-                      }
-                    ],
-                    "required": true
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "KEY_VALUE_LIST_TO_OBJECT"
-                  }
-                ],
-                "required": true
-              }
-            ],
-            "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              }
-            ],
-            "required": true
+            ]
           }
         ],
         "operations": [
@@ -251,47 +143,57 @@
                 "storeIn": "worldpay"
               },
               {
+                "key": "challengeUrl",
+                "value": "{{pspResponse0.challenge.url}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "challengeJwt",
+                "value": "{{pspResponse0.challenge.jwt}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "challengeReference",
+                "value": "{{pspResponse0.challenge.reference}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "complete3dsChallengeHref",
+                "value": "{{pspResponse0._actions.complete3dsChallenge.href}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "cancelHref",
+                "value": "{{pspResponse0._actions.cancelPayment.href}}",
+                "storeIn": "worldpay"
+              },
+              {
+                "key": "settleHref",
+                "value": "{{pspResponse0._actions.settlePayment.href}}",
+                "storeIn": "worldpay"
+              },
+              {
                 "key": "schemeReference",
                 "value": "{{pspResponse0.scheme.reference}}",
                 "storeIn": "worldpay"
               },
               {
-                "key": "authorizationCode",
-                "value": "{{pspResponse0.issuer.authorizationCode}}",
-                "storeIn": "worldpay"
-              },
-              {
-                "key": "cancelHref",
-                "value": "{{pspResponse0._links.cancelPayment.href}}",
-                "storeIn": "worldpay"
-              },
-              {
-                "key": "settleHref",
-                "value": "{{pspResponse0._links.settlePayment.href}}",
-                "storeIn": "worldpay"
-              },
-              {
-                "key": "cardBin",
-                "value": "{{pspResponse0.paymentInstrument.cardBin}}",
-                "storeIn": "worldpay"
-              },
-              {
-                "key": "lastFour",
-                "value": "{{pspResponse0.paymentInstrument.lastFour}}",
-                "storeIn": "worldpay"
-              },
-              {
-                "key": "cardBrand",
-                "value": "{{pspResponse0.paymentInstrument.cardBrand}}",
-                "storeIn": "worldpay"
-              },
-              {
-                "key": "rawResponse",
-                "value": "{{pspResponse0}}",
+                "key": "notChallenged",
+                "value": "{{pspResponse0.outcome}}",
+                "hidden": true,
                 "storeIn": "worldpay",
                 "operations": [
                   {
-                    "name": "OBJECT_TO_JSON"
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "defaultValue": "true",
+                      "mappings": [
+                        {
+                          "from": "3dsChallenged",
+                          "to": "false"
+                        }
+                      ]
+                    }
                   }
                 ]
               }
@@ -303,34 +205,8 @@
             ]
           },
           {
-            "key": "status",
-            "value": "{{store.worldpay.outcome}}",
-            "operations": [
-              {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "defaultValue": "REJECTED",
-                  "mappings": [
-                    {
-                      "from": "authorized",
-                      "to": "AUTHORIZED"
-                    },
-                    {
-                      "from": "sentForSettlement",
-                      "to": "AUTHORIZED"
-                    },
-                    {
-                      "from": "refused",
-                      "to": "REJECTED"
-                    }
-                  ]
-                }
-              }
-            ]
-          },
-          {
             "key": "code",
-            "value": "{{store.worldpay.outcome}}",
+            "value": "{{pspResponse0.outcome}}",
             "operations": [
               {
                 "name": "VALUE_MAPPER",
@@ -346,10 +222,58 @@
                       "to": "success"
                     },
                     {
-                      "from": "refused",
-                      "to": "error"
+                      "from": "3dsChallenged",
+                      "to": "success"
                     }
                   ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse0.outcome}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "defaultValue": "payment_failed",
+                  "mappings": [
+                    {
+                      "from": "authorized",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "sentForSettlement",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "3dsChallenged",
+                      "to": "payment_in_process"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "redirectUrl",
+            "skipIf": "{{store.worldpay.notChallenged}}",
+            "mappings": [
+              {
+                "key": "postUrl",
+                "value": "{{pspResponse0.challenge.url}}"
+              },
+              {
+                "key": "JWT",
+                "value": "{{pspResponse0.challenge.jwt}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GENERATE_HTML",
+                "params": {
+                  "htmlRenderMode": "FORM_SUBMISSION"
                 }
               }
             ]
@@ -361,10 +285,10 @@
                 "value": "{{pspResponse0.refusalDescription}}"
               },
               {
-                "value": "{{store.worldpay.outcome}}"
+                "value": "{{pspResponse0.outcome}}"
               },
               {
-                "value": "Google Pay payment processed"
+                "value": "Google Pay 3DS device data processed"
               }
             ],
             "operations": [
@@ -375,31 +299,7 @@
           },
           {
             "key": "transaction_id",
-            "value": "{{store.worldpay.paymentId}}"
-          },
-          {
-            "key": "authorization_code",
-            "value": "{{store.worldpay.authorizationCode}}"
-          },
-          {
-            "key": "scheme_reference",
-            "value": "{{store.worldpay.schemeReference}}"
-          },
-          {
-            "key": "card_bin",
-            "value": "{{store.worldpay.cardBin}}"
-          },
-          {
-            "key": "card_last_four",
-            "value": "{{store.worldpay.lastFour}}"
-          },
-          {
-            "key": "card_brand",
-            "value": "{{store.worldpay.cardBrand}}"
-          },
-          {
-            "key": "raw_response",
-            "value": "{{store.worldpay.rawResponse}}"
+            "value": "{{pspResponse0.paymentId}}"
           }
         ],
         "operations": [
