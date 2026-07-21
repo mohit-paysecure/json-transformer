@@ -258,6 +258,9 @@
             "key": "x-device-id",
             "mappings": [
               {
+                "value": "{{purchase.nsureDeviceId}}"
+              },
+              {
                 "value": "{{s2s.deviceId}}"
               },
               {

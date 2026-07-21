@@ -52,7 +52,19 @@
           },
           {
             "key": "x-device-id",
-            "value": "{{purchase.userDeviceId}}",
+            "mappings": [
+              {
+                "value": "{{purchase.nsureDeviceId}}"
+              },
+              {
+                "value": "{{purchase.userDeviceId}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
             "required": true
           }
         ],
