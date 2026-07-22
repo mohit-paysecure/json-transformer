@@ -1553,7 +1553,10 @@
                                     "name": "GET_FIRST_NON_EMPTY_STRING"
                                   },
                                   {
-                                    "name": "STRING_TO_INTEGER"
+                                    "name": "STRING_TO_DOUBLE"
+                                  },
+                                  {
+                                    "name": "DOUBLE_TO_FLOOR"
                                   }
                                 ]
                               },
@@ -1782,7 +1785,10 @@
                                 "name": "GET_FIRST_NON_EMPTY_STRING"
                               },
                               {
-                                "name": "STRING_TO_INTEGER"
+                                "name": "STRING_TO_DOUBLE"
+                              },
+                              {
+                                "name": "DOUBLE_TO_FLOOR"
                               }
                             ]
                           },
