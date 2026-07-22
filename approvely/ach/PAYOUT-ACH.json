@@ -727,8 +727,20 @@
               },
               {
                 "key": "ssn",
-                "value": "{{payout.extraParam.ssn_last4}}",
-                "required": true
+                "mappings": [
+                  {
+                    "value": "{{payout.extraParam.ssn_last4}}"
+                  },
+                  {
+                    "value": "1111"
+                  }
+                ],
+                "required": true,
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
               }
             ],
             "operations": [
