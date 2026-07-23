@@ -47,7 +47,7 @@
                       {
                         "name": "GET_ELEMENT_AT_INDEX",
                         "params": {
-                          "index": 2
+                          "index": 1
                         }
                       }
                     ]
@@ -67,7 +67,7 @@
                       {
                         "name": "GET_ELEMENT_AT_INDEX",
                         "params": {
-                          "index": 3
+                          "index": 2
                         }
                       }
                     ]
@@ -115,7 +115,7 @@
               {
                 "name": "GET_ELEMENT_AT_INDEX",
                 "params": {
-                  "index": 2
+                  "index": 1
                 }
               }
             ],
@@ -134,7 +134,7 @@
               {
                 "name": "GET_ELEMENT_AT_INDEX",
                 "params": {
-                  "index": 4,
+                  "index": 3,
                   "defaultValue": "1.00"
                 }
               }
@@ -175,7 +175,7 @@
                       {
                         "name": "GET_ELEMENT_AT_INDEX",
                         "params": {
-                          "index": 1
+                          "index": 0
                         }
                       }
                     ],
