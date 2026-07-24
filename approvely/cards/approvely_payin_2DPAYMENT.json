@@ -1444,6 +1444,32 @@
             "skipIf": "{{store.iframe.url}}"
           },
           {
+            "key": "tempObject",
+            "mappings": [
+              {
+                "key": "nSureDeviceId",
+                "mappings": [
+                  {
+                    "value": "{{purchase.nsureDeviceId}}"
+                  },
+                  {
+                    "value": "{{purchase.userDeviceId}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
             "key": "sanitizeDotKey",
             "value": "true",
             "operations": [

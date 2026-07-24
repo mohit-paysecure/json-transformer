@@ -54,10 +54,10 @@
             "key": "x-device-id",
             "mappings": [
               {
-                "value": "{{purchase.nsureDeviceId}}"
+                "value": "{{bankTransaction.tempObject.nSureDeviceId}}"
               },
               {
-                "value": "{{purchase.userDeviceId}}"
+                "value": "{{purchase.nsureDeviceId}}"
               }
             ],
             "operations": [
