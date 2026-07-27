@@ -258,6 +258,9 @@
             "key": "x-device-id",
             "mappings": [
               {
+                "value": "{{bankTransaction.tempObject.nSureDeviceId}}"
+              },
+              {
                 "value": "{{purchase.nsureDeviceId}}"
               },
               {
@@ -283,7 +286,8 @@
               {
                 "name": "GET_FIRST_NON_EMPTY_STRING"
               }
-            ]
+            ],
+            "required": true
           }
         ],
         "operations": [

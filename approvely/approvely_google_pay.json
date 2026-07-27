@@ -283,7 +283,8 @@
               {
                 "name": "GET_FIRST_NON_EMPTY_STRING"
               }
-            ]
+            ],
+            "required": true
           }
         ],
         "operations": [
@@ -1227,6 +1228,22 @@
               {
                 "key": "redirectLink",
                 "value": "{{pspResponse1.redirectLink}}"
+              },
+              {
+                "key": "nSureDeviceId",
+                "mappings": [
+                  {
+                    "value": "{{purchase.nsureDeviceId}}"
+                  },
+                  {
+                    "value": "{{purchase.userDeviceId}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
               }
             ],
             "operations": [
