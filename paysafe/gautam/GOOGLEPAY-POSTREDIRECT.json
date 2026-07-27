@@ -1,7 +1,7 @@
 [
   {
     "requestMapping": {
-      "method": "POST",
+      "method": "GET",
       "url": {
         "mappings": [
           {
@@ -9,7 +9,23 @@
             "required": true
           },
           {
-            "value": "/paymenthub/v1/paymenthandles",
+            "value": "/paymenthub/v1/paymenthandles/",
+            "required": true
+          },
+          {
+            "mappings": [
+              {
+                "value": "{{bankTransaction.tempObject.paysafePaymentHandleId}}"
+              },
+              {
+                "value": "{{bankTransaction.paymentTransId}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
             "required": true
           }
         ],
@@ -108,840 +124,7 @@
         ]
       },
       "body": {
-        "mappings": [
-          {
-            "key": "merchantRefNum",
-            "value": "{{purchase.purchaseId}}",
-            "required": true
-          },
-          {
-            "key": "transactionType",
-            "value": "PAYMENT",
-            "required": true
-          },
-          {
-            "key": "amount",
-            "mappings": [
-              {
-                "value": "{{purchase.fx_Amount}}",
-                "required": true,
-                "operations": [
-                  {
-                    "name": "STRING_TO_DOUBLE"
-                  }
-                ]
-              },
-              {
-                "value": "100",
-                "required": true,
-                "operations": [
-                  {
-                    "name": "STRING_TO_DOUBLE"
-                  }
-                ]
-              }
-            ],
-            "required": true,
-            "operations": [
-              {
-                "name": "LIST_VALUE_MULTIPLY"
-              },
-              {
-                "name": "DOUBLE_TO_FLOOR"
-              }
-            ]
-          },
-          {
-            "key": "currencyCode",
-            "mappings": [
-              {
-                "value": "{{purchase.fx_Currency}}"
-              },
-              {
-                "value": "{{purchase.purchase.currency}}"
-              },
-              {
-                "value": "USD"
-              }
-            ],
-            "operations": [
-              {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
-              }
-            ],
-            "required": true
-          },
-          {
-            "key": "extraParamObject",
-            "hidden": true,
-            "storeIn": "paysafe",
-            "value": "{{bankTransaction.extraParameter}}",
-            "operations": [
-              {
-                "name": "OBJECT_TO_JSON"
-              }
-            ]
-          },
-          {
-            "key": "accountIdByCurrency",
-            "hidden": true,
-            "storeIn": "paysafe",
-            "mappings": [
-              {
-                "key": "map",
-                "mappings": [
-                  {
-                    "key": "map",
-                    "value": "{{store.paysafe.extraParamObject}}"
-                  },
-                  {
-                    "key": "key",
-                    "value": "accountIds"
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "KEY_VALUE_LIST_TO_OBJECT"
-                  },
-                  {
-                    "name": "GET_MAP_VALUE"
-                  }
-                ]
-              },
-              {
-                "key": "key",
-                "mappings": [
-                  {
-                    "value": "{{purchase.fx_Currency}}"
-                  },
-                  {
-                    "value": "{{purchase.purchase.currency}}"
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "GET_FIRST_NON_EMPTY_STRING"
-                  }
-                ]
-              }
-            ],
-            "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              },
-              {
-                "name": "GET_MAP_VALUE"
-              }
-            ]
-          },
-          {
-            "key": "accountId",
-            "value": "{{store.paysafe.accountIdByCurrency}}",
-            "required": true
-          },
-          {
-            "key": "applePay",
-            "mappings": [
-              {
-                "key": "label",
-                "value": "Pay with Apple"
-              },
-              {
-                "key": "requestBillingAddress",
-                "value": "true",
-                "operations": [
-                  {
-                    "name": "STRING_TO_BOOLEAN"
-                  }
-                ]
-              },
-              {
-                "key": "applePayPaymentToken",
-                "mappings": [
-                  {
-                    "key": "token",
-                    "mappings": [
-                      {
-                        "key": "paymentData",
-                        "mappings": [
-                          {
-                            "key": "decryptedData",
-                            "mappings": [
-                              {
-                                "key": "applicationPrimaryAccountNumber",
-                                "mappings": [
-                                  {
-                                    "value": "{{bankTransaction.applepayPan}}"
-                                  },
-                                  {
-                                    "value": "4831961250315843"
-                                  }
-                                ],
-                                "operations": [
-                                  {
-                                    "name": "GET_FIRST_NON_EMPTY_STRING"
-                                  }
-                                ]
-                              },
-                              {
-                                "key": "applicationExpirationDate",
-                                "mappings": [
-                                  {
-                                    "value": "{{bankTransaction.applepayExpirationDate}}"
-                                  },
-                                  {
-                                    "value": "300131"
-                                  }
-                                ],
-                                "operations": [
-                                  {
-                                    "name": "GET_FIRST_NON_EMPTY_STRING"
-                                  }
-                                ]
-                              },
-                              {
-                                "key": "currencyCode",
-                                "mappings": [
-                                  {
-                                    "value": "{{purchase.fx_Currency}}",
-                                    "operations": [
-                                      {
-                                        "name": "VALUE_MAPPER",
-                                        "params": {
-                                          "mappings": [
-                                            { "from": "USD", "to": "840" },
-                                            { "from": "CAD", "to": "124" },
-                                            { "from": "EUR", "to": "978" },
-                                            { "from": "GBP", "to": "826" }
-                                          ],
-                                          "defaultValue": "840"
-                                        }
-                                      }
-                                    ]
-                                  },
-                                  {
-                                    "value": "840"
-                                  }
-                                ],
-                                "operations": [
-                                  {
-                                    "name": "GET_FIRST_NON_EMPTY_STRING"
-                                  }
-                                ]
-                              },
-                              {
-                                "key": "transactionAmount",
-                                "mappings": [
-                                  {
-                                    "value": "{{purchase.fx_Amount}}",
-                                    "operations": [
-                                      {
-                                        "name": "STRING_TO_DOUBLE"
-                                      }
-                                    ]
-                                  },
-                                  {
-                                    "value": "100",
-                                    "operations": [
-                                      {
-                                        "name": "STRING_TO_DOUBLE"
-                                      }
-                                    ]
-                                  }
-                                ],
-                                "operations": [
-                                  {
-                                    "name": "GET_FIRST_NON_EMPTY_STRING"
-                                  }
-                                ]
-                              },
-                              {
-                                "key": "deviceManufacturerIdentifier",
-                                "value": "040010030273"
-                              },
-                              {
-                                "key": "paymentDataType",
-                                "mappings": [
-                                  {
-                                    "value": "{{bankTransaction.applepayPaymentDataType}}"
-                                  },
-                                  {
-                                    "value": "3DSecure"
-                                  }
-                                ],
-                                "operations": [
-                                  {
-                                    "name": "GET_FIRST_NON_EMPTY_STRING"
-                                  }
-                                ]
-                              },
-                              {
-                                "key": "paymentData",
-                                "mappings": [
-                                  {
-                                    "key": "onlinePaymentCryptogram",
-                                    "mappings": [
-                                      {
-                                        "value": "{{bankTransaction.applepayCryptogram}}"
-                                      },
-                                      {
-                                        "value": "A41AaWcAAWpuMl/1FvMqMAACAAA="
-                                      }
-                                    ],
-                                    "operations": [
-                                      {
-                                        "name": "GET_FIRST_NON_EMPTY_STRING"
-                                      }
-                                    ]
-                                  },
-                                  {
-                                    "key": "eciIndicator",
-                                    "mappings": [
-                                      {
-                                        "value": "{{bankTransaction.applepayEci}}"
-                                      },
-                                      {
-                                        "value": "7"
-                                      }
-                                    ],
-                                    "operations": [
-                                      {
-                                        "name": "GET_FIRST_NON_EMPTY_STRING"
-                                      }
-                                    ]
-                                  }
-                                ],
-                                "operations": [
-                                  {
-                                    "name": "KEY_VALUE_LIST_TO_OBJECT"
-                                  }
-                                ]
-                              }
-                            ],
-                            "operations": [
-                              {
-                                "name": "KEY_VALUE_LIST_TO_OBJECT"
-                              }
-                            ]
-                          }
-                        ],
-                        "operations": [
-                          {
-                            "name": "KEY_VALUE_LIST_TO_OBJECT"
-                          }
-                        ]
-                      },
-                      {
-                        "key": "paymentMethod",
-                        "mappings": [
-                          {
-                            "key": "displayName",
-                            "mappings": [
-                              {
-                                "value": "{{bankTransaction.applepayPan}}",
-                                "operations": [
-                                  {
-                                    "name": "STRING_REPLACE",
-                                    "params": {
-                                      "target": "^(\\d{12})(\\d{4})$",
-                                      "replacement": "Visa $2",
-                                      "occurrence": "REGEX_ALL"
-                                    }
-                                  }
-                                ]
-                              },
-                              {
-                                "value": "Visa 0326"
-                              }
-                            ],
-                            "operations": [
-                              {
-                                "name": "GET_FIRST_NON_EMPTY_STRING"
-                              }
-                            ]
-                          },
-                          {
-                            "key": "network",
-                            "value": "Visa"
-                          },
-                          {
-                            "key": "type",
-                            "value": "debit"
-                          }
-                        ],
-                        "operations": [
-                          {
-                            "name": "KEY_VALUE_LIST_TO_OBJECT"
-                          }
-                        ]
-                      },
-                      {
-                        "key": "transactionIdentifier",
-                        "mappings": [
-                          {
-                            "value": "{{bankTransaction.applepayTransactionId}}"
-                          },
-                          {
-                            "value": "3968e4e9038dcfdd111adf0fd093af7c6c7be4fc575ec9782ca2d43bd8a7e116"
-                          }
-                        ],
-                        "operations": [
-                          {
-                            "name": "GET_FIRST_NON_EMPTY_STRING"
-                          }
-                        ]
-                      }
-                    ],
-                    "operations": [
-                      {
-                        "name": "KEY_VALUE_LIST_TO_OBJECT"
-                      }
-                    ],
-                    "required": true
-                  },
-                  {
-                    "key": "billingContact",
-                    "mappings": [
-                      {
-                        "key": "givenName",
-                        "mappings": [
-                          {
-                            "value": "{{purchase.firstName}}"
-                          },
-                          {
-                            "value": "John"
-                          }
-                        ],
-                        "operations": [
-                          {
-                            "name": "GET_FIRST_NON_EMPTY_STRING"
-                          }
-                        ]
-                      },
-                      {
-                        "key": "familyName",
-                        "mappings": [
-                          {
-                            "value": "{{purchase.lastName}}"
-                          },
-                          {
-                            "value": "Doe"
-                          }
-                        ],
-                        "operations": [
-                          {
-                            "name": "GET_FIRST_NON_EMPTY_STRING"
-                          }
-                        ]
-                      },
-                      {
-                        "key": "addressLines",
-                        "mappings": [
-                          {
-                            "mappings": [
-                              {
-                                "value": "{{purchase.street}}"
-                              },
-                              {
-                                "value": "{{purchase.client.street_address}}"
-                              },
-                              {
-                                "value": "5335 Gate Parkway"
-                              }
-                            ],
-                            "operations": [
-                              {
-                                "name": "GET_FIRST_NON_EMPTY_STRING"
-                              }
-                            ]
-                          }
-                        ],
-                        "operations": [
-                          {
-                            "name": "MAP_LIST_TO_VALUE_LIST"
-                          }
-                        ]
-                      },
-                      {
-                        "key": "locality",
-                        "mappings": [
-                          {
-                            "value": "{{purchase.city}}"
-                          },
-                          {
-                            "value": "{{purchase.client.city}}"
-                          },
-                          {
-                            "value": "Jacksonville"
-                          }
-                        ],
-                        "operations": [
-                          {
-                            "name": "GET_FIRST_NON_EMPTY_STRING"
-                          }
-                        ]
-                      },
-                      {
-                        "key": "administrativeArea",
-                        "mappings": [
-                          {
-                            "value": "{{purchase.state}}"
-                          },
-                          {
-                            "value": "{{purchase.client.stateCode}}"
-                          },
-                          {
-                            "value": "FL"
-                          }
-                        ],
-                        "operations": [
-                          {
-                            "name": "GET_FIRST_NON_EMPTY_STRING"
-                          }
-                        ]
-                      },
-                      {
-                        "key": "postalCode",
-                        "mappings": [
-                          {
-                            "value": "{{purchase.zip}}"
-                          },
-                          {
-                            "value": "{{purchase.client.zip_code}}"
-                          },
-                          {
-                            "value": "32256"
-                          }
-                        ],
-                        "operations": [
-                          {
-                            "name": "GET_FIRST_NON_EMPTY_STRING"
-                          }
-                        ]
-                      },
-                      {
-                        "key": "countryCode",
-                        "mappings": [
-                          {
-                            "value": "{{purchase.country}}"
-                          },
-                          {
-                            "value": "{{purchase.client.country}}"
-                          },
-                          {
-                            "value": "US"
-                          }
-                        ],
-                        "operations": [
-                          {
-                            "name": "GET_FIRST_NON_EMPTY_STRING"
-                          }
-                        ]
-                      },
-                      {
-                        "key": "country",
-                        "value": "United States"
-                      }
-                    ],
-                    "operations": [
-                      {
-                        "name": "KEY_VALUE_LIST_TO_OBJECT"
-                      }
-                    ]
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "KEY_VALUE_LIST_TO_OBJECT"
-                  }
-                ]
-              }
-            ],
-            "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              }
-            ]
-          },
-          {
-            "key": "paymentType",
-            "value": "CARD",
-            "required": true
-          },
-          {
-            "key": "profile",
-            "mappings": [
-              {
-                "key": "firstName",
-                "mappings": [
-                  {
-                    "value": "{{purchase.firstName}}"
-                  },
-                  {
-                    "value": "{{purchase.client.firstName}}"
-                  },
-                  {
-                    "value": "John"
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "GET_FIRST_NON_EMPTY_STRING"
-                  }
-                ]
-              },
-              {
-                "key": "lastName",
-                "mappings": [
-                  {
-                    "value": "{{purchase.lastName}}"
-                  },
-                  {
-                    "value": "{{purchase.client.lastName}}"
-                  },
-                  {
-                    "value": "Doe"
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "GET_FIRST_NON_EMPTY_STRING"
-                  }
-                ]
-              },
-              {
-                "key": "email",
-                "mappings": [
-                  {
-                    "value": "{{purchase.email}}"
-                  },
-                  {
-                    "value": "{{purchase.client.email}}"
-                  },
-                  {
-                    "value": "john.doe@paysafe.com"
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "GET_FIRST_NON_EMPTY_STRING"
-                  }
-                ]
-              },
-              {
-                "key": "phone",
-                "mappings": [
-                  {
-                    "value": "{{purchase.phone}}"
-                  },
-                  {
-                    "value": "{{purchase.client.phone}}"
-                  },
-                  {
-                    "value": "1231231231"
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "GET_FIRST_NON_EMPTY_STRING"
-                  }
-                ]
-              }
-            ],
-            "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              }
-            ]
-          },
-          {
-            "key": "returnLinks",
-            "mappings": [
-              {
-                "mappings": [
-                  {
-                    "key": "rel",
-                    "value": "on_completed"
-                  },
-                  {
-                    "key": "href",
-                    "value": "{{purchase.success_redirect}}"
-                  },
-                  {
-                    "key": "method",
-                    "value": "GET"
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "KEY_VALUE_LIST_TO_OBJECT"
-                  }
-                ]
-              },
-              {
-                "mappings": [
-                  {
-                    "key": "rel",
-                    "value": "on_failed"
-                  },
-                  {
-                    "key": "href",
-                    "value": "{{purchase.failure_redirect}}"
-                  },
-                  {
-                    "key": "method",
-                    "value": "GET"
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "KEY_VALUE_LIST_TO_OBJECT"
-                  }
-                ]
-              },
-              {
-                "mappings": [
-                  {
-                    "key": "rel",
-                    "value": "default"
-                  },
-                  {
-                    "key": "href",
-                    "value": "{{purchase.failure_redirect}}"
-                  },
-                  {
-                    "key": "method",
-                    "value": "GET"
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "KEY_VALUE_LIST_TO_OBJECT"
-                  }
-                ]
-              }
-            ],
-            "operations": [
-              {
-                "name": "MAP_LIST_TO_VALUE_LIST"
-              }
-            ]
-          },
-          {
-            "key": "dupCheck",
-            "value": "false",
-            "operations": [
-              {
-                "name": "STRING_TO_BOOLEAN"
-              }
-            ]
-          },
-          {
-            "key": "billingDetails",
-            "mappings": [
-              {
-                "key": "street",
-                "mappings": [
-                  {
-                    "value": "{{purchase.street}}"
-                  },
-                  {
-                    "value": "{{purchase.client.street_address}}"
-                  },
-                  {
-                    "value": "5335 Gate Parkway"
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "GET_FIRST_NON_EMPTY_STRING"
-                  }
-                ]
-              },
-              {
-                "key": "city",
-                "mappings": [
-                  {
-                    "value": "{{purchase.city}}"
-                  },
-                  {
-                    "value": "{{purchase.client.city}}"
-                  },
-                  {
-                    "value": "Jacksonville"
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "GET_FIRST_NON_EMPTY_STRING"
-                  }
-                ]
-              },
-              {
-                "key": "state",
-                "mappings": [
-                  {
-                    "value": "{{purchase.state}}"
-                  },
-                  {
-                    "value": "{{purchase.client.stateCode}}"
-                  },
-                  {
-                    "value": "FL"
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "GET_FIRST_NON_EMPTY_STRING"
-                  }
-                ]
-              },
-              {
-                "key": "country",
-                "mappings": [
-                  {
-                    "value": "{{purchase.country}}"
-                  },
-                  {
-                    "value": "{{purchase.client.country}}"
-                  },
-                  {
-                    "value": "US"
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "GET_FIRST_NON_EMPTY_STRING"
-                  }
-                ]
-              },
-              {
-                "key": "zip",
-                "mappings": [
-                  {
-                    "value": "{{purchase.zip}}"
-                  },
-                  {
-                    "value": "{{purchase.client.zip_code}}"
-                  },
-                  {
-                    "value": "32256"
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "GET_FIRST_NON_EMPTY_STRING"
-                  }
-                ]
-              }
-            ],
-            "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              }
-            ]
-          }
-        ],
+        "mappings": [],
         "operations": [
           {
             "name": "KEY_VALUE_LIST_TO_OBJECT"
@@ -956,16 +139,16 @@
             "key": "tempObject",
             "mappings": [
               {
-                "key": "paysafeApplePayPaymentHandleId",
+                "key": "paysafePaymentHandleId",
                 "mappings": [
                   {
                     "value": "{{pspResponse0.id}}"
                   },
                   {
-                    "value": "{{bankTransaction.paymentTransId}}"
+                    "value": "{{bankTransaction.tempObject.paysafePaymentHandleId}}"
                   },
                   {
-                    "value": ""
+                    "value": "{{bankTransaction.paymentTransId}}"
                   }
                 ],
                 "operations": [
@@ -975,16 +158,16 @@
                 ]
               },
               {
-                "key": "paysafeApplePayPaymentHandleToken",
+                "key": "paysafePaymentHandleToken",
                 "mappings": [
                   {
                     "value": "{{pspResponse0.paymentHandleToken}}"
                   },
                   {
-                    "value": "{{bankTransaction.token}}"
+                    "value": "{{bankTransaction.tempObject.paysafePaymentHandleToken}}"
                   },
                   {
-                    "value": ""
+                    "value": "{{bankTransaction.token}}"
                   }
                 ],
                 "operations": [
@@ -1112,7 +295,7 @@
                   {
                     "name": "VALUE_MAPPER",
                     "params": {
-                      "defaultValue": "fail",
+                      "defaultValue": "pending",
                       "mappings": [
                         {
                           "from": "PAYABLE",
@@ -1460,7 +643,7 @@
         "mappings": [
           {
             "key": "paymentHandleTokenFrom",
-            "value": "{{bankTransaction.tempObject.paysafeApplePayPaymentHandleToken}}",
+            "value": "{{bankTransaction.tempObject.paysafePaymentHandleToken}}",
             "required": true
           }
         ],
@@ -1664,9 +847,6 @@
               },
               {
                 "value": "{{purchase.purchase.currency}}"
-              },
-              {
-                "value": "USD"
               }
             ],
             "operations": [
@@ -1975,7 +1155,7 @@
                 "value": "{{purchase.purchaseId}}"
               },
               {
-                "key": "customer.extraParam.paysafeApplePayCustomerId",
+                "key": "customer.extraParam.paysafeCustomerId",
                 "value": "{{pspResponse1.id}}"
               }
             ],

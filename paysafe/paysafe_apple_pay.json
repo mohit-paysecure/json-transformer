@@ -172,23 +172,71 @@
             "required": true
           },
           {
-            "key": "accountId",
+            "key": "extraParamObject",
+            "hidden": true,
+            "storeIn": "paysafe",
+            "value": "{{bankTransaction.extraParameter}}",
+            "operations": [
+              {
+                "name": "OBJECT_TO_JSON"
+              }
+            ]
+          },
+          {
+            "key": "accountIdByCurrency",
+            "hidden": true,
+            "storeIn": "paysafe",
             "mappings": [
               {
-                "value": "{{bankTransaction.extraParameter}}"
+                "key": "map",
+                "mappings": [
+                  {
+                    "key": "map",
+                    "value": "{{store.paysafe.extraParamObject}}"
+                  },
+                  {
+                    "key": "key",
+                    "value": "accountIds"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  },
+                  {
+                    "name": "GET_MAP_VALUE"
+                  }
+                ]
               },
               {
-                "value": "{{extraParams.paysafeAccountId}}"
-              },
-              {
-                "value": "1002997120"
+                "key": "key",
+                "mappings": [
+                  {
+                    "value": "{{purchase.fx_Currency}}"
+                  },
+                  {
+                    "value": "{{purchase.purchase.currency}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
               }
             ],
             "operations": [
               {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "GET_MAP_VALUE"
               }
-            ],
+            ]
+          },
+          {
+            "key": "accountId",
+            "value": "{{store.paysafe.accountIdByCurrency}}",
             "required": true
           },
           {
