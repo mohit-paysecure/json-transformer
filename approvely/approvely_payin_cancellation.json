@@ -74,9 +74,63 @@
       "body": {
         "mappings": [
           {
+            "key": "refundAmtMissing",
+            "value": "{{bankTransaction.refundAmt}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_EMPTY"
+              }
+            ],
+            "storeIn": "approvelyRefund",
+            "hidden": true
+          },
+          {
             "key": "refundReason",
             "value": "other",
             "required": true
+          },
+          {
+            "key": "partialAmount",
+            "skipIf": "{{store.approvelyRefund.refundAmtMissing}}",
+            "mappings": [
+              {
+                "key": "cents",
+                "mappings": [
+                  {
+                    "value": "{{bankTransaction.refundAmt}}",
+                    "operations": [
+                      {
+                        "name": "STRING_TO_DOUBLE"
+                      }
+                    ],
+                    "required": true
+                  },
+                  {
+                    "value": "100",
+                    "operations": [
+                      {
+                        "name": "STRING_TO_DOUBLE"
+                      }
+                    ],
+                    "required": true
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_MULTIPLY"
+                  },
+                  {
+                    "name": "DOUBLE_TO_FLOOR"
+                  }
+                ],
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
           }
         ],
         "operations": [

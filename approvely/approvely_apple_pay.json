@@ -531,14 +531,14 @@
                       }
                     ]
                   },
-                  {
+                    {
                     "key": "addressLines",
                     "value": "{{purchase.client.street_address}}",
                     "operations": [
                       {
                         "name": "SPLIT_STRING",
                         "params": {
-                          "delimiter": "|"
+                          "delimiter": "\\|"
                         }
                       }
                     ]

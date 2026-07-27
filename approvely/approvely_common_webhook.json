@@ -275,13 +275,13 @@
             "key": "pspTransactionId",
             "mappings": [
               {
-                "value": "{{webhookRequest.data.signature}}"
-              },
-              {
                 "value": "{{webhookRequest.data.id}}"
               },
               {
                 "value": "{{webhookRequest.data.paymentId}}"
+              },
+              {
+                "value": "{{webhookRequest.data.signature}}"
               },
               {
                 "value": "{{webhookRequest.data.idempotencyKey}}"
