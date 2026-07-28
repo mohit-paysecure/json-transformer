@@ -1,0 +1,86 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "parsedWebhook",
+            "hidden": true,
+            "storeIn": "TP_WEBHOOK",
+            "value": "{{webhookRequest}}",
+            "operations": [
+              {
+                "name": "URL_ENCODED_STRING_TO_JSON"
+              }
+            ]
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{store.TP_WEBHOOK.parsedWebhook.transactionreference}}"
+          },
+          {
+            "key": "orderReference",
+            "value": "{{store.TP_WEBHOOK.parsedWebhook.orderreference}}"
+          },
+          {
+            "key": "settlestatus",
+            "value": "{{store.TP_WEBHOOK.parsedWebhook.settlestatus}}"
+          },
+          {
+            "key": "errorcode",
+            "value": "{{store.TP_WEBHOOK.parsedWebhook.errorcode}}"
+          },
+          {
+            "key": "errormessage",
+            "value": "{{store.TP_WEBHOOK.parsedWebhook.errormessage}}"
+          },
+          {
+            "key": "accounttypedescription",
+            "value": "{{store.TP_WEBHOOK.parsedWebhook.accounttypedescription}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "respCode",
+            "value": "00"
+          },
+          {
+            "key": "respMsg",
+            "value": ""
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]

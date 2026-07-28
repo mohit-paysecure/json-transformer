@@ -103,8 +103,18 @@
       "body": {
         "mappings": [
           {
+            "key": "waitInMiliSecond",
+            "value": "20000",
+            "operations": [
+              {
+                "name": "STRING_TO_INTEGER"
+              }
+            ]
+          },
+          {
             "key": "alias",
             "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
             "operations": [
               {
                 "name": "SPLIT_STRING",
@@ -118,12 +128,12 @@
                   "index": 1
                 }
               }
-            ],
-            "required": true
+            ]
           },
           {
             "key": "version",
             "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
             "operations": [
               {
                 "name": "SPLIT_STRING",
@@ -138,112 +148,60 @@
                   "defaultValue": "1.00"
                 }
               }
-            ],
-            "required": true
+            ]
           },
           {
             "key": "request",
             "mappings": [
               {
+                "key": "prefix",
                 "value": "["
               },
               {
+                "key": "inner",
                 "mappings": [
                   {
-                    "key": "requesttypedescriptions",
+                    "key": "requesttypedescription",
                     "value": "TRANSACTIONQUERY",
+                    "required": true
+                  },
+                  {
+                    "key": "sitereference",
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "required": true,
                     "operations": [
                       {
                         "name": "SPLIT_STRING",
                         "params": {
-                          "delimiter": ","
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 0
                         }
                       }
-                    ],
-                    "required": true
+                    ]
                   },
                   {
                     "key": "filter",
                     "mappings": [
                       {
-                        "key": "sitereference",
-                        "mappings": [
-                          {
-                            "value": "["
-                          },
-                          {
-                            "mappings": [
-                              {
-                                "key": "value",
-                                "value": "{{bankTransaction.usedAuthKey}}",
-                                "operations": [
-                                  {
-                                    "name": "SPLIT_STRING",
-                                    "params": {
-                                      "delimiter": "##"
-                                    }
-                                  },
-                                  {
-                                    "name": "GET_ELEMENT_AT_INDEX",
-                                    "params": {
-                                      "index": 0
-                                    }
-                                  }
-                                ],
-                                "required": true
-                              }
-                            ],
-                            "operations": [
-                              {
-                                "name": "KEY_VALUE_LIST_TO_OBJECT"
-                              },
-                              {
-                                "name": "STRINGIFY_JSON"
-                              }
-                            ]
-                          },
-                          {
-                            "value": "]"
-                          }
-                        ],
-                        "operations": [
-                          {
-                            "name": "LIST_VALUE_JOIN"
-                          },
-                          {
-                            "name": "OBJECT_TO_JSON",
-                            "params": {
-                              "arrayAsList": true
-                            }
-                          }
-                        ],
-                        "required": true
-                      },
-                      {
                         "key": "transactionreference",
                         "mappings": [
                           {
-                            "value": "["
+                            "key": "prefix",
+                            "value": "[{\"value\":\""
                           },
                           {
-                            "mappings": [
-                              {
-                                "key": "value",
-                                "value": "{{bankTransaction.paymentTransId}}",
-                                "required": true
-                              }
-                            ],
-                            "operations": [
-                              {
-                                "name": "KEY_VALUE_LIST_TO_OBJECT"
-                              },
-                              {
-                                "name": "STRINGIFY_JSON"
-                              }
-                            ]
+                            "key": "inner",
+                            "value": "{{bankTransaction.paymentTransId}}",
+                            "required": true
                           },
                           {
-                            "value": "]"
+                            "key": "suffix",
+                            "value": "\"}]"
                           }
                         ],
                         "operations": [
@@ -256,16 +214,14 @@
                               "arrayAsList": true
                             }
                           }
-                        ],
-                        "required": true
+                        ]
                       }
                     ],
                     "operations": [
                       {
                         "name": "KEY_VALUE_LIST_TO_OBJECT"
                       }
-                    ],
-                    "required": true
+                    ]
                   }
                 ],
                 "operations": [
@@ -278,6 +234,7 @@
                 ]
               },
               {
+                "key": "suffix",
                 "value": "]"
               }
             ],
@@ -311,7 +268,8 @@
           },
           {
             "key": "code",
-            "value": "{{pspResponse0.errorcode}}",
+            "value": "{{pspResponse0.response.0.errorcode}}",
+            "required": true,
             "operations": [
               {
                 "name": "VALUE_MAPPER",
@@ -329,16 +287,12 @@
           },
           {
             "key": "status",
-            "value": "{{pspResponse0.records.0.settlestatus}}",
+            "value": "{{pspResponse0.response.0.records.0.settlestatus}}",
             "operations": [
               {
                 "name": "VALUE_MAPPER",
                 "params": {
                   "mappings": [
-                    {
-                      "from": "0",
-                      "to": "paid"
-                    },
                     {
                       "from": "10",
                       "to": "payment_in_process"
@@ -348,23 +302,49 @@
                       "to": "paid"
                     },
                     {
+                      "from": "0",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "1",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "2",
+                      "to": "payment_in_process"
+                    },
+                    {
                       "from": "3",
-                      "to": "fail"
+                      "to": "payment_failed"
                     }
                   ],
-                  "defaultValue": "payment_in_process"
+                  "defaultValue": "payment_failed"
                 }
               }
             ]
           },
           {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse0.response.0.records.0.transactionreference}}"
+          },
+          {
+            "key": "pspReference",
+            "value": "{{pspResponse0.response.0.records.0.transactionreference}}"
+          },
+          {
             "key": "message",
             "mappings": [
               {
-                "value": "{{pspResponse0.errormessage}}"
+                "value": "{{pspResponse0.response.0.records.0.acquirerresponsemessage}}"
               },
               {
-                "value": "{{pspResponse0.records.0.errormessage}}"
+                "value": "{{pspResponse0.response.0.records.0.errormessage}}"
+              },
+              {
+                "value": "{{pspResponse0.response.0.errormessage}}"
+              },
+              {
+                "value": ""
               }
             ],
             "operations": [
@@ -372,22 +352,6 @@
                 "name": "GET_FIRST_NON_EMPTY_STRING"
               }
             ]
-          },
-          {
-            "key": "pspTransactionId",
-            "value": "{{pspResponse0.records.0.transactionreference}}"
-          },
-          {
-            "key": "pspReference",
-            "value": "{{pspResponse0.records.0.transactionreference}}"
-          },
-          {
-            "key": "errorcode",
-            "value": "{{pspResponse0.errorcode}}"
-          },
-          {
-            "key": "requestreference",
-            "value": "{{pspResponse0.requestreference}}"
           }
         ],
         "operations": [

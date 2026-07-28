@@ -103,8 +103,18 @@
       "body": {
         "mappings": [
           {
+            "key": "waitInMiliSecond",
+            "value": "20000",
+            "operations": [
+              {
+                "name": "STRING_TO_INTEGER"
+              }
+            ]
+          },
+          {
             "key": "alias",
             "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
             "operations": [
               {
                 "name": "SPLIT_STRING",
@@ -118,12 +128,12 @@
                   "index": 1
                 }
               }
-            ],
-            "required": true
+            ]
           },
           {
             "key": "version",
             "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
             "operations": [
               {
                 "name": "SPLIT_STRING",
@@ -138,35 +148,27 @@
                   "defaultValue": "1.00"
                 }
               }
-            ],
-            "required": true
+            ]
           },
           {
             "key": "request",
             "mappings": [
               {
+                "key": "prefix",
                 "value": "["
               },
               {
+                "key": "inner",
                 "mappings": [
                   {
-                    "key": "currencyiso3a",
-                    "value": "{{purchase.fx_Currency}}",
-                    "required": true
-                  },
-                  {
                     "key": "requesttypedescription",
-                    "value": "AUTH",
-                    "required": true
-                  },
-                  {
-                    "key": "accounttypedescription",
-                    "value": "ECOM",
+                    "value": "TRANSACTIONQUERY",
                     "required": true
                   },
                   {
                     "key": "sitereference",
                     "value": "{{bankTransaction.usedAuthKey}}",
+                    "required": true,
                     "operations": [
                       {
                         "name": "SPLIT_STRING",
@@ -180,169 +182,46 @@
                           "index": 0
                         }
                       }
-                    ],
-                    "required": true
-                  },
-                  {
-                    "key": "baseamount",
-                    "mappings": [
-                      {
-                        "value": "{{purchase.fx_Amount}}",
-                        "required": true,
-                        "operations": [
-                          {
-                            "name": "STRING_TO_DOUBLE"
-                          }
-                        ]
-                      },
-                      {
-                        "value": "100",
-                        "required": true,
-                        "operations": [
-                          {
-                            "name": "STRING_TO_DOUBLE"
-                          }
-                        ]
-                      }
-                    ],
-                    "required": true,
-                    "operations": [
-                      {
-                        "name": "LIST_VALUE_MULTIPLY"
-                      },
-                      {
-                        "name": "DOUBLE_TO_FLOOR"
-                      },
-                      {
-                        "name": "INTEGER_TO_STRING"
-                      }
                     ]
                   },
                   {
-                    "key": "paymenttypedescription",
-                    "value": "MBWAY",
-                    "required": true
-                  },
-                  {
-                    "key": "successfulurlredirect",
+                    "key": "filter",
                     "mappings": [
                       {
-                        "value": "{{extraParams.baseUrl}}",
-                        "required": true
-                      },
-                      {
-                        "value": "/custRedirect/",
-                        "required": true
-                      },
-                      {
-                        "value": "{{purchase.bankid}}",
-                        "required": true
-                      },
-                      {
-                        "value": "/",
-                        "required": true
-                      },
-                      {
-                        "value": "{{purchase.purchaseId}}",
-                        "required": true
-                      },
-                      {
-                        "value": "/success",
-                        "required": true
+                        "key": "transactionreference",
+                        "mappings": [
+                          {
+                            "key": "prefix",
+                            "value": "[{\"value\":\""
+                          },
+                          {
+                            "key": "inner",
+                            "value": "{{bankTransaction.paymentTransId}}",
+                            "required": true
+                          },
+                          {
+                            "key": "suffix",
+                            "value": "\"}]"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "LIST_VALUE_JOIN"
+                          },
+                          {
+                            "name": "OBJECT_TO_JSON",
+                            "params": {
+                              "arrayAsList": true
+                            }
+                          }
+                        ]
                       }
                     ],
                     "operations": [
                       {
-                        "name": "LIST_VALUE_JOIN"
-                      }
-                    ],
-                    "required": true
-                  },
-                  {
-                    "key": "errorurlredirect",
-                    "mappings": [
-                      {
-                        "value": "{{extraParams.baseUrl}}",
-                        "required": true
-                      },
-                      {
-                        "value": "/custRedirect/",
-                        "required": true
-                      },
-                      {
-                        "value": "{{purchase.bankid}}",
-                        "required": true
-                      },
-                      {
-                        "value": "/",
-                        "required": true
-                      },
-                      {
-                        "value": "{{purchase.purchaseId}}",
-                        "required": true
-                      },
-                      {
-                        "value": "/error",
-                        "required": true
-                      }
-                    ],
-                    "operations": [
-                      {
-                        "name": "LIST_VALUE_JOIN"
-                      }
-                    ],
-                    "required": true
-                  },
-                  {
-                    "key": "orderreference",
-                    "value": "{{purchase.purchaseId}}"
-                  },
-                  {
-                    "key": "billingfirstname",
-                    "value": "{{purchase.client.full_name}}",
-                    "operations": [
-                      {
-                    "name": "SPLIT_STRING",
-                    "params": {
-                      "delimiter": "\\s+"
-                    }
-                  },
-                  {
-                    "name": "GET_ELEMENT_AT_INDEX",
-                    "params": {
-                      "index": 0,
-                      "defaultValue": ""
-                    }
-                  }
-                ]
-              },
-              {
-                "key": "billinglastname",
-                "value": "{{purchase.client.full_name}}",
-                "operations": [
-                  {
-                    "name": "SPLIT_STRING",
-                    "params": {
-                      "delimiter": "\\s+"
-                    }
-                      },
-                      {
-                        "name": "GET_ELEMENT_AT_INDEX",
-                        "params": {
-                          "index": 0,
-                          "fromLast": true,
-                          "defaultValue": ""
-                        }
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
                       }
                     ]
-                  },
-                  {
-                    "key": "billingcountryiso2a",
-                    "value": "{{purchase.client.country}}"
-                  },
-                  {
-                    "key": "billingtelephone",
-                    "value": "{{purchase.client.phone}}"
                   }
                 ],
                 "operations": [
@@ -355,6 +234,7 @@
                 ]
               },
               {
+                "key": "suffix",
                 "value": "]"
               }
             ],
@@ -383,6 +263,10 @@
       "body": {
         "mappings": [
           {
+            "key": "redirectUrl",
+            "value": ""
+          },
+          {
             "key": "code",
             "value": "{{pspResponse0.response.0.errorcode}}",
             "required": true,
@@ -403,7 +287,7 @@
           },
           {
             "key": "status",
-            "value": "{{pspResponse0.response.0.settlestatus}}",
+            "value": "{{pspResponse0.response.0.records.0.settlestatus}}",
             "operations": [
               {
                 "name": "VALUE_MAPPER",
@@ -441,20 +325,23 @@
           },
           {
             "key": "pspTransactionId",
-            "value": "{{pspResponse0.response.0.transactionreference}}"
+            "value": "{{pspResponse0.response.0.records.0.transactionreference}}"
           },
           {
-            "key": "redirectUrl",
-            "value": "{{pspResponse0.response.0.redirecturl}}"
+            "key": "pspReference",
+            "value": "{{pspResponse0.response.0.records.0.transactionreference}}"
           },
           {
             "key": "message",
             "mappings": [
               {
-                "value": "{{pspResponse0.response.0.errormessage}}"
+                "value": "{{pspResponse0.response.0.records.0.acquirerresponsemessage}}"
               },
               {
-                "value": "{{pspResponse0.errormessage}}"
+                "value": "{{pspResponse0.response.0.records.0.errormessage}}"
+              },
+              {
+                "value": "{{pspResponse0.response.0.errormessage}}"
               },
               {
                 "value": ""

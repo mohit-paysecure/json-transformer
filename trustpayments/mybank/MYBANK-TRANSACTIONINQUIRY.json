@@ -1,0 +1,422 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://webservices.securetrading.net/json/",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "Basic "
+              },
+              {
+                "mappings": [
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 1
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 2
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  },
+                  {
+                    "name": "BASE64_TRANSFORM",
+                    "params": {
+                      "mode": "ENCODE"
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "alias",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 1
+                }
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "version",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 3,
+                  "defaultValue": "1.00"
+                }
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "request",
+            "mappings": [
+              {
+                "value": "["
+              },
+              {
+                "mappings": [
+                  {
+                    "key": "requesttypedescriptions",
+                    "value": "TRANSACTIONQUERY",
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": ","
+                        }
+                      }
+                    ],
+                    "required": true
+                  },
+                  {
+                    "key": "filter",
+                    "mappings": [
+                      {
+                        "key": "sitereference",
+                        "mappings": [
+                          {
+                            "value": "["
+                          },
+                          {
+                            "mappings": [
+                              {
+                                "key": "value",
+                                "value": "{{bankTransaction.usedAuthKey}}",
+                                "operations": [
+                                  {
+                                    "name": "SPLIT_STRING",
+                                    "params": {
+                                      "delimiter": "##"
+                                    }
+                                  },
+                                  {
+                                    "name": "GET_ELEMENT_AT_INDEX",
+                                    "params": {
+                                      "index": 0
+                                    }
+                                  }
+                                ],
+                                "required": true
+                              }
+                            ],
+                            "operations": [
+                              {
+                                "name": "KEY_VALUE_LIST_TO_OBJECT"
+                              },
+                              {
+                                "name": "STRINGIFY_JSON"
+                              }
+                            ]
+                          },
+                          {
+                            "value": "]"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "LIST_VALUE_JOIN"
+                          },
+                          {
+                            "name": "OBJECT_TO_JSON",
+                            "params": {
+                              "arrayAsList": true
+                            }
+                          }
+                        ],
+                        "required": true
+                      },
+                      {
+                        "key": "transactionreference",
+                        "mappings": [
+                          {
+                            "value": "["
+                          },
+                          {
+                            "mappings": [
+                              {
+                                "key": "value",
+                                "value": "{{bankTransaction.paymentTransId}}",
+                                "required": true
+                              }
+                            ],
+                            "operations": [
+                              {
+                                "name": "KEY_VALUE_LIST_TO_OBJECT"
+                              },
+                              {
+                                "name": "STRINGIFY_JSON"
+                              }
+                            ]
+                          },
+                          {
+                            "value": "]"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "LIST_VALUE_JOIN"
+                          },
+                          {
+                            "name": "OBJECT_TO_JSON",
+                            "params": {
+                              "arrayAsList": true
+                            }
+                          }
+                        ],
+                        "required": true
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }
+                    ],
+                    "required": true
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  },
+                  {
+                    "name": "STRINGIFY_JSON"
+                  }
+                ]
+              },
+              {
+                "value": "]"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              },
+              {
+                "name": "OBJECT_TO_JSON",
+                "params": {
+                  "arrayAsList": true
+                }
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "code",
+            "value": "{{pspResponse0.errorcode}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "0",
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse0.records.0.settlestatus}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "0",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "10",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "100",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "3",
+                      "to": "fail"
+                    }
+                  ],
+                  "defaultValue": "enquired"
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.errormessage}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse0.records.0.transactionreference}}"
+          },
+          {
+            "key": "pspReference",
+            "value": "{{pspResponse0.records.0.transactionreference}}"
+          },
+          {
+            "key": "orderReference",
+            "value": "{{pspResponse0.records.0.orderreference}}"
+          },
+          {
+            "key": "paymenttypedescription",
+            "value": "{{pspResponse0.records.0.paymenttypedescription}}"
+          },
+          {
+            "key": "requesttypedescription",
+            "value": "{{pspResponse0.records.0.requesttypedescription}}"
+          },
+          {
+            "key": "baseamount",
+            "value": "{{pspResponse0.records.0.baseamount}}"
+          },
+          {
+            "key": "currencyiso3a",
+            "value": "{{pspResponse0.records.0.currencyiso3a}}"
+          },
+          {
+            "key": "remoteErrorCode",
+            "value": "{{pspResponse0.records.0.errorcode}}"
+          },
+          {
+            "key": "remoteErrorMessage",
+            "value": "{{pspResponse0.records.0.errormessage}}"
+          },
+          {
+            "key": "found",
+            "value": "{{pspResponse0.found}}"
+          },
+          {
+            "key": "requestreference",
+            "value": "{{pspResponse.requestreference}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]
