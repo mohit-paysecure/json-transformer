@@ -1,0 +1,302 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "parsedWebhook",
+            "hidden": true,
+            "storeIn": "NOON_WEBHOOK",
+            "value": "{{webhookRequest}}",
+            "operations": [
+              {
+                "name": "JSON_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "jwtHeader",
+            "hidden": true,
+            "value": "{{store.NOON_WEBHOOK.parsedWebhook.data}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "."
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 0
+                }
+              }
+            ],
+            "storeIn": "NOON_JWT"
+          },
+          {
+            "key": "jwtPayload",
+            "hidden": true,
+            "value": "{{store.NOON_WEBHOOK.parsedWebhook.data}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "."
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 1
+                }
+              }
+            ],
+            "storeIn": "NOON_JWT"
+          },
+          {
+            "key": "jwtSignature",
+            "hidden": true,
+            "value": "{{store.NOON_WEBHOOK.parsedWebhook.data}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "."
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 2
+                }
+              }
+            ],
+            "storeIn": "NOON_JWT"
+          },
+          {
+            "key": "payloadJson",
+            "hidden": true,
+            "storeIn": "NOON_WEBHOOK_PAYLOAD",
+            "value": "{{store.NOON_JWT.jwtPayload}}",
+            "operations": [
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "-",
+                  "replacement": "+",
+                  "occurrence": "STRING_ALL"
+                }
+              },
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "_",
+                  "replacement": "/",
+                  "occurrence": "STRING_ALL"
+                }
+              },
+              {
+                "name": "BASE64_TRANSFORM",
+                "params": {
+                  "mode": "DECODE"
+                }
+              },
+              {
+                "name": "JSON_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "receivedSignature",
+            "value": "{{store.NOON_JWT.jwtSignature}}"
+          },
+          {
+            "key": "generatedSignature",
+            "mappings": [
+              {
+                "key": "input",
+                "mappings": [
+                  {
+                    "value": "{{store.NOON_JWT.jwtHeader}}"
+                  },
+                  {
+                    "value": "."
+                  },
+                  {
+                    "value": "{{store.NOON_JWT.jwtPayload}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  }
+                ]
+              },
+              {
+                "key": "secretKey",
+                "value": "2348a9d5-3b80-4f1e-b0fb-8aa74c877661"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "COMPUTE_HMAC_SHA",
+                "params": {
+                  "algorithm": "HmacSHA256",
+                  "outputFormat": "BASE64"
+                }
+              },
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "+",
+                  "replacement": "-",
+                  "occurrence": "STRING_ALL"
+                }
+              },
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "/",
+                  "replacement": "_",
+                  "occurrence": "STRING_ALL"
+                }
+              },
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "=",
+                  "replacement": "",
+                  "occurrence": "STRING_ALL"
+                }
+              }
+            ]
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{store.NOON_WEBHOOK_PAYLOAD.payloadJson.orderId}}",
+            "operations": [
+              {
+                "name": "INTEGER_TO_STRING"
+              }
+            ]
+          },
+          {
+            "key": "orderReference",
+            "value": "{{store.NOON_WEBHOOK_PAYLOAD.payloadJson.merchantOrderRef}}"
+          },
+          {
+            "key": "status",
+            "value": "{{store.NOON_WEBHOOK_PAYLOAD.payloadJson.orderStatus}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "CAPTURED",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "PARTIALLY_CAPTURED",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "FAILED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "REJECTED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "CANCELLED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "EXPIRED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "REVERSED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "PENDING",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "AUTHORIZED",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "MARKED_FOR_REVIEW",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "TOKENIZED",
+                      "to": "payment_in_process"
+                    }
+                  ],
+                  "defaultValue": "payment_in_process"
+                }
+              }
+            ]
+          },
+          {
+            "key": "eventType",
+            "value": "{{store.NOON_WEBHOOK_PAYLOAD.payloadJson.eventType}}"
+          },
+          {
+            "key": "message",
+            "value": "{{store.NOON_WEBHOOK_PAYLOAD.payloadJson.txnStatus}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "respCode",
+            "value": "00"
+          },
+          {
+            "key": "respMsg",
+            "value": ""
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]

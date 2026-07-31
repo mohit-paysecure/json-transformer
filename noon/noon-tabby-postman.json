@@ -1,0 +1,364 @@
+{
+  "info": {
+    "_postman_id": "b6f0a8b4-3e6a-4c9a-9a1a-tabbybnpl0001",
+    "name": "Noon Payments - Tabby (BNPL Direct)",
+    "description": "Covers the Direct Tabby BNPL flow for Noon Payments as documented at https://docs.noonpayments.com/billing/bnpl/direct-tabby\n\nFlow:\n1. CHECK_BNPL_OPTIONS - verify Tabby is an eligible payment option for the order.\n2. INITIATE - create the order with `paymentData.type: TABBY`, get back the Tabby session URL in `result.result.actionHint` (redirect the customer here).\n3. Customer completes the Tabby flow (splits into installments, pays) on Tabby's hosted page - this happens in a browser, it is NOT an API call.\n4. Tabby redirects back to your `configuration.returnUrl` (or fires a webhook).\n5. GET ORDER (or GET ORDER BY REFERENCE) - fetch the final order status.\n\nCANCEL and REFUND requests are included as common follow-up operations once an order exists.\n\nAuthentication: Key-based scheme. Authorization header = `Key ` + Base64(BusinessIdentifier.ApplicationIdentifier:ApplicationKey). The `businessIdentifier`, `applicationIdentifier` and `applicationKey` collection variables are pre-filled with the paysecure_technology sandbox credentials - a collection pre-request script builds the header for every request automatically.\n\nSandbox business `paysecure_technology` - Tabby notes:\n- Tabby is only enabled for AED (SAR is rejected with \"invalid combination of payment details\")\n- The `customer` object only accepts: `registeredSince`, `loyaltyLevel` (int), `orderHistory[]` (amount, purchaseTime, status in [new, processing, complete, refunded, canceled, unknown])\n- `paymentData.data.authenticatorData` is required (empty string accepted)\n- `paymentOption` field is NOT accepted anywhere in this API version\n\nEnvironments (set `baseUrl` accordingly):\n- Global Test: https://api-test.noonpayments.com\n- Global Live: https://api.noonpayments.com\n- KSA Test: https://api-test.sa.noonpayments.com\n- KSA Live: https://api.sa.noonpayments.com\n- Egypt Test: https://api-test.eg.noonpayments.com\n- Egypt Live: https://api.eg.noonpayments.com",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "noauth"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Builds the Key-based Authorization header for every request in this collection.",
+          "// See https://docs.noonpayments.com/test/authorization",
+          "const override = pm.collectionVariables.get('authorizationHeaderOverride');",
+          "",
+          "if (override && override.trim().length > 0) {",
+          "    pm.collectionVariables.set('authHeader', override.trim());",
+          "} else {",
+          "    const businessId = pm.collectionVariables.get('businessIdentifier') || '';",
+          "    const appId = pm.collectionVariables.get('applicationIdentifier') || '';",
+          "    const appKey = pm.collectionVariables.get('applicationKey') || '';",
+          "    const raw = businessId + '.' + appId + ':' + appKey;",
+          "    pm.collectionVariables.set('authHeader', 'Key ' + btoa(raw));",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "https://api-test.noonpayments.com" },
+    { "key": "businessIdentifier", "value": "paysecure_technology" },
+    { "key": "applicationIdentifier", "value": "Paysecure_Test" },
+    { "key": "applicationKey", "value": "cc777b32538941f0903a5d3453dea9e7", "type": "secret" },
+    { "key": "authorizationHeaderOverride", "value": "" },
+    { "key": "authHeader", "value": "" },
+    { "key": "orderId", "value": "" },
+    { "key": "orderReference", "value": "NPORDTEST0001" },
+    { "key": "tabbyRedirectUrl", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Check BNPL Options (Tabby)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{authHeader}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"apiOperation\": \"CHECK_BNPL_OPTIONS\",\n    \"order\": {\n        \"amount\": 100,\n        \"currency\": \"AED\",\n        \"category\": \"pay\",\n        \"channel\": \"web\",\n        \"reference\": \"{{orderReference}}\",\n        \"items\": [\n            {\n                \"code\": \"default\",\n                \"name\": \"Test Product\",\n                \"quantity\": 1,\n                \"unitPrice\": 100,\n                \"nvp\": {\n                    \"productSku\": \"SKU001\",\n                    \"risk\": \"low\"\n                }\n            }\n        ]\n    },\n    \"customer\": {}\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/payment/v1/order",
+          "host": ["{{baseUrl}}"],
+          "path": ["payment", "v1", "order"]
+        },
+        "description": "Step 1 of the BNPL flow. Checks whether Tabby is an eligible BNPL option for this merchant and order. A successful response lists `result.paymentOptions[]` - look for `method: \"Tabby_Sandbox\"` (sandbox) or `method: \"Tabby\"` (live).\n\nIf `paymentOptions` is empty or Tabby is absent, INITIATE will not work - the order amount/currency is outside Tabby's limits for this MID."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const jsonData = pm.response.json();",
+              "",
+              "pm.test('resultCode is 0 (success)', function () {",
+              "    pm.expect(jsonData.resultCode).to.eql(0);",
+              "});",
+              "",
+              "if (jsonData && jsonData.result && jsonData.result.paymentOptions) {",
+              "    const options = jsonData.result.paymentOptions;",
+              "    const tabby = options.find(o => String(o.type).toUpperCase() === 'TABBY');",
+              "    pm.test('Tabby is an eligible BNPL option', function () {",
+              "        pm.expect(tabby, 'No Tabby option returned - check order amount/currency vs Tabby limits').to.exist;",
+              "    });",
+              "}"
+            ]
+          }
+        }
+      ],
+      "response": [
+        {
+          "name": "Positive Scenario",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{authHeader}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"apiOperation\": \"CHECK_BNPL_OPTIONS\",\n    \"order\": {\n        \"amount\": 100,\n        \"currency\": \"AED\",\n        \"category\": \"pay\",\n        \"channel\": \"web\",\n        \"reference\": \"NPORDTEST0001\"\n    },\n    \"customer\": {}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payment/v1/order",
+              "host": ["{{baseUrl}}"],
+              "path": ["payment", "v1", "order"]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n    \"resultCode\": 0,\n    \"message\": \"Processed successfully\",\n    \"resultClass\": 0,\n    \"classDescription\": \"\",\n    \"actionHint\": \"\",\n    \"requestReference\": \"95120554-94df-45cc-a034-c2aee3e8e7fa\",\n    \"result\": {\n        \"paymentOptions\": [\n            {\n                \"method\": \"Tabby_Sandbox\",\n                \"type\": \"Tabby\",\n                \"action\": \"Tabby\"\n            }\n        ]\n    }\n}"
+        }
+      ]
+    },
+    {
+      "name": "2. Initiate Order (Tabby)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{authHeader}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"apiOperation\": \"INITIATE\",\n    \"order\": {\n        \"amount\": 100,\n        \"currency\": \"AED\",\n        \"category\": \"pay\",\n        \"channel\": \"web\",\n        \"reference\": \"{{orderReference}}\",\n        \"name\": \"Test Order\",\n        \"items\": [\n            {\n                \"code\": \"default\",\n                \"name\": \"Test Product\",\n                \"quantity\": 1,\n                \"unitPrice\": 100,\n                \"nvp\": {\n                    \"productSku\": \"SKU001\",\n                    \"risk\": \"low\"\n                }\n            }\n        ]\n    },\n    \"customer\": {\n        \"registeredSince\": \"2024-01-01T00:00:00Z\",\n        \"loyaltyLevel\": 5,\n        \"orderHistory\": [\n            {\n                \"amount\": 100,\n                \"purchaseTime\": \"2024-06-15T12:00:00Z\",\n                \"status\": \"complete\"\n            }\n        ]\n    },\n    \"billing\": {\n        \"contact\": {\n            \"firstName\": \"John\",\n            \"lastName\": \"Doe\",\n            \"email\": \"john.doe@example.com\",\n            \"phone\": \"+971501234567\"\n        },\n        \"address\": {\n            \"line1\": \"123 Main St\",\n            \"city\": \"Dubai\",\n            \"country\": \"AE\"\n        }\n    },\n    \"shipping\": {\n        \"contact\": {\n            \"firstName\": \"John\",\n            \"lastName\": \"Doe\",\n            \"email\": \"john.doe@example.com\",\n            \"phone\": \"+971501234567\"\n        },\n        \"address\": {\n            \"line1\": \"123 Main St\",\n            \"city\": \"Dubai\",\n            \"country\": \"AE\"\n        }\n    },\n    \"paymentData\": {\n        \"type\": \"TABBY\",\n        \"data\": {\n            \"authenticatorData\": \"\"\n        }\n    },\n    \"configuration\": {\n        \"returnUrl\": \"https://www.merchantwebsite.com/response\",\n        \"locale\": \"en\",\n        \"paymentAction\": \"Sale\"\n    }\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/payment/v1/order",
+          "host": ["{{baseUrl}}"],
+          "path": ["payment", "v1", "order"]
+        },
+        "description": "Step 2 of the BNPL flow. Initiates the Tabby session. On success, `result.result.actionHint` contains the Tabby hosted payment URL - redirect the customer there.\n\nNotes:\n- Currency must be AED (Tabby is not enabled for SAR on this MID).\n- `paymentData.data.authenticatorData` is mandatory (empty string is accepted).\n- `customer.email` inside `customer` is rejected - use `billing.contact.email` instead.\n- `paymentOption` must NOT be sent anywhere in this API version."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const jsonData = pm.response.json();",
+              "",
+              "pm.test('resultCode is 0 (success)', function () {",
+              "    pm.expect(jsonData.resultCode).to.eql(0);",
+              "});",
+              "",
+              "if (jsonData && jsonData.result) {",
+              "    if (jsonData.result.order && jsonData.result.order.id) {",
+              "        pm.collectionVariables.set('orderId', jsonData.result.order.id);",
+              "    }",
+              "    if (jsonData.result.order && jsonData.result.order.reference) {",
+              "        pm.collectionVariables.set('orderReference', jsonData.result.order.reference);",
+              "    }",
+              "    if (jsonData.result.result && jsonData.result.result.actionHint) {",
+              "        pm.collectionVariables.set('tabbyRedirectUrl', jsonData.result.result.actionHint);",
+              "        console.log('Redirect customer to Tabby: ' + jsonData.result.result.actionHint);",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "response": [
+        {
+          "name": "Positive Scenario",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{authHeader}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"apiOperation\": \"INITIATE\",\n    \"order\": {\n        \"amount\": 100,\n        \"currency\": \"AED\",\n        \"category\": \"pay\",\n        \"channel\": \"web\",\n        \"reference\": \"NPORDTEST0001\"\n    },\n    \"paymentData\": {\n        \"type\": \"TABBY\",\n        \"data\": {\n            \"authenticatorData\": \"\"\n        }\n    },\n    \"configuration\": {\n        \"returnUrl\": \"https://www.merchantwebsite.com/response\",\n        \"paymentAction\": \"Sale\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payment/v1/order",
+              "host": ["{{baseUrl}}"],
+              "path": ["payment", "v1", "order"]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n    \"resultCode\": 0,\n    \"message\": \"Processed successfully\",\n    \"resultClass\": 0,\n    \"classDescription\": \"\",\n    \"actionHint\": \"\",\n    \"requestReference\": \"3ba2e0a8-4d08-4500-aba5-0f36f8b7ba7c\",\n    \"result\": {\n        \"nextActions\": \"REDIRECT\",\n        \"order\": {\n            \"type\": \"CIT\",\n            \"status\": \"INITIATED\",\n            \"creationTime\": \"2026-07-30T07:01:52.3066207Z\",\n            \"errorCode\": 0,\n            \"id\": 458836634511,\n            \"amount\": 100,\n            \"currency\": \"AED\",\n            \"name\": \"Test Order\",\n            \"reference\": \"NPORDTEST0001\",\n            \"category\": \"pay\",\n            \"channel\": \"web\"\n        },\n        \"configuration\": {\n            \"returnUrl\": \"https://www.merchantwebsite.com/response\",\n            \"paymentAction\": \"Sale\"\n        },\n        \"business\": {\n            \"id\": \"paysecure_technology\",\n            \"name\": \"Paysecure Technology Limited\"\n        },\n        \"result\": {\n            \"actionHint\": \"https://checkout.tabby.ai/payments/pl/2e2f...\",\n            \"status\": \"PENDING\"\n        },\n        \"deviceFingerPrint\": {\n            \"sessionId\": \"458836634511\"\n        }\n    }\n}"
+        },
+        {
+          "name": "Negative Scenario - Tabby sandbox rejects (order_amount_too_high)",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{authHeader}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"apiOperation\": \"INITIATE\",\n    \"order\": {\n        \"amount\": 100,\n        \"currency\": \"AED\",\n        \"category\": \"pay\",\n        \"channel\": \"web\",\n        \"reference\": \"NPORDTEST0001\"\n    },\n    \"paymentData\": {\n        \"type\": \"TABBY\",\n        \"data\": {\n            \"authenticatorData\": \"\"\n        }\n    },\n    \"configuration\": {\n        \"returnUrl\": \"https://www.merchantwebsite.com/response\",\n        \"paymentAction\": \"Sale\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payment/v1/order",
+              "host": ["{{baseUrl}}"],
+              "path": ["payment", "v1", "order"]
+            }
+          },
+          "status": "Bad Request",
+          "code": 400,
+          "_postman_previewlanguage": "json",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n    \"resultCode\": 16714,\n    \"message\": \"Products not available (Rejection Reason = 'order_amount_too_high')\",\n    \"resultClass\": 61,\n    \"classDescription\": \"Failed ExternalSystemError\",\n    \"actionHint\": \"Correct\",\n    \"requestReference\": \"29bf34df-465c-41b0-8a09-906f0aa7dae1\",\n    \"result\": {\n        \"order\": {\n            \"type\": \"CIT\",\n            \"status\": \"FAILED\",\n            \"creationTime\": \"2026-07-30T07:10:45.7153904Z\",\n            \"errorCode\": 16714,\n            \"errorMessage\": \"Products not available (Rejection Reason = 'order_amount_too_high')\",\n            \"id\": 472408110493,\n            \"amount\": 100.0,\n            \"currency\": \"AED\",\n            \"name\": \"Test Order\",\n            \"description\": \"Test Tabby Initiate\",\n            \"reference\": \"TEST-REF-046\",\n            \"category\": \"pay\",\n            \"channel\": \"Web\"\n        },\n        \"configuration\": {\n            \"tokenizeCc\": false,\n            \"returnUrl\": \"https://merchant.com/return\",\n            \"locale\": \"en\",\n            \"paymentAction\": \"Sale\"\n        },\n        \"business\": {\n            \"id\": \"paysecure_technology\",\n            \"name\": \"Paysecure Technology Limited\"\n        },\n        \"deviceFingerPrint\": {\n            \"sessionId\": \"472408110493\"\n        }\n    }\n}"
+        },
+        {
+          "name": "Negative Scenario - Schema violation (customer.email not allowed)",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "{{authHeader}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"apiOperation\": \"INITIATE\",\n    \"order\": {\n        \"amount\": 100,\n        \"currency\": \"AED\",\n        \"category\": \"pay\",\n        \"channel\": \"web\",\n        \"reference\": \"NPORDTEST0001\"\n    },\n    \"customer\": {\n        \"email\": \"john.doe@example.com\"\n    },\n    \"paymentData\": {\n        \"type\": \"TABBY\",\n        \"data\": {\n            \"authenticatorData\": \"\"\n        }\n    },\n    \"configuration\": {\n        \"returnUrl\": \"https://www.merchantwebsite.com/response\",\n        \"paymentAction\": \"Sale\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payment/v1/order",
+              "host": ["{{baseUrl}}"],
+              "path": ["payment", "v1", "order"]
+            }
+          },
+          "status": "Forbidden",
+          "code": 403,
+          "_postman_previewlanguage": "json",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n    \"resultCode\": 5019,\n    \"message\": \"Member 'email' is not allowed here. Path 'customer.email', line 1, position 475.\",\n    \"resultClass\": 30,\n    \"classDescription\": \"Invalid BadRequest\",\n    \"actionHint\": \"Correct\",\n    \"requestReference\": \"e2ab46ab-db1a-4cb8-b035-9d57e7b7ea55\",\n    \"result\": null\n}"
+        }
+      ]
+    },
+    {
+      "name": "3. Get Order",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "{{authHeader}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/payment/v1/order/{{orderId}}?verbose=true",
+          "host": ["{{baseUrl}}"],
+          "path": ["payment", "v1", "order", "{{orderId}}"],
+          "query": [
+            { "key": "verbose", "value": "true", "description": "Optional. Set to true for full order/transaction detail. Omit for the default lighter payload." }
+          ]
+        },
+        "description": "Step 5 of the BNPL flow. Call after the customer returns from Tabby to `returnUrl` / the webhook fires, to retrieve the final order status (`result.order.status`: INITIATED / SUCCESS / FAILED / CAPTURED).\n\nNote: do not poll this endpoint for reconciliation - noon payments throttles that usage pattern."
+      },
+      "response": [
+        {
+          "name": "Positive Scenario",
+          "originalRequest": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "{{authHeader}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/payment/v1/order/{{orderId}}?verbose=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["payment", "v1", "order", "{{orderId}}"],
+              "query": [{ "key": "verbose", "value": "true" }]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n    \"resultCode\": 0,\n    \"message\": \"Processed successfully\",\n    \"resultClass\": 0,\n    \"classDescription\": \"\",\n    \"actionHint\": \"\",\n    \"requestReference\": \"1022e19b-4d08-4500-aba5-0f36f8b7ba7c\",\n    \"result\": {\n        \"nextActions\": \"REFUND\",\n        \"order\": {\n            \"type\": \"CIT\",\n            \"status\": \"CAPTURED\",\n            \"creationTime\": \"2026-07-30T07:01:52.3066207Z\",\n            \"totalAuthorizedAmount\": 100,\n            \"totalCapturedAmount\": 100,\n            \"totalRefundedAmount\": 0,\n            \"totalRemainingAmount\": 0,\n            \"errorCode\": 0,\n            \"id\": 458836634511,\n            \"amount\": 100,\n            \"currency\": \"AED\",\n            \"name\": \"Test Order\",\n            \"reference\": \"NPORDTEST0001\",\n            \"category\": \"pay\",\n            \"channel\": \"web\"\n        }\n    }\n}"
+        },
+        {
+          "name": "Negative Scenario",
+          "originalRequest": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "{{authHeader}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/payment/v1/order/{{orderId}}?verbose=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["payment", "v1", "order", "{{orderId}}"],
+              "query": [{ "key": "verbose", "value": "true" }]
+            }
+          },
+          "status": "Bad Request",
+          "code": 400,
+          "_postman_previewlanguage": "json",
+          "header": [{ "key": "Content-Type", "value": "application/json" }],
+          "body": "{\n    \"resultCode\": 5021,\n    \"message\": \"Parameter 'orderId' has invalid value.\",\n    \"resultClass\": 30,\n    \"classDescription\": \"Invalid BadRequest\",\n    \"actionHint\": \"Correct\",\n    \"requestReference\": \"ec5504b6-b473-4599-b65a-89fbcb82cbbd\",\n    \"result\": null\n}"
+        }
+      ]
+    },
+    {
+      "name": "3b. Get Order By Reference",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "{{authHeader}}" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/payment/v1/order/getbyreference/{{orderReference}}?verbose=true",
+          "host": ["{{baseUrl}}"],
+          "path": ["payment", "v1", "order", "getbyreference", "{{orderReference}}"],
+          "query": [
+            { "key": "verbose", "value": "true" }
+          ]
+        },
+        "description": "Alternative to Get Order, looked up by the merchant order reference passed in INITIATE instead of noon's order id. URL-encode the reference if it contains special characters. Returns the newest order if multiple orders share the same reference."
+      }
+    },
+    {
+      "name": "4. Cancel Order",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{authHeader}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"apiOperation\": \"CANCEL\",\n    \"order\": {\n        \"id\": {{orderId}},\n        \"cancellationReason\": \"Abandonment for timeout\"\n    }\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/payment/v1/order",
+          "host": ["{{baseUrl}}"],
+          "path": ["payment", "v1", "order"]
+        },
+        "description": "Cancels the order. Only possible before authorization completes - not typically reachable once the Tabby flow has authorized the order, but useful to abandon an INITIATED order."
+      }
+    },
+    {
+      "name": "5. Refund Order",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "{{authHeader}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"apiOperation\": \"REFUND\",\n    \"order\": {\n        \"id\": {{orderId}}\n    },\n    \"transaction\": {\n        \"currency\": \"AED\",\n        \"amount\": 45.96,\n        \"description\": \"Test Refund\",\n        \"targetTransactionIdentifier\": \"\",\n        \"transactionReference\": \"ref-001\"\n    }\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/payment/v1/order",
+          "host": ["{{baseUrl}}"],
+          "path": ["payment", "v1", "order"]
+        },
+        "description": "Refunds a captured order. `targetTransactionIdentifier` should be the CAPTURE transaction's `identifier` from the Get Order response - fill it in before sending."
+      }
+    }
+  ]
+}
