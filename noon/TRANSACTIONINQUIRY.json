@@ -204,8 +204,20 @@
             ]
           },
           {
+            "key": "pspTransIdGuard",
+            "hidden": true,
+            "storeIn": "NOON_TRANS_ID_GUARD",
+            "value": "{{pspResponse0.result.order.id}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_EMPTY"
+              }
+            ]
+          },
+          {
             "key": "pspTransactionId",
             "value": "{{pspResponse0.result.order.id}}",
+            "skipIf": "{{store.NOON_TRANS_ID_GUARD.pspTransIdGuard}}",
             "operations": [
               {
                 "name": "INTEGER_TO_STRING"
@@ -230,7 +242,19 @@
           },
           {
             "key": "message",
-            "value": "{{pspResponse0.message}}"
+            "mappings": [
+              {
+                "value": "{{pspResponse0.result.order.errorMessage}}"
+              },
+              {
+                "value": "{{pspResponse0.message}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
           },
           {
             "key": "errorCode",

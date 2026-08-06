@@ -1,0 +1,334 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [],
+        "operations": []
+      },
+      "headers": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "jwt",
+            "hidden": true,
+            "storeIn": "NOON_DECRYPT",
+            "mappings": [
+              {
+                "value": "{{webhookRequest.data}}"
+              },
+              {
+                "value": "{{webhookRequest.payload}}"
+              },
+              {
+                "value": "{{webhookRequest.webhookData}}"
+              },
+              {
+                "value": "{{webhookRequest.body}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "jwtHeader",
+            "hidden": true,
+            "storeIn": "NOON_DECRYPT",
+            "value": "{{store.NOON_DECRYPT.jwt}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "\\."
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 0
+                }
+              }
+            ]
+          },
+          {
+            "key": "jwtPayload",
+            "hidden": true,
+            "storeIn": "NOON_DECRYPT",
+            "value": "{{store.NOON_DECRYPT.jwt}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "\\."
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 1
+                }
+              }
+            ]
+          },
+          {
+            "key": "jwtSignature",
+            "hidden": true,
+            "storeIn": "NOON_DECRYPT",
+            "value": "{{store.NOON_DECRYPT.jwt}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "\\."
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 2
+                }
+              }
+            ]
+          },
+          {
+            "key": "header",
+            "hidden": true,
+            "storeIn": "NOON_DECRYPT",
+            "value": "{{store.NOON_DECRYPT.jwtHeader}}",
+            "operations": [
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "-",
+                  "replacement": "+",
+                  "occurrence": "STRING_ALL"
+                }
+              },
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "_",
+                  "replacement": "/",
+                  "occurrence": "STRING_ALL"
+                }
+              },
+              {
+                "name": "BASE64_TRANSFORM",
+                "params": {
+                  "mode": "DECODE"
+                }
+              },
+              {
+                "name": "OBJECT_TO_JSON"
+              }
+            ]
+          },
+          {
+            "key": "kid",
+            "hidden": true,
+            "storeIn": "NOON_DECRYPT",
+            "value": "{{store.NOON_DECRYPT.header.kid}}",
+            "operations": [
+              {
+                "name": "STRING_TO_LOWERCASE"
+              },
+              {
+                "name": "STRING_PATTERN_MATCH",
+                "params": {
+                  "regex": "^key[0-9]+$"
+                }
+              }
+            ]
+          },
+          {
+            "key": "keyNumber",
+            "hidden": true,
+            "storeIn": "NOON_DECRYPT",
+            "value": "{{store.NOON_DECRYPT.kid}}",
+            "operations": [
+              {
+                "name": "SUB_STRING",
+                "params": {
+                  "fromIndex": 3,
+                  "toIndex": 0,
+                  "toIndexFromLast": true
+                }
+              },
+              {
+                "name": "STRING_TO_INTEGER"
+              }
+            ]
+          },
+          {
+            "_comment": "Secrets start at index 3 of mid_auth_key (after businessId, applicationId, apiKey), and kid 'keyN' is 1-based, so N+2.",
+            "key": "keyIndex",
+            "hidden": true,
+            "storeIn": "NOON_DECRYPT",
+            "mappings": [
+              {
+                "value": "{{store.NOON_DECRYPT.keyNumber}}"
+              },
+              {
+                "value": 2
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_INTEGER_ADD"
+              }
+            ]
+          },
+          {
+            "_comment": "Point this at whichever field holds the secret.",
+            "key": "selectedSecret",
+            "hidden": true,
+            "storeIn": "NOON_DECRYPT",
+            "value": "{{mid.mid_auth_key}}",
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": "{{store.NOON_DECRYPT.keyIndex}}"
+                }
+              },
+              {
+                "name": "STRING_TRIM"
+              }
+            ]
+          },
+          {
+            "_comment": "Keep as a string - OBJECT_TO_JSON here gets mangled by the parent KEY_VALUE_LIST_TO_OBJECT. WEBHOOK parses it.",
+            "key": "decryptedPayload",
+            "value": "{{store.NOON_DECRYPT.jwtPayload}}",
+            "operations": [
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "-",
+                  "replacement": "+",
+                  "occurrence": "STRING_ALL"
+                }
+              },
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "_",
+                  "replacement": "/",
+                  "occurrence": "STRING_ALL"
+                }
+              },
+              {
+                "name": "BASE64_TRANSFORM",
+                "params": {
+                  "mode": "DECODE"
+                }
+              }
+            ]
+          },
+          {
+            "key": "receivedSignature",
+            "value": "{{store.NOON_DECRYPT.jwtSignature}}"
+          },
+          {
+            "key": "generatedSignature",
+            "mappings": [
+              {
+                "key": "input",
+                "mappings": [
+                  {
+                    "value": "{{store.NOON_DECRYPT.jwtHeader}}"
+                  },
+                  {
+                    "value": "."
+                  },
+                  {
+                    "value": "{{store.NOON_DECRYPT.jwtPayload}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  }
+                ]
+              },
+              {
+                "key": "secretKey",
+                "value": "{{store.NOON_DECRYPT.selectedSecret}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "COMPUTE_HMAC_SHA",
+                "params": {
+                  "algorithm": "HmacSHA256",
+                  "outputFormat": "BASE64"
+                }
+              },
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "+",
+                  "replacement": "-",
+                  "occurrence": "STRING_ALL"
+                }
+              },
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "/",
+                  "replacement": "_",
+                  "occurrence": "STRING_ALL"
+                }
+              },
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "=",
+                  "replacement": "",
+                  "occurrence": "STRING_ALL"
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "headers": {
+        "mappings": [],
+        "operations": []
+      },
+      "body": {
+        "mappings": [],
+        "operations": []
+      }
+    }
+  }
+]

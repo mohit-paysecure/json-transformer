@@ -1,0 +1,654 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://api-test.noonpayments.com/payment/v1/order",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Authorization",
+            "mappings": [
+              {
+                "value": "Key "
+              },
+              {
+                "mappings": [
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 0
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": "."
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 1
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "value": ":"
+                  },
+                  {
+                    "value": "{{bankTransaction.usedAuthKey}}",
+                    "operations": [
+                      {
+                        "name": "SPLIT_STRING",
+                        "params": {
+                          "delimiter": "##"
+                        }
+                      },
+                      {
+                        "name": "GET_ELEMENT_AT_INDEX",
+                        "params": {
+                          "index": 2
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  },
+                  {
+                    "name": "BASE64_TRANSFORM",
+                    "params": {
+                      "mode": "ENCODE"
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "apiOperation",
+            "value": "INITIATE",
+            "required": true
+          },
+          {
+            "key": "order",
+            "mappings": [
+              {
+                "key": "amount",
+                "value": "{{purchase.fx_Amount}}",
+                "required": true,
+                "operations": [
+                  {
+                    "name": "STRING_TO_DOUBLE"
+                  }
+                ]
+              },
+              {
+                "key": "currency",
+                "value": "{{purchase.fx_Currency}}",
+                "required": true
+              },
+              {
+                "key": "category",
+                "value": "pay",
+                "required": true
+              },
+              {
+                "key": "channel",
+                "value": "Web",
+                "required": true
+              },
+              {
+                "key": "reference",
+                "value": "{{purchase.purchaseId}}",
+                "required": true
+              },
+              {
+                "key": "name",
+                "mappings": [
+                  {
+                    "value": "{{purchase.merchantDescriptor}}"
+                  },
+                  {
+                    "value": "{{purchase.brandName}}"
+                  },
+                  {
+                    "value": "{{purchase.purchaseId}}"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "configuration",
+            "mappings": [
+              {
+                "key": "returnUrl",
+                "mappings": [
+                  {
+                    "value": "{{extraParams.baseUrl}}",
+                    "required": true
+                  },
+                  {
+                    "value": "/custRedirect/",
+                    "required": true
+                  },
+                  {
+                    "value": "{{purchase.bankid}}",
+                    "required": true
+                  },
+                  {
+                    "value": "/",
+                    "required": true
+                  },
+                  {
+                    "value": "{{purchase.purchaseId}}",
+                    "required": true
+                  },
+                  {
+                    "value": "/",
+                    "required": true
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_JOIN"
+                  }
+                ],[
+                {
+                  "requestMapping": {
+                    "method": "POST",
+                    "url": {
+                      "mappings": [
+                        {
+                          "value": "https://api-test.noonpayments.com/payment/v1/order",
+                          "required": true
+                        }
+                      ],
+                      "operations": [
+                        {
+                          "name": "LIST_VALUE_JOIN"
+                        }
+                      ]
+                    },
+                    "headers": {
+                      "mappings": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json",
+                          "required": true
+                        },
+                        {
+                          "key": "Authorization",
+                          "mappings": [
+                            {
+                              "value": "Key "
+                            },
+                            {
+                              "mappings": [
+                                {
+                                  "value": "{{bankTransaction.usedAuthKey}}",
+                                  "operations": [
+                                    {
+                                      "name": "SPLIT_STRING",
+                                      "params": {
+                                        "delimiter": "##"
+                                      }
+                                    },
+                                    {
+                                      "name": "GET_ELEMENT_AT_INDEX",
+                                      "params": {
+                                        "index": 0
+                                      }
+                                    }
+                                  ]
+                                },
+                                {
+                                  "value": "."
+                                },
+                                {
+                                  "value": "{{bankTransaction.usedAuthKey}}",
+                                  "operations": [
+                                    {
+                                      "name": "SPLIT_STRING",
+                                      "params": {
+                                        "delimiter": "##"
+                                      }
+                                    },
+                                    {
+                                      "name": "GET_ELEMENT_AT_INDEX",
+                                      "params": {
+                                        "index": 1
+                                      }
+                                    }
+                                  ]
+                                },
+                                {
+                                  "value": ":"
+                                },
+                                {
+                                  "value": "{{bankTransaction.usedAuthKey}}",
+                                  "operations": [
+                                    {
+                                      "name": "SPLIT_STRING",
+                                      "params": {
+                                        "delimiter": "##"
+                                      }
+                                    },
+                                    {
+                                      "name": "GET_ELEMENT_AT_INDEX",
+                                      "params": {
+                                        "index": 2
+                                      }
+                                    }
+                                  ]
+                                }
+                              ],
+                              "operations": [
+                                {
+                                  "name": "LIST_VALUE_JOIN"
+                                },
+                                {
+                                  "name": "BASE64_TRANSFORM",
+                                  "params": {
+                                    "mode": "ENCODE"
+                                  }
+                                }
+                              ]
+                            }
+                          ],
+                          "operations": [
+                            {
+                              "name": "LIST_VALUE_JOIN"
+                            }
+                          ],
+                          "required": true
+                        }
+                      ],
+                      "operations": [
+                        {
+                          "name": "KEY_VALUE_LIST_TO_OBJECT"
+                        }
+                      ]
+                    },
+                    "body": {
+                      "mappings": [
+                        {
+                          "key": "apiOperation",
+                          "value": "INITIATE",
+                          "required": true
+                        },
+                        {
+                          "key": "order",
+                          "mappings": [
+                            {
+                              "key": "amount",
+                              "value": "{{purchase.fx_Amount}}",
+                              "required": true,
+                              "operations": [
+                                {
+                                  "name": "STRING_TO_DOUBLE"
+                                }
+                              ]
+                            },
+                            {
+                              "key": "currency",
+                              "value": "{{purchase.fx_Currency}}",
+                              "required": true
+                            },
+                            {
+                              "key": "category",
+                              "value": "pay",
+                              "required": true
+                            },
+                            {
+                              "key": "channel",
+                              "value": "Web",
+                              "required": true
+                            },
+                            {
+                              "key": "reference",
+                              "value": "{{purchase.purchaseId}}",
+                              "required": true
+                            },
+                            {
+                              "key": "name",
+                              "mappings": [
+                                {
+                                  "value": "{{purchase.merchantDescriptor}}"
+                                },
+                                {
+                                  "value": "{{purchase.brandName}}"
+                                },
+                                {
+                                  "value": "{{purchase.purchaseId}}"
+                                }
+                              ],
+                              "operations": [
+                                {
+                                  "name": "GET_FIRST_NON_EMPTY_STRING"
+                                }
+                              ]
+                            }
+                          ],
+                          "operations": [
+                            {
+                              "name": "KEY_VALUE_LIST_TO_OBJECT"
+                            }
+                          ],
+                          "required": true
+                        },
+                        {
+                          "key": "configuration",
+                          "mappings": [
+                            {
+                              "key": "returnUrl",
+                              "mappings": [
+                                {
+                                  "value": "{{extraParams.baseUrl}}",
+                                  "required": true
+                                },
+                                {
+                                  "value": "/custRedirect/",
+                                  "required": true
+                                },
+                                {
+                                  "value": "{{purchase.bankid}}",
+                                  "required": true
+                                },
+                                {
+                                  "value": "/",
+                                  "required": true
+                                },
+                                {
+                                  "value": "{{purchase.purchaseId}}",
+                                  "required": true
+                                },
+                                {
+                                  "value": "/",
+                                  "required": true
+                                }
+                              ],
+                              "operations": [
+                                {
+                                  "name": "LIST_VALUE_JOIN"
+                                }
+                              ],
+                              "required": true
+                            },
+                            {
+                              "key": "locale",
+                              "value": "en"
+                            },
+                            {
+                              "key": "paymentAction",
+                              "value": "Sale"
+                            }
+                          ],
+                          "operations": [
+                            {
+                              "name": "KEY_VALUE_LIST_TO_OBJECT"
+                            }
+                          ]
+                        }
+                      ],
+                      "operations": [
+                        {
+                          "name": "KEY_VALUE_LIST_TO_OBJECT"
+                        }
+                      ]
+                    }
+                  },
+                  "responseMapping": {
+                    "body": {
+                      "mappings": [
+                        {
+                          "key": "code",
+                          "value": "{{pspResponse0.resultCode}}",
+                          "required": true,
+                          "operations": [
+                            {
+                              "name": "INTEGER_TO_STRING"
+                            },
+                            {
+                              "name": "VALUE_MAPPER",
+                              "params": {
+                                "mappings": [
+                                  {
+                                    "from": "0",
+                                    "to": "success"
+                                  }
+                                ],
+                                "defaultValue": "fail"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "key": "status",
+                          "value": "{{pspResponse0.result.order.status}}",
+                          "operations": [
+                            {
+                              "name": "VALUE_MAPPER",
+                              "params": {
+                                "mappings": [
+                                  {
+                                    "from": "SUCCESS",
+                                    "to": "paid"
+                                  },
+                                  {
+                                    "from": "FAILED",
+                                    "to": "payment_failed"
+                                  },
+                                  {
+                                    "from": "PENDING",
+                                    "to": "payment_in_process"
+                                  }
+                                ],
+                                "defaultValue": "payment_in_process"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "key": "redirectUrl",
+                          "value": "{{pspResponse0.result.checkoutData.postUrl}}"
+                        },
+                        {
+                          "key": "pspTransactionId",
+                          "value": "{{pspResponse0.result.order.id}}",
+                          "operations": [
+                            {
+                              "name": "INTEGER_TO_STRING"
+                            }
+                          ]
+                        },
+                        {
+                          "key": "orderReference",
+                          "value": "{{pspResponse0.result.order.reference}}"
+                        },
+                        {
+                          "key": "message",
+                          "value": "{{pspResponse0.message}}"
+                        }
+                      ],
+                      "operations": [
+                        {
+                          "name": "KEY_VALUE_LIST_TO_OBJECT"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+
+                "required": true
+              },
+              {
+                "key": "locale",
+                "value": "en"
+              },
+              {
+                "key": "paymentAction",
+                "value": "Sale"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "code",
+            "value": "{{pspResponse0.resultCode}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "INTEGER_TO_STRING"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "0",
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse0.result.order.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "SUCCESS",
+                      "to": "paid"
+                    },
+                    {
+                      "from": "FAILED",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "PENDING",
+                      "to": "payment_in_process"
+                    }
+                  ],
+                  "defaultValue": "payment_in_process"
+                }
+              }
+            ]
+          },
+          {
+            "key": "redirectUrl",
+            "value": "{{pspResponse0.result.checkoutData.postUrl}}"
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse0.result.order.id}}",
+            "operations": [
+              {
+                "name": "INTEGER_TO_STRING"
+              }
+            ]
+          },
+          {
+            "key": "orderReference",
+            "value": "{{pspResponse0.result.order.reference}}"
+          },
+          {
+            "key": "message",
+            "value": "{{pspResponse0.message}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]

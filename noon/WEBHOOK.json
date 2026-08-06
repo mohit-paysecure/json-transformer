@@ -21,193 +21,36 @@
       "body": {
         "mappings": [
           {
-            "key": "parsedWebhook",
+            "_comment": "Arrives as a string; parse it hidden so {{store...}} lookups work.",
+            "key": "payload",
             "hidden": true,
             "storeIn": "NOON_WEBHOOK",
-            "value": "{{webhookRequest}}",
+            "value": "{{webhookRequest.decryptedPayload}}",
             "operations": [
               {
-                "name": "JSON_TO_OBJECT"
-              }
-            ]
-          },
-          {
-            "key": "jwtHeader",
-            "hidden": true,
-            "value": "{{store.NOON_WEBHOOK.parsedWebhook.data}}",
-            "operations": [
-              {
-                "name": "SPLIT_STRING",
-                "params": {
-                  "delimiter": "."
-                }
-              },
-              {
-                "name": "GET_ELEMENT_AT_INDEX",
-                "params": {
-                  "index": 0
-                }
-              }
-            ],
-            "storeIn": "NOON_JWT"
-          },
-          {
-            "key": "jwtPayload",
-            "hidden": true,
-            "value": "{{store.NOON_WEBHOOK.parsedWebhook.data}}",
-            "operations": [
-              {
-                "name": "SPLIT_STRING",
-                "params": {
-                  "delimiter": "."
-                }
-              },
-              {
-                "name": "GET_ELEMENT_AT_INDEX",
-                "params": {
-                  "index": 1
-                }
-              }
-            ],
-            "storeIn": "NOON_JWT"
-          },
-          {
-            "key": "jwtSignature",
-            "hidden": true,
-            "value": "{{store.NOON_WEBHOOK.parsedWebhook.data}}",
-            "operations": [
-              {
-                "name": "SPLIT_STRING",
-                "params": {
-                  "delimiter": "."
-                }
-              },
-              {
-                "name": "GET_ELEMENT_AT_INDEX",
-                "params": {
-                  "index": 2
-                }
-              }
-            ],
-            "storeIn": "NOON_JWT"
-          },
-          {
-            "key": "payloadJson",
-            "hidden": true,
-            "storeIn": "NOON_WEBHOOK_PAYLOAD",
-            "value": "{{store.NOON_JWT.jwtPayload}}",
-            "operations": [
-              {
-                "name": "STRING_REPLACE",
-                "params": {
-                  "target": "-",
-                  "replacement": "+",
-                  "occurrence": "STRING_ALL"
-                }
-              },
-              {
-                "name": "STRING_REPLACE",
-                "params": {
-                  "target": "_",
-                  "replacement": "/",
-                  "occurrence": "STRING_ALL"
-                }
-              },
-              {
-                "name": "BASE64_TRANSFORM",
-                "params": {
-                  "mode": "DECODE"
-                }
-              },
-              {
-                "name": "JSON_TO_OBJECT"
+                "name": "OBJECT_TO_JSON"
               }
             ]
           },
           {
             "key": "receivedSignature",
-            "value": "{{store.NOON_JWT.jwtSignature}}"
+            "value": "{{webhookRequest.receivedSignature}}"
           },
           {
             "key": "generatedSignature",
-            "mappings": [
-              {
-                "key": "input",
-                "mappings": [
-                  {
-                    "value": "{{store.NOON_JWT.jwtHeader}}"
-                  },
-                  {
-                    "value": "."
-                  },
-                  {
-                    "value": "{{store.NOON_JWT.jwtPayload}}"
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "LIST_VALUE_JOIN"
-                  }
-                ]
-              },
-              {
-                "key": "secretKey",
-                "value": "2348a9d5-3b80-4f1e-b0fb-8aa74c877661"
-              }
-            ],
-            "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              },
-              {
-                "name": "COMPUTE_HMAC_SHA",
-                "params": {
-                  "algorithm": "HmacSHA256",
-                  "outputFormat": "BASE64"
-                }
-              },
-              {
-                "name": "STRING_REPLACE",
-                "params": {
-                  "target": "+",
-                  "replacement": "-",
-                  "occurrence": "STRING_ALL"
-                }
-              },
-              {
-                "name": "STRING_REPLACE",
-                "params": {
-                  "target": "/",
-                  "replacement": "_",
-                  "occurrence": "STRING_ALL"
-                }
-              },
-              {
-                "name": "STRING_REPLACE",
-                "params": {
-                  "target": "=",
-                  "replacement": "",
-                  "occurrence": "STRING_ALL"
-                }
-              }
-            ]
+            "value": "{{webhookRequest.generatedSignature}}"
           },
           {
             "key": "pspTransactionId",
-            "value": "{{store.NOON_WEBHOOK_PAYLOAD.payloadJson.orderId}}",
-            "operations": [
-              {
-                "name": "INTEGER_TO_STRING"
-              }
-            ]
+            "value": "{{store.NOON_WEBHOOK.payload.orderId}}"
           },
           {
             "key": "orderReference",
-            "value": "{{store.NOON_WEBHOOK_PAYLOAD.payloadJson.merchantOrderRef}}"
+            "value": "{{store.NOON_WEBHOOK.payload.merchantOrderRef}}"
           },
           {
             "key": "status",
-            "value": "{{store.NOON_WEBHOOK_PAYLOAD.payloadJson.orderStatus}}",
+            "value": "{{store.NOON_WEBHOOK.payload.orderStatus}}",
             "operations": [
               {
                 "name": "VALUE_MAPPER",
@@ -265,11 +108,11 @@
           },
           {
             "key": "eventType",
-            "value": "{{store.NOON_WEBHOOK_PAYLOAD.payloadJson.eventType}}"
+            "value": "{{store.NOON_WEBHOOK.payload.eventType}}"
           },
           {
             "key": "message",
-            "value": "{{store.NOON_WEBHOOK_PAYLOAD.payloadJson.txnStatus}}"
+            "value": "{{store.NOON_WEBHOOK.payload.txnStatus}}"
           }
         ],
         "operations": [
