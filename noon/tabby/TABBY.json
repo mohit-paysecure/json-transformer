@@ -146,8 +146,80 @@
                 "required": true
               },
               {
+                "key": "_uaMobile",
+                "value": "{{s2s.user_agent}}",
+                "operations": [
+                  {
+                    "name": "STRING_PATTERN_MATCH",
+                    "params": {
+                      "regex": ".*(Android|iPhone|iPad|iPod|Mobile|Mobi).*",
+                      "defaultValue": "__NOMOBILE__"
+                    }
+                  }
+                ],
+                "storeIn": "dev",
+                "hidden": true
+              },
+              {
+                "key": "_isDesktop",
+                "value": "{{store.dev._uaMobile}}",
+                "operations": [
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "defaultValue": "false",
+                      "mappings": [
+                        {
+                          "from": "__NOMOBILE__",
+                          "to": "true"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "storeIn": "dev",
+                "hidden": true
+              },
+              {
+                "key": "_isMobile",
+                "value": "{{store.dev._isDesktop}}",
+                "operations": [
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": "true",
+                          "to": "false"
+                        },
+                        {
+                          "from": "false",
+                          "to": "true"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "storeIn": "dev",
+                "hidden": true
+              },
+              {
                 "key": "channel",
-                "value": "Web",
+                "value": "{{store.dev._isMobile}}",
+                "operations": [
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "defaultValue": "WEB",
+                      "mappings": [
+                        {
+                          "from": "true",
+                          "to": "MOBILE"
+                        }
+                      ]
+                    }
+                  }
+                ],
                 "required": true
               },
               {
