@@ -92,6 +92,14 @@
                       "to": "payment_in_process"
                     },
                     {
+                      "from": "PENDING",
+                      "to": "payment_in_process"
+                    },
+                    {
+                      "from": "BATCHED",
+                      "to": "payment_in_process"
+                    },
+                    {
                       "from": "REFUNDED",
                       "to": "refunded"
                     },
@@ -123,6 +131,14 @@
                     },
                     {
                       "from": "INITIATED",
+                      "to": "success"
+                    },
+                    {
+                      "from": "PENDING",
+                      "to": "success"
+                    },
+                    {
+                      "from": "BATCHED",
                       "to": "success"
                     },
                     {

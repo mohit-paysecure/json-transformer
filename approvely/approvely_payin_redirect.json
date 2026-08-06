@@ -29,6 +29,10 @@
                     {
                       "from": "stage=rtp_bank_link",
                       "to": 1
+                    },
+                    {
+                      "from": "stage=ach_payin",
+                      "to": 1
                     }
                   ],
                   "defaultValue": 0
@@ -51,6 +55,10 @@
                     {
                       "from": "stage=rtp_bank_link",
                       "to": "PAYOUT-RTP-POSTREDIRECT"
+                    },
+                    {
+                      "from": "stage=ach_payin",
+                      "to": "PAYIN-ACH-POSTREDIRECT"
                     }
                   ],
                   "defaultValue": ""
