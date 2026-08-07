@@ -183,6 +183,17 @@
             ]
           },
           {
+            "key": "applepayEncryptedPayload",
+            "hidden": true,
+            "storeIn": "paysafe",
+            "value": "{{bankTransaction.applepayEncryptedPayload}}",
+            "operations": [
+              {
+                "name": "OBJECT_TO_JSON"
+              }
+            ]
+          },
+          {
             "key": "accountIdByCurrency",
             "hidden": true,
             "storeIn": "paysafe",
@@ -216,6 +227,9 @@
                   },
                   {
                     "value": "{{purchase.purchase.currency}}"
+                  },
+                  {
+                    "value": "USD"
                   }
                 ],
                 "operations": [
@@ -236,7 +250,19 @@
           },
           {
             "key": "accountId",
-            "value": "{{store.paysafe.accountIdByCurrency}}",
+            "mappings": [
+              {
+                "value": "{{store.paysafe.accountIdByCurrency}}"
+              },
+              {
+                "value": "1002997120"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
             "required": true
           },
           {
@@ -352,7 +378,19 @@
                       },
                       {
                         "key": "transactionIdentifier",
-                        "value": "{{bankTransaction.applepayTransactionId}}"
+                        "mappings": [
+                          {
+                            "value": "{{store.paysafe.applepayEncryptedPayload.paymentData.header.transactionId}}"
+                          },
+                          {
+                            "value": "{{bankTransaction.applepayTransactionId}}"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "GET_FIRST_NON_EMPTY_STRING"
+                          }
+                        ]
                       }
                     ],
                     "operations": [
