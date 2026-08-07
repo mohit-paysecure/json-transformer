@@ -377,6 +377,10 @@
                           "to": "payment_failed"
                         },
                         {
+                          "from": "Refund",
+                          "to": "refunded"
+                        },
+                        {
                           "from": "Refunded",
                           "to": "refunded"
                         },
