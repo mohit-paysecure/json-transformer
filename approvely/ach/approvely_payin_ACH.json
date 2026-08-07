@@ -266,6 +266,22 @@
       "body": {
         "mappings": [
           {
+            "key": "expireInMin",
+            "mappings": [
+              {
+                "value": "{{purchase.purchase.expireInMin}}"
+              },
+              {
+                "value": "4320"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
             "key": "redirectUrl",
             "value": "{{pspResponse0.link}}"
           },
