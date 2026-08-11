@@ -206,7 +206,7 @@
                 "value": "{{extraParams.accountType}}"
               },
               {
-                "value": "checking"
+                "value": "savings"
               }
             ],
             "operations": [
@@ -387,22 +387,19 @@
                   {
                     "name": "STRING_PATTERN_MATCH",
                     "params": {
-                      "regex": "^.*\"details\":\"[^\"]+\".*$",
+                      "regex": "^.*\"message\":\"[^\"]+\".*$",
                       "defaultValue": ""
                     }
                   },
                   {
                     "name": "STRING_REPLACE",
                     "params": {
-                      "target": "^.*\"details\":\"([^\"]+)\".*$",
+                      "target": "^.*\"message\":\"([^\"]+)\".*$",
                       "replacement": "$1",
                       "occurrence": "REGEX_FIRST"
                     }
                   }
                 ]
-              },
-              {
-                "value": "Session created"
               }
             ],
             "operations": [
@@ -609,18 +606,27 @@
             "key": "message",
             "mappings": [
               {
-                "value": "{{store.approvelyAchApi.isBankAlreadyLinked}}",
+                "value": "{{pspResponse1.message}}"
+              },
+              {
+                "value": "{{pspResponse1}}",
                 "operations": [
                   {
-                    "name": "VALUE_MAPPER",
+                    "name": "STRINGIFY_JSON"
+                  },
+                  {
+                    "name": "STRING_PATTERN_MATCH",
                     "params": {
-                      "mappings": [
-                        {
-                          "from": true,
-                          "to": "Existing tokenized bank account found"
-                        }
-                      ],
-                      "defaultValue": "No tokenized bank account found, adding new one"
+                      "regex": "^.*\"message\":\"[^\"]+\".*$",
+                      "defaultValue": ""
+                    }
+                  },
+                  {
+                    "name": "STRING_REPLACE",
+                    "params": {
+                      "target": "^.*\"message\":\"([^\"]+)\".*$",
+                      "replacement": "$1",
+                      "occurrence": "REGEX_FIRST"
                     }
                   }
                 ]
@@ -638,23 +644,6 @@
           {
             "key": "skipPspCount",
             "mappings": [
-              {
-                "value": "{{store.approvelyAchApi.isBankAlreadyLinked}}",
-                "operations": [
-                  {
-                    "name": "VALUE_MAPPER",
-                    "params": {
-                      "mappings": [
-                        {
-                          "from": true,
-                          "to": 1
-                        }
-                      ],
-                      "defaultValue": ""
-                    }
-                  }
-                ]
-              },
               {
                 "value": 0
               }
@@ -997,43 +986,78 @@
           },
           {
             "key": "code",
-            "value": "{{store.approvelyAchApi.resolvedBankToken}}",
-            "operations": [
+            "mappings": [
               {
-                "name": "CHECK_IF_EMPTY"
+                "value": "{{pspResponse2.message}}",
+                "operations": [
+                  {
+                    "name": "CHECK_IF_EMPTY"
+                  },
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": true,
+                          "to": "success"
+                        }
+                      ],
+                      "defaultValue": ""
+                    }
+                  }
+                ]
               },
               {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "mappings": [
-                    {
-                      "from": false,
-                      "to": "success"
-                    }
-                  ],
-                  "defaultValue": "fail"
-                }
+                "value": "fail"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
               }
             ]
           },
           {
             "key": "status",
-            "value": "{{store.approvelyAchApi.resolvedBankToken}}",
+            "mappings": [
+              {
+                "value": "{{pspResponse2.message}}",
+                "operations": [
+                  {
+                    "name": "CHECK_IF_EMPTY"
+                  },
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": true,
+                          "to": "payment_in_process"
+                        }
+                      ],
+                      "defaultValue": ""
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "payment_failed"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "bodyEmpty",
+            "hidden": true,
+            "storeIn": "approvelyAchApi",
+            "value": "{{pspResponse2.details}}",
             "operations": [
               {
                 "name": "CHECK_IF_EMPTY"
-              },
-              {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "mappings": [
-                    {
-                      "from": false,
-                      "to": "payment_in_process"
-                    }
-                  ],
-                  "defaultValue": "payment_failed"
-                }
               }
             ]
           },
@@ -1041,10 +1065,8 @@
             "key": "message",
             "mappings": [
               {
-                "value": "{{pspResponse2.message}}"
-              },
-              {
-                "value": "{{pspResponse2}}",
+                "value": "{{pspResponse2.details}}",
+                "skipIf": "{{store.approvelyAchApi.bodyEmpty}}",
                 "operations": [
                   {
                     "name": "STRINGIFY_JSON"
@@ -1052,14 +1074,14 @@
                   {
                     "name": "STRING_PATTERN_MATCH",
                     "params": {
-                      "regex": "^.*\"details\":\"[^\"]+\".*$",
+                      "regex": "^.*\"message\":\"([^\"]+)\".*$",
                       "defaultValue": ""
                     }
                   },
                   {
                     "name": "STRING_REPLACE",
                     "params": {
-                      "target": "^.*\"details\":\"([^\"]+)\".*$",
+                      "target": "^.*\"message\":\"([^\"]+)\".*$",
                       "replacement": "$1",
                       "occurrence": "REGEX_FIRST"
                     }
@@ -1067,7 +1089,308 @@
                 ]
               },
               {
-                "value": "Bank account linked"
+                "value": "{{pspResponse2.message}}"
+              },
+              {
+                "value": "{{pspResponse2}}",
+                "skipIf": "{{store.approvelyAchApi.bodyEmpty}}",
+                "operations": [
+                  {
+                    "name": "STRINGIFY_JSON"
+                  },
+                  {
+                    "name": "STRING_PATTERN_MATCH",
+                    "params": {
+                      "regex": "^.*\"message\":\"[^\"]+\".*$",
+                      "defaultValue": ""
+                    }
+                  },
+                  {
+                    "name": "STRING_REPLACE",
+                    "params": {
+                      "target": "^.*\"message\":\"([^\"]+)\".*$",
+                      "replacement": "$1",
+                      "occurrence": "REGEX_FIRST"
+                    }
+                  }
+                ]
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "sanitizeDotKey",
+            "value": "true",
+            "operations": [
+              {
+                "name": "STRING_TO_BOOLEAN"
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "requestMapping": {
+      "method": "GET",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://api-sandbox.coinflow.cash/api/customer/v2",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "x-coinflow-auth-session-key",
+            "mappings": [
+              {
+                "value": "{{store.approvelyAchApi.sessionKey}}"
+              },
+              {
+                "value": "{{bankTransaction.token}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "matchedTokenFromRoot",
+            "hidden": true,
+            "storeIn": "approvelyAchApi",
+            "mappings": [
+              {
+                "key": "list",
+                "value": "{{pspResponse3.bankAccounts}}"
+              },
+              {
+                "key": "matchValue",
+                "value": "{{store.approvelyAchApi.accountLast4}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "FIND_OBJECT_IN_LIST_BY_FIELD_MATCH",
+                "params": {
+                  "fieldPath": "last4",
+                  "extractField": "token"
+                }
+              }
+            ]
+          },
+          {
+            "key": "matchedTokenFromCustomer",
+            "hidden": true,
+            "storeIn": "approvelyAchApi",
+            "mappings": [
+              {
+                "key": "list",
+                "value": "{{pspResponse3.customer.bankAccounts}}"
+              },
+              {
+                "key": "matchValue",
+                "value": "{{store.approvelyAchApi.accountLast4}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "FIND_OBJECT_IN_LIST_BY_FIELD_MATCH",
+                "params": {
+                  "fieldPath": "last4",
+                  "extractField": "token"
+                }
+              }
+            ]
+          },
+          {
+            "key": "resolvedBankToken",
+            "hidden": true,
+            "storeIn": "approvelyAchApi",
+            "mappings": [
+              {
+                "value": "{{store.approvelyAchApi.resolvedBankToken}}"
+              },
+              {
+                "value": "{{store.approvelyAchApi.matchedTokenFromRoot}}"
+              },
+              {
+                "value": "{{store.approvelyAchApi.matchedTokenFromCustomer}}"
+              },
+              {
+                "value": "{{store.approvelyAchApi.savedAccountToken}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "mappings": [
+              {
+                "value": "{{store.approvelyAchApi.resolvedBankToken}}",
+                "operations": [
+                  {
+                    "name": "CHECK_IF_EMPTY"
+                  },
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": false,
+                          "to": "success"
+                        }
+                      ],
+                      "defaultValue": ""
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "fail"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "mappings": [
+              {
+                "value": "{{store.approvelyAchApi.resolvedBankToken}}",
+                "operations": [
+                  {
+                    "name": "CHECK_IF_EMPTY"
+                  },
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": false,
+                          "to": "payment_in_process"
+                        }
+                      ],
+                      "defaultValue": ""
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "payment_failed"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{store.approvelyAchApi.resolvedBankToken}}",
+                "operations": [
+                  {
+                    "name": "CHECK_IF_EMPTY"
+                  },
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": false,
+                          "to": ""
+                        }
+                      ],
+                      "defaultValue": "No bank account token found after linking"
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "{{pspResponse3.detailMessage}}"
+              },
+              {
+                "value": "{{pspResponse3.message}}"
+              },
+              {
+                "value": "{{pspResponse3.status}}"
+              },
+              {
+                "value": ""
               }
             ],
             "operations": [
@@ -1251,13 +1574,13 @@
             "storeIn": "approvelyAchApi",
             "mappings": [
               {
-                "value": "{{pspResponse3.checkoutJwtToken}}"
+                "value": "{{pspResponse4.checkoutJwtToken}}"
               },
               {
-                "value": "{{pspResponse3.jwtToken}}"
+                "value": "{{pspResponse4.jwtToken}}"
               },
               {
-                "value": "{{pspResponse3.token}}"
+                "value": "{{pspResponse4.token}}"
               },
               {
                 "value": ""
@@ -1315,10 +1638,10 @@
             "key": "message",
             "mappings": [
               {
-                "value": "{{pspResponse3.message}}"
+                "value": "{{pspResponse4.message}}"
               },
               {
-                "value": "{{pspResponse3}}",
+                "value": "{{pspResponse4}}",
                 "operations": [
                   {
                     "name": "STRINGIFY_JSON"
@@ -1326,22 +1649,19 @@
                   {
                     "name": "STRING_PATTERN_MATCH",
                     "params": {
-                      "regex": "^.*\"details\":\"[^\"]+\".*$",
+                      "regex": "^.*\"message\":\"[^\"]+\".*$",
                       "defaultValue": ""
                     }
                   },
                   {
                     "name": "STRING_REPLACE",
                     "params": {
-                      "target": "^.*\"details\":\"([^\"]+)\".*$",
+                      "target": "^.*\"message\":\"([^\"]+)\".*$",
                       "replacement": "$1",
                       "occurrence": "REGEX_FIRST"
                     }
                   }
                 ]
-              },
-              {
-                "value": "Checkout parameters tokenized"
               }
             ],
             "operations": [
@@ -1393,13 +1713,13 @@
                   "index": 0
                 }
               }
-            ]
-          }
-        ],
-        "operations": [
-          {
-            "name": "LIST_VALUE_JOIN"
-          }
+]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
         ]
       },
       "headers": {
@@ -1509,6 +1829,11 @@
           {
             "key": "jwtToken",
             "value": "{{store.approvelyAchApi.checkoutJwtToken}}",
+            "required": true
+          },
+          {
+            "key": "token",
+            "value": "{{store.approvelyAchApi.resolvedBankToken}}",
             "required": true
           },
           {
@@ -1660,16 +1985,16 @@
             "key": "pspTransactionId",
             "mappings": [
               {
-                "value": "{{pspResponse4.paymentId}}"
+                "value": "{{pspResponse5.paymentId}}"
               },
               {
-                "value": "{{pspResponse4.transactionId}}"
+                "value": "{{pspResponse5.transactionId}}"
               },
               {
-                "value": "{{pspResponse4.signature}}"
+                "value": "{{pspResponse5.signature}}"
               },
               {
-                "value": "{{pspResponse4.id}}"
+                "value": "{{pspResponse5.id}}"
               },
               {
                 "value": ""
@@ -1685,7 +2010,7 @@
             "key": "code",
             "mappings": [
               {
-                "value": "{{pspResponse4.paymentId}}",
+                "value": "{{pspResponse5.paymentId}}",
                 "operations": [
                   {
                     "name": "CHECK_IF_NULL"
@@ -1705,7 +2030,7 @@
                 ]
               },
               {
-                "value": "{{pspResponse4.transactionId}}",
+                "value": "{{pspResponse5.transactionId}}",
                 "operations": [
                   {
                     "name": "CHECK_IF_NULL"
@@ -1725,7 +2050,7 @@
                 ]
               },
               {
-                "value": "{{pspResponse4.signature}}",
+                "value": "{{pspResponse5.signature}}",
                 "operations": [
                   {
                     "name": "CHECK_IF_NULL"
@@ -1758,7 +2083,7 @@
             "key": "status",
             "mappings": [
               {
-                "value": "{{pspResponse4.paymentId}}",
+                "value": "{{pspResponse5.paymentId}}",
                 "operations": [
                   {
                     "name": "CHECK_IF_NULL"
@@ -1778,7 +2103,7 @@
                 ]
               },
               {
-                "value": "{{pspResponse4.transactionId}}",
+                "value": "{{pspResponse5.transactionId}}",
                 "operations": [
                   {
                     "name": "CHECK_IF_NULL"
@@ -1798,7 +2123,7 @@
                 ]
               },
               {
-                "value": "{{pspResponse4.signature}}",
+                "value": "{{pspResponse5.signature}}",
                 "operations": [
                   {
                     "name": "CHECK_IF_NULL"
@@ -1831,10 +2156,10 @@
             "key": "message",
             "mappings": [
               {
-                "value": "{{pspResponse4.detailMessage}}"
+                "value": "{{pspResponse5.detailMessage}}"
               },
               {
-                "value": "{{pspResponse4}}",
+                "value": "{{pspResponse5}}",
                 "operations": [
                   {
                     "name": "STRINGIFY_JSON"
@@ -1842,14 +2167,14 @@
                   {
                     "name": "STRING_PATTERN_MATCH",
                     "params": {
-                      "regex": "^.*\"details\":\"[^\"]+\".*$",
+                      "regex": "^.*\"message\":\"[^\"]+\".*$",
                       "defaultValue": ""
                     }
                   },
                   {
                     "name": "STRING_REPLACE",
                     "params": {
-                      "target": "^.*\"details\":\"([^\"]+)\".*$",
+                      "target": "^.*\"message\":\"([^\"]+)\".*$",
                       "replacement": "$1",
                       "occurrence": "REGEX_FIRST"
                     }
@@ -1857,13 +2182,10 @@
                 ]
               },
               {
-                "value": "{{pspResponse4.message}}"
+                "value": "{{pspResponse5.message}}"
               },
               {
-                "value": "{{pspResponse4.status}}"
-              },
-              {
-                "value": "ACH payment submitted, awaiting settlement"
+                "value": "{{pspResponse5.status}}"
               }
             ],
             "operations": [

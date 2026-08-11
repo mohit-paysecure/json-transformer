@@ -173,11 +173,45 @@
         "mappings": [
           {
             "key": "status",
-            "value": "payment_in_process"
+            "value": "{{pspResponseHeader0.location}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "payment_in_process"
+                    }
+                  ],
+                  "defaultValue": "payment_failed"
+                }
+              }
+            ]
           },
           {
             "key": "code",
-            "value": "success"
+            "value": "{{pspResponseHeader0.location}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": "success"
+                    }
+                  ],
+                  "defaultValue": "fail"
+                }
+              }
+            ]
           },
           {
             "key": "message",

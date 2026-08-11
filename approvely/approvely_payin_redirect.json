@@ -58,7 +58,7 @@
                     },
                     {
                       "from": "stage=ach_payin",
-                      "to": "PAYIN-ACH-POSTREDIRECT"
+                      "to": "ACH-REDIRECT-POSTREDIRECT"
                     }
                   ],
                   "defaultValue": ""
