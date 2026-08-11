@@ -32,7 +32,7 @@
                     },
                     {
                       "from": "stage=ach_payin",
-                      "to": 1
+                      "to": 0
                     }
                   ],
                   "defaultValue": 0
