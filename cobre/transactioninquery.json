@@ -241,8 +241,65 @@
             ]
           },
           {
+            "key": "isNotFailState",
+            "value": "{{pspResponse1.status.state}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "rejected",
+                      "to": "false"
+                    },
+                    {
+                      "from": "failed",
+                      "to": "false"
+                    },
+                    {
+                      "from": "canceled",
+                      "to": "false"
+                    }
+                  ],
+                  "defaultValue": "true"
+                }
+              }
+            ],
+            "storeIn": "flow",
+            "hidden": true
+          },
+          {
+            "key": "failDescription",
+            "value": "{{pspResponse1.status.description}}",
+            "skipIf": "{{store.flow.isNotFailState}}",
+            "storeIn": "flow",
+            "hidden": true
+          },
+          {
+            "key": "failState",
+            "value": "{{pspResponse1.status.state}}",
+            "skipIf": "{{store.flow.isNotFailState}}",
+            "storeIn": "flow",
+            "hidden": true
+          },
+          {
             "key": "message",
-            "value": "{{pspResponse1.status.state}}"
+            "mappings": [
+              {
+                "value": "{{store.flow.failDescription}}"
+              },
+              {
+                "value": "{{store.flow.failState}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
           }
         ],
         "operations": [

@@ -116,6 +116,66 @@
             ]
           },
           {
+            "key": "isNotFailState",
+            "mappings": [
+              { "value": "{{webhookRequest.content.type}}" },
+              { "value": "_" },
+              { "value": "{{webhookRequest.content.status.state}}" }
+            ],
+            "operations": [
+              { "name": "LIST_VALUE_JOIN" },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    { "from": "spei_return_rejected", "to": "false" },
+                    { "from": "spei_return_failed",   "to": "false" },
+                    { "from": "spei_return_canceled", "to": "false" },
+                    { "from": "r2p_spei_rejected",    "to": "false" },
+                    { "from": "r2p_spei_failed",      "to": "false" },
+                    { "from": "r2p_spei_canceled",    "to": "false" }
+                  ],
+                  "defaultValue": "true"
+                }
+              }
+            ],
+            "storeIn": "flow",
+            "hidden": true
+          },
+          {
+            "key": "failDescription",
+            "value": "{{webhookRequest.content.status.description}}",
+            "skipIf": "{{store.flow.isNotFailState}}",
+            "storeIn": "flow",
+            "hidden": true
+          },
+          {
+            "key": "failState",
+            "value": "{{webhookRequest.content.status.state}}",
+            "skipIf": "{{store.flow.isNotFailState}}",
+            "storeIn": "flow",
+            "hidden": true
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{store.flow.failDescription}}"
+              },
+              {
+                "value": "{{store.flow.failState}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
             "key": "sigInput",
             "mappings": [
               { "value": "{{webhookRequestHeader.event-timestamp}}" },
