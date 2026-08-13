@@ -1291,6 +1291,25 @@
             "key": "code",
             "mappings": [
               {
+                "value": "{{pspResponse3.msg}}",
+                "operations": [
+                  {
+                    "name": "CHECK_IF_EMPTY"
+                  },
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": false,
+                          "to": "fail"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
                 "value": "{{pspResponse3.paymentId}}",
                 "operations": [
                   {
@@ -1341,6 +1360,25 @@
           {
             "key": "status",
             "mappings": [
+              {
+                "value": "{{pspResponse3.msg}}",
+                "operations": [
+                  {
+                    "name": "CHECK_IF_EMPTY"
+                  },
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": false,
+                          "to": "payment_failed"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
               {
                 "value": "{{pspResponse3.paymentId}}",
                 "operations": [
