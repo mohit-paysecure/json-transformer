@@ -5,7 +5,7 @@
       "url": {
         "mappings": [
           {
-            "value": "https://api-sandbox.coinflow.cash/api/withdraw",
+            "value": "https://api.coinflow.cash/api/withdraw",
             "required": true
           }
         ],
@@ -536,7 +536,7 @@
       "url": {
         "mappings": [
           {
-            "value": "https://api-sandbox.coinflow.cash/api/withdraw/kyc",
+            "value": "https://api.coinflow.cash/api/withdraw/kyc",
             "required": true
           }
         ],
@@ -1035,7 +1035,7 @@
       "url": {
         "mappings": [
           {
-            "value": "https://api-sandbox.coinflow.cash/api/auth/session-key",
+            "value": "https://api.coinflow.cash/api/auth/session-key",
             "required": true
           }
         ],
@@ -1401,7 +1401,7 @@
       "url": {
         "mappings": [
           {
-            "value": "https://api-sandbox.coinflow.cash/api/withdraw/quote"
+            "value": "https://api.coinflow.cash/api/withdraw/quote"
           },
           {
             "value": "?token="
@@ -1577,53 +1577,6 @@
             ]
           },
           {
-            "key": "rtpUnsupported",
-            "hidden": true,
-            "storeIn": "approvelyAch",
-            "mappings": [
-              {
-                "key": "left",
-                "value": "{{store.approvelyAch.isRtpMode}}"
-              },
-              {
-                "key": "right",
-                "value": "{{store.approvelyAch.asapQuoteMissing}}"
-              }
-            ],
-            "operations": [
-              {
-                "name": "LOGICAL_OPERATION",
-                "params": {
-                  "operator": "AND"
-                }
-              }
-            ]
-          },
-          {
-            "key": "rtpQuoteAcceptable",
-            "hidden": true,
-            "storeIn": "approvelyAch",
-            "value": "{{store.approvelyAch.rtpUnsupported}}",
-            "operations": [
-              {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "mappings": [
-                    {
-                      "from": true,
-                      "to": false
-                    },
-                    {
-                      "from": false,
-                      "to": true
-                    }
-                  ],
-                  "defaultValue": true
-                }
-              }
-            ]
-          },
-          {
             "key": "requestedSpeed",
             "hidden": true,
             "storeIn": "approvelyAch",
@@ -1632,7 +1585,7 @@
                 "value": "{{payout.extraParam.ach_type}}"
               },
               {
-                "value": "standard"
+                "value": "none"
               }
             ],
             "operations": [
@@ -1679,6 +1632,192 @@
             ]
           },
           {
+            "key": "isAsapRequested",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{store.approvelyAch.requestedSpeed}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "asap",
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "notAsapRequested",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{store.approvelyAch.isAsapRequested}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": false
+                    },
+                    {
+                      "from": false,
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": true
+                }
+              }
+            ]
+          },
+          {
+            "key": "asapMissing",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "mappings": [
+              {
+                "key": "left",
+                "value": "{{store.approvelyAch.notAsapRequested}}"
+              },
+              {
+                "key": "right",
+                "value": "{{store.approvelyAch.asapQuoteMissing}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LOGICAL_OPERATION",
+                "params": {
+                  "operator": "OR"
+                }
+              }
+            ]
+          },
+          {
+            "key": "quoteErrorMessage",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "mappings": [
+              {
+                "value": "{{pspResponse3.detailMessage}}"
+              },
+              {
+                "value": "{{pspResponse3.message}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "quoteHasError",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{store.approvelyAch.quoteErrorMessage}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_EMPTY"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": false
+                    },
+                    {
+                      "from": false,
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "quoteOk",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{store.approvelyAch.quoteHasError}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": false
+                    },
+                    {
+                      "from": false,
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": true
+                }
+              }
+            ]
+          },
+          {
+            "key": "rtpRejected",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "mappings": [
+              {
+                "key": "left",
+                "value": "{{store.approvelyAch.asapMissing}}"
+              },
+              {
+                "key": "right",
+                "value": "{{store.approvelyAch.quoteHasError}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LOGICAL_OPERATION",
+                "params": {
+                  "operator": "OR"
+                }
+              }
+            ]
+          },
+          {
+            "key": "rtpQuoteAcceptable",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{store.approvelyAch.rtpRejected}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": false
+                    },
+                    {
+                      "from": false,
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": false
+                }
+              }
+            ]
+          },
+          {
             "key": "achSpeed",
             "hidden": true,
             "storeIn": "approvelyAch",
@@ -1692,7 +1831,7 @@
                 "skipIf": "{{store.approvelyAch.requestedSpeedMissing}}"
               },
               {
-                "value": "standard"
+                "value": "none"
               }
             ],
             "operations": [
@@ -1739,14 +1878,12 @@
             "key": "message",
             "mappings": [
               {
-                "value": "RTP payout cannot be processed: the beneficiary bank or account does not support Real-Time Payments.",
-                "skipIf": "{{store.approvelyAch.rtpQuoteAcceptable}}"
-              },
-              {
-                "value": "{{pspResponse3.detailMessage}}"
+                "value": "{{pspResponse3.detailMessage}}",
+                "skipIf": "{{store.approvelyAch.quoteOk}}"
               },
               {
                 "value": "{{pspResponse3}}",
+                "skipIf": "{{store.approvelyAch.quoteOk}}",
                 "operations": [
                   {
                     "name": "STRINGIFY_JSON"
@@ -1769,10 +1906,16 @@
                 ]
               },
               {
-                "value": "{{pspResponse3.message}}"
+                "value": "{{pspResponse3.message}}",
+                "skipIf": "{{store.approvelyAch.quoteOk}}"
               },
               {
-                "value": "{{pspResponse3.status}}"
+                "value": "{{pspResponse3.status}}",
+                "skipIf": "{{store.approvelyAch.quoteOk}}"
+              },
+              {
+                "value": "RTP payout cannot be processed: this account does not support RTP.",
+                "skipIf": "{{store.approvelyAch.rtpQuoteAcceptable}}"
               },
               {
                 "value": ""
@@ -1799,7 +1942,7 @@
       "url": {
         "mappings": [
           {
-            "value": "https://api-sandbox.coinflow.cash/api/merchant/withdraws/payout/delegated",
+            "value": "https://api.coinflow.cash/api/merchant/withdraws/payout/delegated",
             "required": true
           }
         ],

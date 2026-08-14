@@ -5,7 +5,7 @@
       "url": {
         "mappings": [
           {
-            "value": "https://api-sandbox.coinflow.cash/api/withdraw",
+            "value": "https://api.coinflow.cash/api/withdraw",
             "required": true
           }
         ],
@@ -448,7 +448,7 @@
       "url": {
         "mappings": [
           {
-            "value": "https://api-sandbox.coinflow.cash/api/withdraw/kyc",
+            "value": "https://api.coinflow.cash/api/withdraw/kyc",
             "required": true
           }
         ],
@@ -947,7 +947,7 @@
       "url": {
         "mappings": [
           {
-            "value": "https://api-sandbox.coinflow.cash/api/withdraw/venmo",
+            "value": "https://api.coinflow.cash/api/withdraw/venmo",
             "required": true
           }
         ],
@@ -1040,8 +1040,24 @@
             "key": "hasLinkError",
             "hidden": true,
             "storeIn": "approvelyVenmo",
-            "value": "{{pspResponse2.debugId}}",
+            "mappings": [
+              {
+                "value": "{{pspResponse2.message}}"
+              },
+              {
+                "value": "{{pspResponse2.error}}"
+              },
+              {
+                "value": "{{pspResponse2.debugId}}"
+              },
+              {
+                "value": ""
+              }
+            ],
             "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              },
               {
                 "name": "CHECK_IF_EMPTY"
               },
@@ -1105,7 +1121,33 @@
                 "value": "{{pspResponse2.detailMessage}}"
               },
               {
+                "value": "{{pspResponse2.details}}"
+              },
+              {
                 "value": "{{pspResponse2.message}}"
+              },
+              {
+                "value": "{{pspResponse2}}",
+                "operations": [
+                  {
+                    "name": "STRINGIFY_JSON"
+                  },
+                  {
+                    "name": "STRING_PATTERN_MATCH",
+                    "params": {
+                      "regex": "^.*\"details\":\"[^\"]+\".*$",
+                      "defaultValue": ""
+                    }
+                  },
+                  {
+                    "name": "STRING_REPLACE",
+                    "params": {
+                      "target": "^.*\"details\":\"([^\"]+)\".*$",
+                      "replacement": "$1",
+                      "occurrence": "REGEX_FIRST"
+                    }
+                  }
+                ]
               },
               {
                 "value": "{{pspResponse2.status}}"
@@ -1135,7 +1177,7 @@
       "url": {
         "mappings": [
           {
-            "value": "https://api-sandbox.coinflow.cash/api/withdraw",
+            "value": "https://api.coinflow.cash/api/withdraw",
             "required": true
           }
         ],
@@ -1324,7 +1366,7 @@
       "url": {
         "mappings": [
           {
-            "value": "https://api-sandbox.coinflow.cash/api/merchant/withdraws/payout/delegated",
+            "value": "https://api.coinflow.cash/api/merchant/withdraws/payout/delegated",
             "required": true
           }
         ],

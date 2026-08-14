@@ -96,8 +96,18 @@
             "key": "code",
             "mappings": [
               {
-                "value": "{{pspResponse0.withdrawal.status}}",
+                "mappings": [
+                  {
+                    "value": "{{pspResponse0.withdrawal.status}}"
+                  },
+                  {
+                    "value": "none"
+                  }
+                ],
                 "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  },
                   {
                     "name": "STRING_TO_LOWERCASE"
                   },

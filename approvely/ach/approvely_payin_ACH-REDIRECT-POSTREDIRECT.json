@@ -5,7 +5,7 @@
       "url": {
         "mappings": [
           {
-            "value": "https://api-sandbox.coinflow.cash/api/auth/session-key",
+            "value": "https://api.coinflow.cash/api/auth/session-key",
             "required": true
           }
         ],
