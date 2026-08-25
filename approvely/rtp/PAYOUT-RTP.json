@@ -1632,57 +1632,13 @@
             ]
           },
           {
-            "key": "isAsapRequested",
-            "hidden": true,
-            "storeIn": "approvelyAch",
-            "value": "{{store.approvelyAch.requestedSpeed}}",
-            "operations": [
-              {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "mappings": [
-                    {
-                      "from": "asap",
-                      "to": true
-                    }
-                  ],
-                  "defaultValue": false
-                }
-              }
-            ]
-          },
-          {
-            "key": "notAsapRequested",
-            "hidden": true,
-            "storeIn": "approvelyAch",
-            "value": "{{store.approvelyAch.isAsapRequested}}",
-            "operations": [
-              {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "mappings": [
-                    {
-                      "from": true,
-                      "to": false
-                    },
-                    {
-                      "from": false,
-                      "to": true
-                    }
-                  ],
-                  "defaultValue": true
-                }
-              }
-            ]
-          },
-          {
             "key": "asapMissing",
             "hidden": true,
             "storeIn": "approvelyAch",
             "mappings": [
               {
                 "key": "left",
-                "value": "{{store.approvelyAch.notAsapRequested}}"
+                "value": "{{store.approvelyAch.isRtpMode}}"
               },
               {
                 "key": "right",
@@ -1693,7 +1649,7 @@
               {
                 "name": "LOGICAL_OPERATION",
                 "params": {
-                  "operator": "OR"
+                  "operator": "AND"
                 }
               }
             ]

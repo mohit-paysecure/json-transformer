@@ -612,15 +612,18 @@
                         "required": true
                       },
                       {
-                        "key": "token",
-                        "mappings": [
-                          {
-                            "value": "{{bankTransaction.tempObject.paymentMethodData.tokenizationData.token}}"
-                          },
-                          {
-                            "value": "{{bankTransaction.gpayEncryptedToken}}"
-                          }
-                        ],
+                         "key": "token",
+                         "mappings": [
+                           {
+                             "value": "{{bankTransaction.tempObject.paymentMethodData.tokenizationData.token}}"
+                           },
+                           {
+                             "value": "{{bankTransaction.gpayEncryptedToken}}"
+                           },
+                           {
+                             "value": ""
+                           }
+                         ],
                         "operations": [
                           {
                             "name": "GET_FIRST_NON_EMPTY_STRING"

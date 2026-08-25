@@ -272,7 +272,9 @@
             "value": "{{store.approvelyWebhook.resolvedOrderId}}"
           },
           {
-            "key": "pspTransactionId",
+            "key": "hasPspTxnId",
+            "hidden": true,
+            "storeIn": "approvelyWebhook",
             "mappings": [
               {
                 "value": "{{webhookRequest.data.id}}"
@@ -282,12 +284,29 @@
               },
               {
                 "value": "{{webhookRequest.data.signature}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
               },
               {
-                "value": "{{webhookRequest.data.idempotencyKey}}"
+                "name": "CHECK_IF_EMPTY"
+              }
+            ]
+          },
+          {
+            "key": "pspTransactionId",
+            "skipIf": "{{store.approvelyWebhook.hasPspTxnId}}",
+            "mappings": [
+              {
+                "value": "{{webhookRequest.data.id}}"
               },
               {
-                "value": ""
+                "value": "{{webhookRequest.data.paymentId}}"
+              },
+              {
+                "value": "{{webhookRequest.data.signature}}"
               }
             ],
             "operations": [

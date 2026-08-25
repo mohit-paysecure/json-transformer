@@ -33,6 +33,10 @@
                     {
                       "from": "stage=ach_payin",
                       "to": 0
+                    },
+                    {
+                      "from": "stage=applepay_payin",
+                      "to": 0
                     }
                   ],
                   "defaultValue": 0
@@ -59,6 +63,10 @@
                     {
                       "from": "stage=ach_payin",
                       "to": "ACH-REDIRECT-POSTREDIRECT"
+                    },
+                    {
+                      "from": "stage=applepay_payin",
+                      "to": "APPLEPAY-REDIRECT-POSTREDIRECT"
                     }
                   ],
                   "defaultValue": ""

@@ -5,7 +5,7 @@
       "url": {
         "mappings": [
           {
-            "value": "https://api-sandbox.coinflow.cash/api/merchant/withdraws/",
+            "value": "https://api.coinflow.cash/api/merchant/withdraws/",
             "required": true
           },
           {
@@ -77,6 +77,40 @@
             "operations": [
               {
                 "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "isWithdrawalNotFound",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "skipIf": "{{store.approvelyAch.hasWithdrawal}}",
+            "value": "{{pspResponse0}}",
+            "operations": [
+              {
+                "name": "STRINGIFY_JSON"
+              },
+              {
+                "name": "STRING_PATTERN_MATCH",
+                "params": {
+                  "regex": "(?is)^.*withdrawal.*not found.*$",
+                  "defaultValue": ""
+                }
+              },
+              {
+                "name": "CHECK_IF_EMPTY"
               },
               {
                 "name": "VALUE_MAPPER",
@@ -282,6 +316,23 @@
           {
             "key": "message",
             "mappings": [
+              {
+                "value": "{{store.approvelyAch.isWithdrawalNotFound}}",
+                "operations": [
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": true,
+                          "to": "User did not complete the transaction"
+                        }
+                      ],
+                      "defaultValue": ""
+                    }
+                  }
+                ]
+              },
               {
                 "value": "{{pspResponse0.detailMessage}}"
               },
