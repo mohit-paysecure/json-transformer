@@ -5,7 +5,7 @@
       "url": {
         "mappings": [
           {
-            "value": "https://api-sandbox.coinflow.cash/api/checkout/card/",
+            "value": "https://api.coinflow.cash/api/checkout/card/",
             "required": true
           },
           {
@@ -595,6 +595,9 @@
           {
             "key": "message",
             "mappings": [
+              {
+                "value": "{{pspResponse0.msg}}"
+              },
               {
                 "value": "{{pspResponse0.action}}"
               },
