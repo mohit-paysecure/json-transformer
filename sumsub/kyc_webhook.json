@@ -1,0 +1,237 @@
+[
+ {
+  "requestMapping": {
+   "method": "POST",
+   "url": {
+    "mappings": [
+     {
+      "value": "about:blank"
+     }
+    ]
+   },
+   "body": {
+    "mappings": [
+     {
+      "key": "code",
+      "value": "success"
+     },
+     {
+      "key": "providerReferenceId",
+      "value": "{{webhookRequest.applicantId}}",
+      "required": true
+     },
+     {
+      "key": "typeGate",
+      "hidden": true,
+      "storeIn": "sumsub",
+      "value": "{{webhookRequest.type}}",
+      "operations": [
+       {
+        "name": "VALUE_MAPPER",
+        "params": {
+         "mappings": [
+          {
+           "from": "applicantReviewed",
+           "to": "1"
+          },
+          {
+           "from": "applicantWorkflowCompleted",
+           "to": "1"
+          },
+          {
+           "from": "applicantWorkflowFailed",
+           "to": "1"
+          }
+         ],
+         "defaultValue": "0"
+        }
+       }
+      ]
+     },
+     {
+      "key": "rejectType",
+      "hidden": true,
+      "storeIn": "sumsub",
+      "value": "{{webhookRequest.reviewResult.reviewRejectType}}",
+      "operations": [
+       {
+        "name": "VALUE_MAPPER",
+        "params": {
+         "mappings": [
+          {
+           "from": "FINAL",
+           "to": "FINAL"
+          },
+          {
+           "from": "RETRY",
+           "to": "RETRY"
+          }
+         ],
+         "defaultValue": "RETRY"
+        }
+       }
+      ]
+     },
+     {
+      "key": "verdictKey",
+      "hidden": true,
+      "storeIn": "sumsub",
+      "mappings": [
+       {
+        "value": "{{webhookRequest.reviewResult.reviewAnswer}}"
+       },
+       {
+        "value": "{{store.sumsub.rejectType}}"
+       }
+      ],
+      "operations": [
+       {
+        "name": "LIST_VALUE_JOIN",
+        "params": {
+         "delimiter": "_"
+        }
+       }
+      ]
+     },
+     {
+      "key": "verdictStatus",
+      "hidden": true,
+      "storeIn": "sumsub",
+      "value": "{{store.sumsub.verdictKey}}",
+      "operations": [
+       {
+        "name": "VALUE_MAPPER",
+        "params": {
+         "mappings": [
+          {
+           "from": "GREEN_FINAL",
+           "to": "KYC_APPROVED"
+          },
+          {
+           "from": "GREEN_RETRY",
+           "to": "KYC_APPROVED"
+          },
+          {
+           "from": "RED_FINAL",
+           "to": "KYC_REJECTED"
+          },
+          {
+           "from": "RED_RETRY",
+           "to": "RESUBMISSION_REQUIRED"
+          }
+         ],
+         "defaultValue": ""
+        }
+       }
+      ]
+     },
+     {
+      "key": "gatedStatus",
+      "hidden": true,
+      "storeIn": "sumsub",
+      "mappings": [
+       {
+        "value": "{{store.sumsub.typeGate}}"
+       },
+       {
+        "value": "{{store.sumsub.verdictStatus}}"
+       }
+      ],
+      "operations": [
+       {
+        "name": "LIST_VALUE_JOIN",
+        "params": {
+         "delimiter": "_"
+        }
+       },
+       {
+        "name": "VALUE_MAPPER",
+        "params": {
+         "mappings": [
+          {
+           "from": "1_KYC_APPROVED",
+           "to": "KYC_APPROVED"
+          },
+          {
+           "from": "1_KYC_REJECTED",
+           "to": "KYC_REJECTED"
+          },
+          {
+           "from": "1_RESUBMISSION_REQUIRED",
+           "to": "RESUBMISSION_REQUIRED"
+          }
+         ],
+         "defaultValue": ""
+        }
+       }
+      ]
+     },
+     {
+      "key": "status",
+      "value": "{{store.sumsub.gatedStatus}}"
+     },
+     {
+      "key": "decisionReasons",
+      "value": "{{webhookRequest.reviewResult.rejectLabels}}",
+      "operations": [
+       {
+        "name": "LIST_VALUE_JOIN",
+        "params": {
+         "delimiter": ","
+        }
+       }
+      ]
+     },
+     {
+      "key": "receivedSignature",
+      "value": "{{webhookRequestHeader.x-payload-digest}}"
+     },
+     {
+      "key": "generatedSignature",
+      "mappings": [
+       {
+        "key": "input",
+        "value": "{{webhookRequestHeader.x-raw-body}}"
+       },
+       {
+        "key": "secretKey",
+        "value": "{{kycProvider.authKey}}",
+        "operations": [
+         {
+          "name": "SPLIT_STRING",
+          "params": {
+           "delimiter": "##"
+          }
+         },
+         {
+          "name": "GET_ELEMENT_AT_INDEX",
+          "params": {
+           "index": 2
+          }
+         }
+        ]
+       }
+      ],
+      "operations": [
+       {
+        "name": "KEY_VALUE_LIST_TO_OBJECT"
+       },
+       {
+        "name": "COMPUTE_HMAC_SHA",
+        "params": {
+         "algorithm": "HmacSHA256",
+         "outputFormat": "HEX"
+        }
+       }
+      ]
+     }
+    ],
+    "operations": [
+     {
+      "name": "KEY_VALUE_LIST_TO_OBJECT"
+     }
+    ]
+   }
+  }
+ }
+]

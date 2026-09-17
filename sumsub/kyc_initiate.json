@@ -1,0 +1,745 @@
+[
+ {
+  "requestMapping": {
+   "method": "GET",
+   "url": {
+    "mappings": [
+     {
+      "value": "{{kycProvider.baseUrl}}",
+      "required": true
+     },
+     {
+      "value": "/resources/applicants/-;externalUserId=",
+      "required": true
+     },
+     {
+      "value": "{{kyc.customerId}}",
+      "required": true
+     },
+     {
+      "value": "/one",
+      "required": true
+     }
+    ],
+    "operations": [
+     {
+      "name": "LIST_VALUE_JOIN"
+     }
+    ]
+   },
+   "headers": {
+    "mappings": [
+     {
+      "key": "Content-Type",
+      "value": "application/json",
+      "required": true
+     },
+     {
+      "key": "X-App-Token",
+      "required": true,
+      "value": "{{kycProvider.authKey}}",
+      "operations": [
+       {
+        "name": "SPLIT_STRING",
+        "params": {
+         "delimiter": "##"
+        }
+       },
+       {
+        "name": "GET_ELEMENT_AT_INDEX",
+        "params": {
+         "index": 0
+        }
+       }
+      ]
+     },
+     {
+      "key": "X-App-Access-Ts",
+      "value": "{{kycSign.epochSeconds}}",
+      "required": true
+     },
+     {
+      "key": "X-App-Access-Sig",
+      "required": true,
+      "mappings": [
+       {
+        "key": "input",
+        "mappings": [
+         {
+          "value": "{{kycSign.epochSeconds}}"
+         },
+         {
+          "value": "{{kycSign.method}}"
+         },
+         {
+          "value": "{{kycSign.pathWithQuery}}"
+         },
+         {
+          "value": "{{kycSign.body}}"
+         }
+        ],
+        "operations": [
+         {
+          "name": "LIST_VALUE_JOIN"
+         }
+        ]
+       },
+       {
+        "key": "secretKey",
+        "value": "{{kycProvider.authKey}}",
+        "operations": [
+         {
+          "name": "SPLIT_STRING",
+          "params": {
+           "delimiter": "##"
+          }
+         },
+         {
+          "name": "GET_ELEMENT_AT_INDEX",
+          "params": {
+           "index": 1
+          }
+         }
+        ]
+       }
+      ],
+      "operations": [
+       {
+        "name": "KEY_VALUE_LIST_TO_OBJECT"
+       },
+       {
+        "name": "COMPUTE_HMAC_SHA",
+        "params": {
+         "algorithm": "HmacSHA256",
+         "outputFormat": "HEX"
+        }
+       }
+      ]
+     }
+    ],
+    "operations": [
+     {
+      "name": "KEY_VALUE_LIST_TO_OBJECT"
+     }
+    ]
+   }
+  },
+  "responseMapping": {
+   "body": {
+    "mappings": [
+     {
+      "key": "code",
+      "value": "success"
+     },
+     {
+      "key": "providerReferenceId",
+      "value": "{{pspResponse0.id}}"
+     },
+     {
+      "key": "skipPspCount",
+      "value": "{{kycHttp0.statusCode}}",
+      "operations": [
+       {
+        "name": "VALUE_MAPPER",
+        "params": {
+         "mappings": [
+          {
+           "from": "200",
+           "to": "1"
+          }
+         ],
+         "defaultValue": "0"
+        }
+       }
+      ]
+     }
+    ],
+    "operations": [
+     {
+      "name": "KEY_VALUE_LIST_TO_OBJECT"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "requestMapping": {
+   "method": "POST",
+   "url": {
+    "mappings": [
+     {
+      "value": "{{kycProvider.baseUrl}}"
+     },
+     {
+      "value": "/resources/applicants?levelName="
+     },
+     {
+      "value": "{{kycProvider.authKey}}",
+      "operations": [
+       {
+        "name": "SPLIT_STRING",
+        "params": {
+         "delimiter": "##"
+        }
+       },
+       {
+        "name": "GET_ELEMENT_AT_INDEX",
+        "params": {
+         "index": 3
+        }
+       }
+      ]
+     }
+    ],
+    "operations": [
+     {
+      "name": "LIST_VALUE_JOIN"
+     }
+    ]
+   },
+   "headers": {
+    "mappings": [
+     {
+      "key": "Content-Type",
+      "value": "application/json",
+      "required": true
+     },
+     {
+      "key": "X-App-Token",
+      "required": true,
+      "value": "{{kycProvider.authKey}}",
+      "operations": [
+       {
+        "name": "SPLIT_STRING",
+        "params": {
+         "delimiter": "##"
+        }
+       },
+       {
+        "name": "GET_ELEMENT_AT_INDEX",
+        "params": {
+         "index": 0
+        }
+       }
+      ]
+     },
+     {
+      "key": "X-App-Access-Ts",
+      "value": "{{kycSign.epochSeconds}}",
+      "required": true
+     },
+     {
+      "key": "X-App-Access-Sig",
+      "required": true,
+      "mappings": [
+       {
+        "key": "input",
+        "mappings": [
+         {
+          "value": "{{kycSign.epochSeconds}}"
+         },
+         {
+          "value": "{{kycSign.method}}"
+         },
+         {
+          "value": "{{kycSign.pathWithQuery}}"
+         },
+         {
+          "value": "{{kycSign.body}}"
+         }
+        ],
+        "operations": [
+         {
+          "name": "LIST_VALUE_JOIN"
+         }
+        ]
+       },
+       {
+        "key": "secretKey",
+        "value": "{{kycProvider.authKey}}",
+        "operations": [
+         {
+          "name": "SPLIT_STRING",
+          "params": {
+           "delimiter": "##"
+          }
+         },
+         {
+          "name": "GET_ELEMENT_AT_INDEX",
+          "params": {
+           "index": 1
+          }
+         }
+        ]
+       }
+      ],
+      "operations": [
+       {
+        "name": "KEY_VALUE_LIST_TO_OBJECT"
+       },
+       {
+        "name": "COMPUTE_HMAC_SHA",
+        "params": {
+         "algorithm": "HmacSHA256",
+         "outputFormat": "HEX"
+        }
+       }
+      ]
+     }
+    ],
+    "operations": [
+     {
+      "name": "KEY_VALUE_LIST_TO_OBJECT"
+     }
+    ]
+   },
+   "body": {
+    "mappings": [
+     {
+      "key": "externalUserId",
+      "value": "{{kyc.customerId}}",
+      "required": true
+     },
+     {
+      "key": "type",
+      "value": "individual",
+      "required": true
+     },
+     {
+      "key": "lang",
+      "value": "en"
+     },
+     {
+      "key": "email",
+      "value": "{{customer.email}}"
+     },
+     {
+      "key": "phone",
+      "value": "{{customer.phone}}"
+     },
+     {
+      "key": "fixedInfo",
+      "mappings": [
+       {
+        "key": "firstName",
+        "operations": [
+         {
+          "name": "SPLIT_STRING",
+          "params": {
+           "delimiter": "\\s+"
+          }
+         },
+         {
+          "name": "GET_ELEMENT_AT_INDEX",
+          "params": {
+           "index": 0,
+           "fromLast": false,
+           "defaultValue": ""
+          }
+         }
+        ],
+        "value": "{{customer.fullName}}"
+       },
+       {
+        "key": "lastName",
+        "operations": [
+         {
+          "name": "SPLIT_STRING",
+          "params": {
+           "delimiter": "\\s+"
+          }
+         },
+         {
+          "name": "GET_ELEMENT_AT_INDEX",
+          "params": {
+           "index": 0,
+           "fromLast": true,
+           "defaultValue": ""
+          }
+         }
+        ],
+        "value": "{{customer.fullName}}"
+       },
+       {
+        "key": "dob",
+        "value": "{{customer.dateOfBirth}}"
+       },
+       {
+        "key": "country",
+        "mappings": [
+         {
+          "value": "{{customer.country}}"
+         },
+         {
+          "value": "{{kyc.country}}"
+         }
+        ],
+        "operations": [
+         {
+          "name": "GET_FIRST_NON_EMPTY_STRING"
+         },
+         {
+          "name": "CONVERT_COUNTRYCODE_ALPHA2_TO_ALPHA3"
+         }
+        ]
+       },
+       {
+        "key": "addresses",
+        "mappings": [
+         {
+          "mappings": [
+           {
+            "key": "street",
+            "value": "{{customer.street}}"
+           },
+           {
+            "key": "town",
+            "value": "{{customer.city}}"
+           },
+           {
+            "key": "state",
+            "value": "{{customer.stateCode}}"
+           },
+           {
+            "key": "postCode",
+            "value": "{{customer.zipCode}}"
+           },
+           {
+            "key": "country",
+            "mappings": [
+             {
+              "value": "{{customer.country}}"
+             },
+             {
+              "value": "{{kyc.country}}"
+             }
+            ],
+            "operations": [
+             {
+              "name": "GET_FIRST_NON_EMPTY_STRING"
+             },
+             {
+              "name": "CONVERT_COUNTRYCODE_ALPHA2_TO_ALPHA3"
+             }
+            ]
+           }
+          ],
+          "operations": [
+           {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+           }
+          ]
+         }
+        ],
+        "operations": [
+         {
+          "name": "MAP_LIST_TO_VALUE_LIST"
+         }
+        ]
+       }
+      ],
+      "operations": [
+       {
+        "name": "KEY_VALUE_LIST_TO_OBJECT"
+       }
+      ]
+     }
+    ],
+    "operations": [
+     {
+      "name": "KEY_VALUE_LIST_TO_OBJECT"
+     }
+    ]
+   }
+  },
+  "responseMapping": {
+   "body": {
+    "mappings": [
+     {
+      "key": "code",
+      "value": "success"
+     },
+     {
+      "key": "providerReferenceId",
+      "value": "{{pspResponse1.id}}"
+     }
+    ],
+    "operations": [
+     {
+      "name": "KEY_VALUE_LIST_TO_OBJECT"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "requestMapping": {
+   "method": "POST",
+   "url": {
+    "mappings": [
+     {
+      "value": "{{kycProvider.baseUrl}}"
+     },
+     {
+      "value": "/resources/accessTokens?userId="
+     },
+     {
+      "value": "{{kyc.customerId}}"
+     },
+     {
+      "value": "&levelName="
+     },
+     {
+      "value": "{{kycProvider.authKey}}",
+      "operations": [
+       {
+        "name": "SPLIT_STRING",
+        "params": {
+         "delimiter": "##"
+        }
+       },
+       {
+        "name": "GET_ELEMENT_AT_INDEX",
+        "params": {
+         "index": 3
+        }
+       }
+      ]
+     },
+     {
+      "value": "&ttlInSecs=1800"
+     }
+    ],
+    "operations": [
+     {
+      "name": "LIST_VALUE_JOIN"
+     }
+    ]
+   },
+   "headers": {
+    "mappings": [
+     {
+      "key": "Content-Type",
+      "value": "application/json",
+      "required": true
+     },
+     {
+      "key": "X-App-Token",
+      "required": true,
+      "value": "{{kycProvider.authKey}}",
+      "operations": [
+       {
+        "name": "SPLIT_STRING",
+        "params": {
+         "delimiter": "##"
+        }
+       },
+       {
+        "name": "GET_ELEMENT_AT_INDEX",
+        "params": {
+         "index": 0
+        }
+       }
+      ]
+     },
+     {
+      "key": "X-App-Access-Ts",
+      "value": "{{kycSign.epochSeconds}}",
+      "required": true
+     },
+     {
+      "key": "X-App-Access-Sig",
+      "required": true,
+      "mappings": [
+       {
+        "key": "input",
+        "mappings": [
+         {
+          "value": "{{kycSign.epochSeconds}}"
+         },
+         {
+          "value": "{{kycSign.method}}"
+         },
+         {
+          "value": "{{kycSign.pathWithQuery}}"
+         },
+         {
+          "value": "{{kycSign.body}}"
+         }
+        ],
+        "operations": [
+         {
+          "name": "LIST_VALUE_JOIN"
+         }
+        ]
+       },
+       {
+        "key": "secretKey",
+        "value": "{{kycProvider.authKey}}",
+        "operations": [
+         {
+          "name": "SPLIT_STRING",
+          "params": {
+           "delimiter": "##"
+          }
+         },
+         {
+          "name": "GET_ELEMENT_AT_INDEX",
+          "params": {
+           "index": 1
+          }
+         }
+        ]
+       }
+      ],
+      "operations": [
+       {
+        "name": "KEY_VALUE_LIST_TO_OBJECT"
+       },
+       {
+        "name": "COMPUTE_HMAC_SHA",
+        "params": {
+         "algorithm": "HmacSHA256",
+         "outputFormat": "HEX"
+        }
+       }
+      ]
+     }
+    ],
+    "operations": [
+     {
+      "name": "KEY_VALUE_LIST_TO_OBJECT"
+     }
+    ]
+   }
+  },
+  "responseMapping": {
+   "body": {
+    "mappings": [
+     {
+      "key": "code",
+      "value": "success"
+     },
+     {
+      "key": "sumsubToken",
+      "value": "{{pspResponse2.token}}",
+      "storeIn": "sumsub",
+      "hidden": true
+     }
+    ],
+    "operations": [
+     {
+      "name": "KEY_VALUE_LIST_TO_OBJECT"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "requestMapping": {
+   "method": "POST",
+   "url": {
+    "mappings": [
+     {
+      "value": "about:blank"
+     }
+    ]
+   },
+   "body": {
+    "mappings": [
+     {
+      "key": "skipPspCall",
+      "value": "true",
+      "required": true
+     }
+    ],
+    "operations": [
+     {
+      "name": "KEY_VALUE_LIST_TO_OBJECT"
+     }
+    ]
+   }
+  },
+  "responseMapping": {
+   "body": {
+    "mappings": [
+     {
+      "key": "code",
+      "value": "success"
+     },
+     {
+      "key": "status",
+      "value": "AWAITING_USER"
+     },
+     {
+      "key": "terminal",
+      "value": "true"
+     },
+     {
+      "key": "redirectHtml",
+      "required": true,
+      "mappings": [
+       {
+        "key": "accessToken",
+        "value": "{{store.sumsub.sumsubToken}}"
+       },
+       {
+        "key": "returnUrl",
+        "value": "{{extraParams.returnUrl}}"
+       },
+       {
+        "key": "lang",
+        "value": "en"
+       },
+       {
+        "key": "email",
+        "mappings": [
+         {
+          "value": "{{customer.email}}"
+         },
+         {
+          "value": "{{customer.email}}"
+         }
+        ],
+        "operations": [
+         {
+          "name": "GET_FIRST_NON_EMPTY_STRING"
+         }
+        ]
+       },
+       {
+        "key": "phone",
+        "mappings": [
+         {
+          "value": "{{customer.phone}}"
+         },
+         {
+          "value": "{{customer.phone}}"
+         }
+        ],
+        "operations": [
+         {
+          "name": "GET_FIRST_NON_EMPTY_STRING"
+         }
+        ]
+       }
+      ],
+      "operations": [
+       {
+        "name": "GENERATE_HTML",
+        "params": {
+         "htmlRenderMode": "SUMSUB_WEBSDK"
+        }
+       }
+      ]
+     }
+    ],
+    "operations": [
+     {
+      "name": "KEY_VALUE_LIST_TO_OBJECT"
+     }
+    ]
+   }
+  }
+ }
+]
