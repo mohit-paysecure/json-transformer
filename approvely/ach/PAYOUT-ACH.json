@@ -955,7 +955,144 @@
           },
           {
             "key": "redirectUrl",
-            "value": "{{pspResponse1.verificationLink}}"
+            "mappings": [
+              {
+                "value": "/showProvider/details/payout/"
+              },
+              {
+                "value": "{{payout.payoutId}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
+          },
+          {
+            "key": "tempObjectThird",
+            "mappings": [
+              {
+                "key": "page",
+                "mappings": [
+                  {
+                    "key": "title",
+                    "value": ""
+                  },
+                  {
+                    "key": "description",
+                    "value": ""
+                  },
+                  {
+                    "key": "layout",
+                    "mappings": [
+                      {
+                        "key": "bodyStyle",
+                        "value": "align-items:center;"
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "footer",
+                    "value": ""
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ]
+              },
+              {
+                "key": "fields",
+                "mappings": [
+                  {
+                    "key": "value",
+                    "mappings": [
+                      {
+                        "key": "id",
+                        "value": "kycBtn"
+                      },
+                      {
+                        "key": "name",
+                        "value": "kycBtn"
+                      },
+                      {
+                        "key": "inputType",
+                        "value": "STATICHTML"
+                      },
+                      {
+                        "key": "dataType",
+                        "value": "STRING"
+                      },
+                      {
+                        "key": "content",
+                        "mappings": [
+                          {
+                            "value": "<button type='button' class='btn btn-primary' id='kycBtn' onclick=\"window.open('"
+                          },
+                          {
+                            "value": "{{pspResponse1.verificationLink}}"
+                          },
+                          {
+                            "value": "','_blank'); document.getElementById('kycBtn').style.display='none'; document.getElementById('kycLoaderBox').style.display='block'; var start=Date.now(); var pendingRedirectUrl=null; var totalMs=1800000; function fmt(ms){ var s=Math.max(0,Math.floor(ms/1000)); var m=Math.floor(s/60); var sec=s%60; return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0'); } var timerEl=document.getElementById('kycTimerText'); var tick=setInterval(function(){ var remaining=totalMs-(Date.now()-start); if(remaining<=0){ clearInterval(tick); } else { timerEl.textContent='Time left: '+fmt(remaining)+' min'; } },1000); var poll=setInterval(function(){ if(Date.now()-start>=totalMs){ clearInterval(poll); clearInterval(tick); window.location.href=pendingRedirectUrl || '/'; return; } fetch('/api/v1/payoutF/'+TRANSACTION_ID+'/').then(function(r){return r.json();}).then(function(res){ var isPaid=res.code==='success'; var isError=res.code==='error'; var isPending=res.code==='inProcess'; if(isPending&&res.message){ pendingRedirectUrl=res.message; } if((isPaid||isError)&&res.message){ clearInterval(poll); clearInterval(tick); window.location.href=res.message; } }).catch(function(e){console.error('payoutF poll failed',e);}); },5000);\">Continue to Kyc</button><div id='kycLoaderBox' style='display:none;text-align:center;margin-top:16px;'><span class=\"spinner-border text-primary\"></span><p style='margin-top:10px;margin-bottom:4px;font-size:14px;font-weight:600;color:#1A1A1A;'>Complete your KYC in the new tab, verifying status...</p><p id='kycTimerText' style='font-size:13px;color:#8C8C8C;'>Time left: 30:00 min</p></div>"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "LIST_VALUE_JOIN"
+                          }
+                        ],
+                        "value": ""
+                      },
+                      {
+                        "key": "ui",
+                        "mappings": [
+                          {
+                            "key": "uiStyle",
+                            "value": "position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:90%; max-width:420px; z-index:10;"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "KEY_VALUE_LIST_TO_OBJECT"
+                          }
+                        ]
+                      },
+                      {
+                        "key": "required",
+                        "value": "false",
+                        "operations": [
+                          {
+                            "name": "STRING_TO_BOOLEAN"
+                          }
+                        ]
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_OBJECT_VALUE_TO_LIST_VALUE"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
           },
           {
             "key": "message",
