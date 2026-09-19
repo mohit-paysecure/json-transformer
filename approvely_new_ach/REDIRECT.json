@@ -43,6 +43,14 @@
                       "to": 1
                     },
                     {
+                      "from": "stage=kyc_rtp_payout",
+                      "to": 1
+                    },
+                    {
+                      "from": "stage=after_kyc_rtp_bank_link",
+                      "to": 1
+                    },
+                    {
                       "from": "stage=ach_payin",
                       "to": 0
                     },
@@ -87,6 +95,14 @@
                     {
                       "from": "stage=rtp_bank_link",
                       "to": "PAYOUT-RTP-POSTREDIRECT"
+                    },
+                    {
+                      "from": "stage=kyc_rtp_payout",
+                      "to": "PAYOUT-RTP-POSTREDIRECT1"
+                    },
+                    {
+                      "from": "stage=after_kyc_rtp_bank_link",
+                      "to": "PAYOUT-RTP-POSTREDIRECT2"
                     },
                     {
                       "from": "stage=ach_payin",
