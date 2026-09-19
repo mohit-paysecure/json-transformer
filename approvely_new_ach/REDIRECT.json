@@ -1,0 +1,135 @@
+[
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": []
+      },
+      "headers": {
+        "mappings": []
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "postRedirectFlowRequired",
+            "value": true
+          },
+          {
+            "key": "allowedRedirectionCount",
+            "value": "{{redirectRequest.value}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "stage=after_kyc_bank_link",
+                      "to": 1
+                    },
+                    {
+                      "from": "stage=after_kyc_bank_link_redirect",
+                      "to": 1
+                    },
+                    {
+                      "from": "stage=bank_link",
+                      "to": 1
+                    },
+                    {
+                      "from": "stage=bank_link_redirect",
+                      "to": 1
+                    },
+                    {
+                      "from": "stage=rtp_bank_link",
+                      "to": 1
+                    },
+                    {
+                      "from": "stage=ach_payin",
+                      "to": 0
+                    },
+                    {
+                      "from": "stage=applepay_payin",
+                      "to": 0
+                    },
+                    {
+                      "from": "stage=kycPayout",
+                      "to": 1
+                    },
+                    {
+                      "from": "stage=kycAchPayout",
+                      "to": 1
+                    },
+                    {
+                      "from": "stage=kyc_ach_redirect_payout",
+                      "to": 1
+                    }
+                  ],
+                  "defaultValue": 0
+                }
+              }
+            ]
+          },
+          {
+            "key": "postRedirectFlow",
+            "value": "{{redirectRequest.value}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "stage=bank_link",
+                      "to": "PAYOUT-ACH-POSTREDIRECT"
+                    },
+                    {
+                      "from": "stage=bank_link_redirect",
+                      "to": "PAYOUT-ACH-REDIRECT-POSTREDIRECT"
+                    },
+                    {
+                      "from": "stage=rtp_bank_link",
+                      "to": "PAYOUT-RTP-POSTREDIRECT"
+                    },
+                    {
+                      "from": "stage=ach_payin",
+                      "to": "ACH-REDIRECT-POSTREDIRECT"
+                    },
+                    {
+                      "from": "stage=applepay_payin",
+                      "to": "APPLEPAY-REDIRECT-POSTREDIRECT"
+                    },
+                    {
+                      "from": "stage=kycAchPayout",
+                      "to": "PAYOUT-ACH-POSTREDIRECT1"
+                    },
+                    {
+                      "from": "stage=kyc_ach_redirect_payout",
+                      "to": "PAYOUT-ACH-REDIRECT-POSTREDIRECT1"
+                    },
+                    {
+                      "from": "stage=after_kyc_bank_link",
+                      "to": "PAYOUT-ACH-POSTREDIRECT1"
+                    },
+                    {
+                      "from": "stage=after_kyc_bank_link_redirect",
+                      "to": "PAYOUT-ACH-REDIRECT-POSTREDIRECT2"
+                    }
+                  ],
+                  "defaultValue": ""
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": []
+      }
+    }
+  }
+]
