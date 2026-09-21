@@ -476,23 +476,6 @@
                 ]
               },
               {
-                "value": "{{store.approvelyAch.isBankNotAlreadyLinked}}",
-                "operations": [
-                  {
-                    "name": "VALUE_MAPPER",
-                    "params": {
-                      "mappings": [
-                        {
-                          "from": true,
-                          "to": 1
-                        }
-                      ],
-                      "defaultValue": ""
-                    }
-                  }
-                ]
-              },
-              {
                 "value": "{{bankTransaction.bankTokenAuthenticated}}",
                 "operations": [
                   {
@@ -502,6 +485,23 @@
                         {
                           "from": true,
                           "to": 2
+                        }
+                      ],
+                      "defaultValue": ""
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "{{store.approvelyAch.isBankNotAlreadyLinked}}",
+                "operations": [
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": true,
+                          "to": 1
                         }
                       ],
                       "defaultValue": ""
