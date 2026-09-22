@@ -398,11 +398,11 @@
                       "from": true,
                       "to": "approved"
                     }
-                  ],
-                  "defaultValue": ""
+                  ]
                 }
               }
-            ]
+            ],
+            "_comment": "Omitting defaultValue is deliberate: VALUE_MAPPER then returns null, the null child is dropped, and CommonPayout only writes customerKycStatus when the key is present -- so a non-approved probe no longer blanks a status another flow already earned."
           },
           {
             "key": "skipPspCount",
@@ -1080,14 +1080,15 @@
                 ]
               },
               {
-                "value": "rejected"
+                "value": ""
               }
             ],
             "operations": [
               {
                 "name": "GET_FIRST_NON_EMPTY_STRING"
               }
-            ]
+            ],
+            "_comment": "Trailing \"\" is the terminator, not a status: it keeps the GET_FIRST_NON_EMPTY_STRING list non-empty (an empty list throws) while resolving to null, so the key is dropped and the stored status is left alone. It replaces a literal \"rejected\", which also fired on 4xx/error responses. A genuine rejection comes from the KYC webhook (\"kyc failure\" -> \"rejected\")."
           },
           {
             "key": "message",

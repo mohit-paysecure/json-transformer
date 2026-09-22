@@ -449,11 +449,11 @@
                       "from": true,
                       "to": "approved"
                     }
-                  ],
-                  "defaultValue": ""
+                  ]
                 }
               }
-            ]
+            ],
+            "_comment": "Omitting defaultValue is deliberate: VALUE_MAPPER then returns null, the null child is dropped, and CommonPayout only writes customerKycStatus when the key is present -- so a non-approved probe no longer blanks a status another flow already earned."
           },
           {
             "key": "skipPspCount",
@@ -895,14 +895,15 @@
                 ]
               },
               {
-                "value": "rejected"
+                "value": ""
               }
             ],
             "operations": [
               {
                 "name": "GET_FIRST_NON_EMPTY_STRING"
               }
-            ]
+            ],
+            "_comment": "Trailing \"\" is the terminator, not a status: it keeps the GET_FIRST_NON_EMPTY_STRING list non-empty (an empty list throws) while resolving to null, so the key is dropped and the stored status is left alone. It replaces a literal \"rejected\", which also fired on 4xx/error responses. A genuine rejection comes from the KYC webhook (\"kyc failure\" -> \"rejected\")."
           },
           {
             "key": "code",
@@ -1091,13 +1092,13 @@
                             "value": "{{store.approvelyAch.previouslyUsedContext.customer.customerId}}"
                           },
                           {
-                            "value": "/').then(function(r){return r.json();}).then(function(res){var code=(res.code||'').toLowerCase();if(code==='approved'){showVerified();}else if(code==='rejected'){showRejected();}else if(code==='error'||code==='unknown'){console.error('kycStatus returned',code,res.message);}}).catch(function(e){console.error('kycStatus poll failed',e);});}function startTimer(windowMs){start=Date.now();totalMs=windowMs;tick=setInterval(function(){var remaining=totalMs-(Date.now()-start);if(remaining<=0){clearInterval(tick);clearInterval(msgTick);clearInterval(poll);showPending();}else{timerEl.textContent=fmt(remaining);}},1000);}function startPolling(){poll=setInterval(function(){if(Date.now()-start>=totalMs){clearInterval(poll);clearInterval(tick);clearInterval(msgTick);showPending();return;}doPoll();},15000);}var msgs=['Waiting for verification…','Checking status…','Still waiting on the other tab…'];var mi=0;msgTick=setInterval(function(){mi=(mi+1)%msgs.length;if(statusEl){statusEl.textContent=msgs[mi];}},4000);startTimer(totalMs);startPolling();document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'&&waitV.style.display!=='none'){doPoll();}});window.__kycReopen=function(){var w2=window.open('"
+                            "value": "/').then(function(r){return r.json();}).then(function(res){var code=(res.code||'').toLowerCase();if(code==='approved'){showVerified();}else if(code==='rejected'){showRejected();}else if(code==='error'||code==='unknown'){console.error('kycStatus returned',code,res.message);}}).catch(function(e){console.error('kycStatus poll failed',e);});}function startTimer(windowMs){start=Date.now();totalMs=windowMs;tick=setInterval(function(){var remaining=totalMs-(Date.now()-start);if(remaining<=0){clearInterval(tick);clearInterval(msgTick);clearInterval(poll);showPending();}else{timerEl.textContent=fmt(remaining);}},1000);}function startPolling(){poll=setInterval(function(){if(Date.now()-start>=totalMs){clearInterval(poll);clearInterval(tick);clearInterval(msgTick);showPending();return;}doPoll();},15000);}var msgs=['Waiting for verification\u2026','Checking status\u2026','Still waiting on the other tab\u2026'];var mi=0;msgTick=setInterval(function(){mi=(mi+1)%msgs.length;if(statusEl){statusEl.textContent=msgs[mi];}},4000);startTimer(totalMs);startPolling();document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'&&waitV.style.display!=='none'){doPoll();}});window.__kycReopen=function(){var w2=window.open('"
                           },
                           {
                             "value": "{{pspResponse1.verificationLink}}"
                           },
                           {
-                            "value": "','_blank');if(w2&&fb){fb.style.display='none';}};\">Continue to verification <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12h14'/><path d='M13 6l6 6-6 6'/></svg></button>\n</div><div id='kycWaitView' style='display:none'>\n<div class='kyc-icon'><span class='kyc-ring'></span><span class='kyc-ring kyc-d2'></span><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3l7 3v5c0 4.6-3 8.4-7 9.5-4-1.1-7-4.9-7-9.5V6l7-3z'/><path d='M8.5 12l2.3 2.3L15.5 9.5'/></svg></div>\n<div class='kyc-h1'>Verifying your identity</div>\n<div class='kyc-p'>Finish the steps in the tab we opened. Don't close this one &mdash; it updates on its own.</div>\n<div class='kyc-status'><span class='kyc-blip'></span><span id='kycStatusText'>Waiting for verification…</span></div>\n<div class='kyc-timer' id='kycTimerText'>30:00</div>\n<div class='kyc-timer-label'>time left to complete</div>\n<div class='kyc-track'><div class='kyc-fill'></div></div>\n<div class='kyc-links'>\n<button type='button' class='kyc-link' onclick='window.__kycReopen()'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M14 4h6v6'/><path d='M20 4l-9 9'/><path d='M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5'/></svg>Reopen verification tab</button>\n</div>\n<div class='kyc-fallback' id='kycFallback'>Pop-up blocked? <a id='kycFallbackLink' href='"
+                            "value": "','_blank');if(w2&&fb){fb.style.display='none';}};\">Continue to verification <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12h14'/><path d='M13 6l6 6-6 6'/></svg></button>\n</div><div id='kycWaitView' style='display:none'>\n<div class='kyc-icon'><span class='kyc-ring'></span><span class='kyc-ring kyc-d2'></span><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3l7 3v5c0 4.6-3 8.4-7 9.5-4-1.1-7-4.9-7-9.5V6l7-3z'/><path d='M8.5 12l2.3 2.3L15.5 9.5'/></svg></div>\n<div class='kyc-h1'>Verifying your identity</div>\n<div class='kyc-p'>Finish the steps in the tab we opened. Don't close this one &mdash; it updates on its own.</div>\n<div class='kyc-status'><span class='kyc-blip'></span><span id='kycStatusText'>Waiting for verification\u2026</span></div>\n<div class='kyc-timer' id='kycTimerText'>30:00</div>\n<div class='kyc-timer-label'>time left to complete</div>\n<div class='kyc-track'><div class='kyc-fill'></div></div>\n<div class='kyc-links'>\n<button type='button' class='kyc-link' onclick='window.__kycReopen()'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M14 4h6v6'/><path d='M20 4l-9 9'/><path d='M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5'/></svg>Reopen verification tab</button>\n</div>\n<div class='kyc-fallback' id='kycFallback'>Pop-up blocked? <a id='kycFallbackLink' href='"
                           },
                           {
                             "value": "{{pspResponse1.verificationLink}}"
