@@ -1,0 +1,1474 @@
+[
+  {
+    "requestMapping": {
+      "method": "GET",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://api-sandbox.coinflow.cash/api/withdraw",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Authorization",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 1
+                }
+              }
+            ]
+          },
+          {
+            "key": "x-coinflow-auth-user-id",
+            "value": "{{store.approvelyAch.resolvedUserId}}",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "previouslyUsedContext",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{payout.payoutId}}",
+            "operations": [
+              {
+                "name": "GET_OR_CREATE_CUSTOMER",
+                "params": {}
+              }
+            ]
+          },
+          {
+            "key": "resolvedUserId",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "mappings": [
+              {
+                "value": "{{store.approvelyAch.previouslyUsedContext.customer.customerId}}"
+              },
+              {
+                "value": "{{payout.extraParam.approvelyVenmoUserId}}"
+              },
+              {
+                "value": "{{payout.client.email}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "normalizedAccount",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{payout.beneficiaryDetail.bankAccountNumber}}",
+            "operations": [
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "\\s+",
+                  "replacement": "",
+                  "occurrence": "REGEX_ALL"
+                }
+              }
+            ]
+          },
+          {
+            "key": "accountLast4",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{store.approvelyAch.normalizedAccount}}",
+            "operations": [
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "^.*(.{4})$",
+                  "replacement": "$1",
+                  "occurrence": "REGEX_FIRST"
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "isKycApproved",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{pspResponse0.withdrawer.verification.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "approved",
+                      "to": true
+                    },
+                    {
+                      "from": "APPROVED",
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "midAchTokens",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "mappings": [
+              {
+                "key": "map",
+                "value": "{{store.approvelyAch.previouslyUsedContext.customer.financialDetails.achTokens}}"
+              },
+              {
+                "key": "key",
+                "value": "{{bankTransaction.midName}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "GET_MAP_VALUE"
+              }
+            ]
+          },
+          {
+            "key": "existingAccountTokenByFullAccount",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "mappings": [
+              {
+                "key": "map",
+                "value": "{{store.approvelyAch.midAchTokens}}"
+              },
+              {
+                "key": "key",
+                "value": "{{store.approvelyAch.normalizedAccount}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "GET_MAP_VALUE"
+              }
+            ]
+          },
+          {
+            "key": "existingAccountTokenByLast4",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "mappings": [
+              {
+                "key": "map",
+                "value": "{{store.approvelyAch.midAchTokens}}"
+              },
+              {
+                "key": "key",
+                "value": "{{store.approvelyAch.accountLast4}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "GET_MAP_VALUE"
+              }
+            ]
+          },
+          {
+            "key": "existingAccountToken",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "mappings": [
+              {
+                "value": "{{store.approvelyAch.existingAccountTokenByFullAccount}}"
+              },
+              {
+                "value": "{{store.approvelyAch.existingAccountTokenByLast4}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "isBankAlreadyLinked",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{store.approvelyAch.existingAccountToken}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_EMPTY"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "matchedResponseToken",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "mappings": [
+              {
+                "key": "list",
+                "value": "{{pspResponse0.withdrawer.bankAccounts}}"
+              },
+              {
+                "key": "matchValue",
+                "value": "{{store.approvelyAch.accountLast4}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "FIND_OBJECT_IN_LIST_BY_FIELD_MATCH",
+                "params": {
+                  "fieldPath": "last4",
+                  "extractField": "token"
+                }
+              }
+            ]
+          },
+          {
+            "key": "resolvedResponseToken",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "mappings": [
+              {
+                "value": "{{store.approvelyAch.matchedResponseToken}}"
+              },
+              {
+                "value": "{{store.approvelyAch.existingAccountToken}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "hasResolvedToken",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{store.approvelyAch.resolvedResponseToken}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_EMPTY"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "resolvedAccountToken",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{store.approvelyAch.resolvedResponseToken}}"
+          },
+          {
+            "key": "canUseResolvedToken",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "mappings": [
+              {
+                "key": "left",
+                "value": "{{store.approvelyAch.isKycApproved}}"
+              },
+              {
+                "key": "right",
+                "value": "{{store.approvelyAch.hasResolvedToken}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LOGICAL_OPERATION",
+                "params": {
+                  "operator": "AND"
+                }
+              }
+            ]
+          },
+          {
+            "key": "pspToken",
+            "value": "{{store.approvelyAch.resolvedResponseToken}}"
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse0.withdrawer.verification.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "approved",
+                      "to": "success"
+                    },
+                    {
+                      "from": "pending",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "partial-approval",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "rejected",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "expired",
+                      "to": "fail"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse0.withdrawer.verification.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "approved",
+                      "to": "payout_in_process"
+                    },
+                    {
+                      "from": "pending",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "partial-approval",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "rejected",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "expired",
+                      "to": "payment_failed"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://api-sandbox.coinflow.cash/api/withdraw/paypal",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "x-coinflow-auth-user-id",
+            "value": "{{store.approvelyAch.resolvedUserId}}",
+            "required": true
+          },
+          {
+            "key": "Authorization",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 1
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "email",
+            "value": "{{payout.client.email}}",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "isPaypalAccountCreated",
+            "value": "{{pspResponse1.value}}",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": false
+                    },
+                    {
+                      "from": false,
+                      "to": true
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{store.approvelyAch.isPaypalAccountCreated}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": "success"
+                    },
+                    {
+                      "from": false,
+                      "to": "fail"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{store.approvelyAch.isPaypalAccountCreated}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": "payout_in_process"
+                    },
+                    {
+                      "from": false,
+                      "to": "payment_failed"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "value": "{{pspResponse1.details.body.message}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "requestMapping": {
+      "method": "GET",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://api-sandbox.coinflow.cash/api/withdraw",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Authorization",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 1
+                }
+              }
+            ]
+          },
+          {
+            "key": "x-coinflow-auth-user-id",
+            "value": "{{store.approvelyAch.resolvedUserId}}",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "previouslyUsedContext",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{payout.payoutId}}",
+            "operations": [
+              {
+                "name": "GET_OR_CREATE_CUSTOMER",
+                "params": {}
+              }
+            ]
+          },
+          {
+            "key": "resolvedUserId",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "mappings": [
+              {
+                "value": "{{store.approvelyAch.previouslyUsedContext.customer.customerId}}"
+              },
+              {
+                "value": "{{payout.extraParam.approvelyVenmoUserId}}"
+              },
+              {
+                "value": "{{payout.client.email}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "required": true
+          },
+          {
+            "key": "normalizedAccount",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{payout.beneficiaryDetail.bankAccountNumber}}",
+            "operations": [
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "\\s+",
+                  "replacement": "",
+                  "occurrence": "REGEX_ALL"
+                }
+              }
+            ]
+          },
+          {
+            "key": "accountLast4",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{store.approvelyAch.normalizedAccount}}",
+            "operations": [
+              {
+                "name": "STRING_REPLACE",
+                "params": {
+                  "target": "^.*(.{4})$",
+                  "replacement": "$1",
+                  "occurrence": "REGEX_FIRST"
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "isKycApproved",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{pspResponse2.withdrawer.verification.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "approved",
+                      "to": true
+                    },
+                    {
+                      "from": "APPROVED",
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "midAchTokens",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "mappings": [
+              {
+                "key": "map",
+                "value": "{{store.approvelyAch.previouslyUsedContext.customer.financialDetails.achTokens}}"
+              },
+              {
+                "key": "key",
+                "value": "{{bankTransaction.midName}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "GET_MAP_VALUE"
+              }
+            ]
+          },
+          {
+            "key": "existingAccountTokenByFullAccount",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "mappings": [
+              {
+                "key": "map",
+                "value": "{{store.approvelyAch.midAchTokens}}"
+              },
+              {
+                "key": "key",
+                "value": "{{store.approvelyAch.normalizedAccount}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "GET_MAP_VALUE"
+              }
+            ]
+          },
+          {
+            "key": "existingAccountTokenByLast4",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "mappings": [
+              {
+                "key": "map",
+                "value": "{{store.approvelyAch.midAchTokens}}"
+              },
+              {
+                "key": "key",
+                "value": "{{store.approvelyAch.accountLast4}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "GET_MAP_VALUE"
+              }
+            ]
+          },
+          {
+            "key": "existingAccountToken",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "mappings": [
+              {
+                "value": "{{store.approvelyAch.existingAccountTokenByFullAccount}}"
+              },
+              {
+                "value": "{{store.approvelyAch.existingAccountTokenByLast4}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "isBankAlreadyLinked",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{store.approvelyAch.existingAccountToken}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_EMPTY"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "matchedResponseToken",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "mappings": [
+              {
+                "key": "list",
+                "value": "{{pspResponse2.withdrawer.bankAccounts}}"
+              },
+              {
+                "key": "matchValue",
+                "value": "{{store.approvelyAch.accountLast4}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              },
+              {
+                "name": "FIND_OBJECT_IN_LIST_BY_FIELD_MATCH",
+                "params": {
+                  "fieldPath": "last4",
+                  "extractField": "token"
+                }
+              }
+            ]
+          },
+          {
+            "key": "resolvedResponseToken",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "mappings": [
+              {
+                "value": "{{store.approvelyAch.matchedResponseToken}}"
+              },
+              {
+                "value": "{{store.approvelyAch.existingAccountToken}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "hasResolvedToken",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{store.approvelyAch.resolvedResponseToken}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_EMPTY"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "resolvedAccountToken",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{store.approvelyAch.resolvedResponseToken}}"
+          },
+          {
+            "key": "canUseResolvedToken",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "mappings": [
+              {
+                "key": "left",
+                "value": "{{store.approvelyAch.isKycApproved}}"
+              },
+              {
+                "key": "right",
+                "value": "{{store.approvelyAch.hasResolvedToken}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LOGICAL_OPERATION",
+                "params": {
+                  "operator": "AND"
+                }
+              }
+            ]
+          },
+          {
+            "key": "pspToken",
+            "value": "{{store.approvelyAch.resolvedResponseToken}}"
+          },
+          {
+            "key": "code",
+            "value": "{{pspResponse2.withdrawer.verification.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "approved",
+                      "to": "success"
+                    },
+                    {
+                      "from": "pending",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "partial-approval",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "rejected",
+                      "to": "fail"
+                    },
+                    {
+                      "from": "expired",
+                      "to": "fail"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{pspResponse2.withdrawer.verification.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "approved",
+                      "to": "payout_in_process"
+                    },
+                    {
+                      "from": "pending",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "partial-approval",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "rejected",
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": "expired",
+                      "to": "payment_failed"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "requestMapping": {
+      "method": "GET",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://api-sandbox.coinflow.cash/api/merchant/withdraws/payout/balance",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Authorization",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 1
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "doWeHaveEnoughBalance",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "mappings": [
+              {
+                "mappings": [
+                  {
+                    "value": "{{pspResponse3.balance.cents}}"
+                  },
+                  {
+                    "mappings": [
+                      {
+                        "value": "{{payout.fx_Amount}}"
+                      },
+                      {
+                        "value": 100
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "LIST_VALUE_MULTIPLY"
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LOGICAL_OPERATION",
+                    "params": {
+                      "operator": "GREATER"
+                    }
+                  }
+                ]
+              },
+              {
+                "mappings": [
+                  {
+                    "value": "{{pspResponse3.balance.cents}}"
+                  },
+                  {
+                    "mappings": [
+                      {
+                        "value": "{{payout.fx_Amount}}"
+                      },
+                      {
+                        "value": 100
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "LIST_VALUE_MULTIPLY"
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LOGICAL_OPERATION",
+                    "params": {
+                      "operator": "EQUALS"
+                    }
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "LOGICAL_OPERATION",
+                "params": {
+                  "operator": "OR"
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{store.approvelyAch.doWeHaveEnoughBalance}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": "success"
+                    },
+                    {
+                      "from": false,
+                      "to": "fail"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{store.approvelyAch.doWeHaveEnoughBalance}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": "payout_in_process"
+                    },
+                    {
+                      "from": false,
+                      "to": "payment_failed"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "value": "{{pspResponse3.message}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "requestMapping": {
+      "method": "POST",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://api-sandbox.coinflow.cash/api/merchant/withdraws/payout/delegated",
+            "required": true
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "required": true
+          },
+          {
+            "key": "Authorization",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 1
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [
+          {
+            "key": "speed",
+            "value": "paypal",
+            "required": true
+          },
+          {
+            "key": "account",
+            "value": "{{pspResponse2.withdrawer.paypal.token}}",
+            "required": true
+          },
+          {
+            "key": "userId",
+            "value": "{{store.approvelyAch.resolvedUserId}}",
+            "required": true
+          },
+          {
+            "key": "idempotencyKey",
+            "value": "{{payout.payoutId}}",
+            "required": true
+          },
+          {
+            "key": "amount",
+            "required": true,
+            "mappings": [
+              {
+                "key": "cents",
+                "mappings": [
+                  {
+                    "value": "{{payout.fx_Amount}}"
+                  },
+                  {
+                    "value": "100"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_VALUE_MULTIPLY"
+                  }
+                ]
+              },
+              {
+                "key": "currency",
+                "value": "{{payout.fx_Currency}}",
+                "required": true
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "waitForConfirmation",
+            "value": false
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "isPayoutAPIFailed",
+            "hidden": true,
+            "storeIn": "approvelyAch",
+            "value": "{{pspResponse4.signature}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "value": "{{store.approvelyAch.isPayoutAPIFailed}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": "fail"
+                    },
+                    {
+                      "from": false,
+                      "to": "success"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "status",
+            "value": "{{store.approvelyAch.isPayoutAPIFailed}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": "payment_failed"
+                    },
+                    {
+                      "from": false,
+                      "to": "payout_in_process"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse4.details.params.message}}"
+              },
+              {
+                "value": "{{pspResponse4.details}}"
+              },
+              {
+                "value": "{{pspResponse4.message}}"
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse4.signature}}"
+          },
+          {
+            "key": "paysecureId",
+            "value": "{{payout.payoutId}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]

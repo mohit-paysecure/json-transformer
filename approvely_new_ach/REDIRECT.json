@@ -31,6 +31,18 @@
                       "to": 1
                     },
                     {
+                      "from": "stage=after_kyc_venmo_link_redirect",
+                      "to": 1
+                    },
+                    {
+                      "from": "stage=after_kyc_card_link_redirect",
+                      "to": 1
+                    },
+                    {
+                      "from": "stage=bank_link_redirect_from_kyc",
+                      "to": 2
+                    },
+                    {
                       "from": "stage=bank_link",
                       "to": 1
                     },
@@ -40,14 +52,6 @@
                     },
                     {
                       "from": "stage=rtp_bank_link",
-                      "to": 1
-                    },
-                    {
-                      "from": "stage=kyc_rtp_payout",
-                      "to": 1
-                    },
-                    {
-                      "from": "stage=after_kyc_rtp_bank_link",
                       "to": 1
                     },
                     {
@@ -97,14 +101,6 @@
                       "to": "PAYOUT-RTP-POSTREDIRECT"
                     },
                     {
-                      "from": "stage=kyc_rtp_payout",
-                      "to": "PAYOUT-RTP-POSTREDIRECT1"
-                    },
-                    {
-                      "from": "stage=after_kyc_rtp_bank_link",
-                      "to": "PAYOUT-RTP-POSTREDIRECT2"
-                    },
-                    {
                       "from": "stage=ach_payin",
                       "to": "ACH-REDIRECT-POSTREDIRECT"
                     },
@@ -127,7 +123,20 @@
                     {
                       "from": "stage=after_kyc_bank_link_redirect",
                       "to": "PAYOUT-ACH-REDIRECT-POSTREDIRECT2"
+                    },
+                    {
+                      "from": "stage=after_kyc_venmo_link_redirect",
+                      "to": "PAYOUT-VENMO-POSTREDIRECT1"
+                    },
+                    {
+                      "from": "stage=after_kyc_card_link_redirect",
+                      "to": "PAYOUT-CARDS-POSTREDIRECT1"
+                    },
+                    {
+                      "from": "stage=bank_link_redirect_from_kyc",
+                      "to": "PAYOUT-ACH-REDIRECT-POSTREDIRECT"
                     }
+
                   ],
                   "defaultValue": ""
                 }

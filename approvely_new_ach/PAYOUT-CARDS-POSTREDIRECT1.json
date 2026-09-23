@@ -289,14 +289,14 @@
                           "to": "success"
                         }
                       ],
-                      "defaultValue": ""
+                      "defaultValue": "success"
                     }
                   }
                 ],
                 "_comment": "STRING_TO_LOWERCASE removed: hasWithdrawal is a Boolean, and lowercasing coerced it to the String \"true\", which VALUE_MAPPER then compared against the Boolean from:true via equals() -- never a match, so this branch always fell through to \"fail\"."
               },
               {
-                "value": "fail"
+                "value": "success"
               }
             ],
             "operations": [
@@ -393,7 +393,7 @@
                 ]
               },
               {
-                "value": "payment_failed"
+                "value": "payout_in_process"
               }
             ],
             "operations": [

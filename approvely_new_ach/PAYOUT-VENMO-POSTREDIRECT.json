@@ -48,7 +48,7 @@
           },
           {
             "key": "x-coinflow-auth-user-id",
-            "value": "{{store.approvelyVenmo.resolvedUserId}}",
+            "value": "{{store.approvelyAch.resolvedUserId}}",
             "required": true
           }
         ],
@@ -67,7 +67,7 @@
           {
             "key": "previouslyUsedContext",
             "hidden": true,
-            "storeIn": "approvelyVenmo",
+            "storeIn": "approvelyAch",
             "value": "{{payout.payoutId}}",
             "operations": [
               {
@@ -79,8 +79,17 @@
           {
             "key": "resolvedUserId",
             "hidden": true,
-            "storeIn": "approvelyVenmo",
+            "storeIn": "approvelyAch",
             "mappings": [
+              {
+                "value": "{{payout.extraParam.merchantCustomerId}}"
+              },
+              {
+                "value": "{{payout.extraParam.lineprosCustomerId}}"
+              },
+              {
+                "value": "{{store.approvelyAch.previouslyUsedContext.customer.customerId}}"
+              },
               {
                 "value": "{{payout.extraParam.approvelyVenmoUserId}}"
               },
@@ -94,30 +103,6 @@
               }
             ],
             "required": true
-          },
-          {
-            "key": "sanitizedPhone",
-            "hidden": true,
-            "storeIn": "approvelyVenmo",
-            "value": "{{payout.client.phone}}",
-            "operations": [
-              {
-                "name": "STRING_REPLACE",
-                "params": {
-                  "target": "[^0-9]",
-                  "replacement": "",
-                  "occurrence": "REGEX_ALL"
-                }
-              },
-              {
-                "name": "STRING_REPLACE",
-                "params": {
-                  "target": "^.*([0-9]{10})$",
-                  "replacement": "$1",
-                  "occurrence": "REGEX_FIRST"
-                }
-              }
-            ]
           }
         ],
         "operations": [
@@ -133,7 +118,7 @@
           {
             "key": "isKycApproved",
             "hidden": true,
-            "storeIn": "approvelyVenmo",
+            "storeIn": "approvelyAch",
             "value": "{{pspResponse0.withdrawer.verification.status}}",
             "operations": [
               {
@@ -157,7 +142,7 @@
           {
             "key": "isKycPending",
             "hidden": true,
-            "storeIn": "approvelyVenmo",
+            "storeIn": "approvelyAch",
             "value": "{{pspResponse0.withdrawer.verification.status}}",
             "operations": [
               {
@@ -179,148 +164,54 @@
             ]
           },
           {
-            "key": "redirectUrl",
-            "value": ""
-          },
-          {
-            "key": "merchantTokens",
-            "hidden": true,
-            "storeIn": "approvelyVenmo",
-            "mappings": [
-              {
-                "key": "map",
-                "value": "{{store.approvelyVenmo.previouslyUsedContext.customer.financialDetails.venmoTokens}}"
-              },
-              {
-                "key": "key",
-                "value": "{{bankTransaction.midName}}"
-              }
-            ],
-            "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              },
-              {
-                "name": "GET_MAP_VALUE"
-              }
-            ]
-          },
-          {
-            "key": "existingPhoneToken",
-            "hidden": true,
-            "storeIn": "approvelyVenmo",
-            "mappings": [
-              {
-                "key": "map",
-                "value": "{{store.approvelyVenmo.merchantTokens}}"
-              },
-              {
-                "key": "key",
-                "value": "{{store.approvelyVenmo.sanitizedPhone}}"
-              }
-            ],
-            "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              },
-              {
-                "name": "GET_MAP_VALUE"
-              }
-            ]
-          },
-          {
-            "key": "isPhoneAlreadyLinked",
-            "hidden": true,
-            "storeIn": "approvelyVenmo",
-            "value": "{{store.approvelyVenmo.existingPhoneToken}}",
-            "operations": [
-              {
-                "name": "CHECK_IF_EMPTY"
-              },
-              {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "mappings": [
-                    {
-                      "from": false,
-                      "to": true
-                    }
-                  ],
-                  "defaultValue": false
-                }
-              }
-            ]
-          },
-          {
-            "key": "resolvedResponseToken",
-            "hidden": true,
-            "storeIn": "approvelyVenmo",
-            "mappings": [
-              {
-                "value": "{{pspResponse0.withdrawer.venmo.token}}"
-              },
-              {
-                "value": "{{store.approvelyVenmo.existingPhoneToken}}"
-              },
-              {
-                "value": ""
-              }
-            ],
-            "operations": [
-              {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
-              }
-            ]
-          },
-          {
-            "key": "hasResolvedToken",
-            "hidden": true,
-            "storeIn": "approvelyVenmo",
-            "value": "{{store.approvelyVenmo.resolvedResponseToken}}",
-            "operations": [
-              {
-                "name": "CHECK_IF_EMPTY"
-              },
-              {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "mappings": [
-                    {
-                      "from": false,
-                      "to": true
-                    }
-                  ],
-                  "defaultValue": false
-                }
-              }
-            ]
-          },
-          {
-            "key": "canUseResolvedToken",
-            "hidden": true,
-            "storeIn": "approvelyVenmo",
-            "mappings": [
-              {
-                "key": "left",
-                "value": "{{store.approvelyVenmo.isKycApproved}}"
-              },
-              {
-                "key": "right",
-                "value": "{{store.approvelyVenmo.isPhoneAlreadyLinked}}"
-              }
-            ],
-            "operations": [
-              {
-                "name": "LOGICAL_OPERATION",
-                "params": {
-                  "operator": "AND"
-                }
-              }
-            ]
-          },
-          {
             "key": "pspToken",
-            "value": "{{store.approvelyVenmo.resolvedResponseToken}}"
+            "value": "{{store.approvelyAch.resolvedResponseToken}}"
+          },
+          {
+            "key": "kycStatus",
+            "value": "{{pspResponse0.withdrawer.verification.status}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "approved",
+                      "to": "approved"
+                    },
+                    {
+                      "from": "APPROVED",
+                      "to": "approved"
+                    },
+                    {
+                      "from": "pending",
+                      "to": "pending"
+                    },
+                    {
+                      "from": "PENDING",
+                      "to": "pending"
+                    },
+                    {
+                      "from": "rejected",
+                      "to": "reject"
+                    },
+                    {
+                      "from": "reject",
+                      "to": "rejected"
+                    },
+                    {
+                      "from": "REJECTED",
+                      "to": "rejected"
+                    },
+                    {
+                      "from": "REJECT",
+                      "to": "rejected"
+                    }
+                  ],
+                  "defaultValue": "pending"
+                }
+              }
+            ]
           },
           {
             "key": "code",
@@ -331,7 +222,7 @@
             ],
             "mappings": [
               {
-                "value": "{{store.approvelyVenmo.canUseResolvedToken}}",
+                "value": "{{store.approvelyAch.isKycApproved}}",
                 "operations": [
                   {
                     "name": "VALUE_MAPPER",
@@ -348,7 +239,7 @@
                 ]
               },
               {
-                "value": "{{store.approvelyVenmo.isKycApproved}}",
+                "value": "{{store.approvelyAch.isKycPending}}",
                 "operations": [
                   {
                     "name": "VALUE_MAPPER",
@@ -378,7 +269,7 @@
             ],
             "mappings": [
               {
-                "value": "{{store.approvelyVenmo.canUseResolvedToken}}",
+                "value": "{{store.approvelyAch.isKycApproved}}",
                 "operations": [
                   {
                     "name": "VALUE_MAPPER",
@@ -395,7 +286,7 @@
                 ]
               },
               {
-                "value": "{{store.approvelyVenmo.isKycApproved}}",
+                "value": "{{store.approvelyAch.isKycPending}}",
                 "operations": [
                   {
                     "name": "VALUE_MAPPER",
@@ -465,24 +356,7 @@
             "key": "skipPspCount",
             "mappings": [
               {
-                "value": "{{store.approvelyVenmo.canUseResolvedToken}}",
-                "operations": [
-                  {
-                    "name": "VALUE_MAPPER",
-                    "params": {
-                      "mappings": [
-                        {
-                          "from": true,
-                          "to": 4
-                        }
-                      ],
-                      "defaultValue": ""
-                    }
-                  }
-                ]
-              },
-              {
-                "value": "{{store.approvelyVenmo.isKycPending}}",
+                "value": "{{store.approvelyAch.isKycPending}}",
                 "operations": [
                   {
                     "name": "VALUE_MAPPER",
@@ -499,7 +373,7 @@
                 ]
               },
               {
-                "value": "{{store.approvelyVenmo.isKycApproved}}",
+                "value": "{{store.approvelyAch.isKycApproved}}",
                 "operations": [
                   {
                     "name": "VALUE_MAPPER",
@@ -507,7 +381,7 @@
                       "mappings": [
                         {
                           "from": true,
-                          "to": 2
+                          "to": 99
                         }
                       ],
                       "defaultValue": ""
@@ -522,6 +396,89 @@
             "operations": [
               {
                 "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "redirectUrl",
+            "mappings": [
+              {
+                "value": "{{extraParams.baseUrl}}",
+                "required": true
+              },
+              {
+                "value": "/cashier/kycstatus?merchantId="
+              },
+              {
+                "value": "{{payout.merchant_id}}"
+              },
+              {
+                "value": "&payoutId="
+              },
+              {
+                "value": "{{payout.payoutId}}"
+              },
+              {
+                "value": "&kycId="
+              },
+              {
+                "value": "kyc456"
+              },
+              {
+                "value": "&status="
+              },
+              {
+                "value": "{{pspResponse0.withdrawer.verification.status}}",
+                "operations": [
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": "approved",
+                          "to": "success"
+                        },
+                        {
+                          "from": "APPROVED",
+                          "to": "success"
+                        },
+                        {
+                          "from": "pending",
+                          "to": "pending"
+                        },
+                        {
+                          "from": "PENDING",
+                          "to": "pending"
+                        },
+                        {
+                          "from": "rejected",
+                          "to": "failed"
+                        },
+                        {
+                          "from": "reject",
+                          "to": "failed"
+                        },
+                        {
+                          "from": "REJECTED",
+                          "to": "failed"
+                        },
+                        {
+                          "from": "REJECT",
+                          "to": "failed"
+                        }
+                      ],
+                      "defaultValue": "pending"
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "&autoclosetab=true"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
               }
             ]
           }
@@ -583,7 +540,7 @@
           },
           {
             "key": "x-coinflow-auth-user-id",
-            "value": "{{store.approvelyVenmo.resolvedUserId}}",
+            "value": "{{store.approvelyAch.resolvedUserId}}",
             "required": true
           }
         ],
@@ -611,13 +568,9 @@
       "body": {
         "mappings": [
           {
-            "key": "redirectUrl",
-            "value": ""
-          },
-          {
             "key": "isKycApproved",
             "hidden": true,
-            "storeIn": "approvelyVenmo",
+            "storeIn": "approvelyAch",
             "value": "{{pspResponse1.withdrawer.verification.status}}",
             "operations": [
               {
@@ -641,7 +594,7 @@
           {
             "key": "isKycPending",
             "hidden": true,
-            "storeIn": "approvelyVenmo",
+            "storeIn": "approvelyAch",
             "value": "{{pspResponse1.withdrawer.verification.status}}",
             "operations": [
               {
@@ -663,27 +616,47 @@
             ]
           },
           {
-            "key": "canUseResolvedToken",
-            "hidden": true,
-            "storeIn": "approvelyVenmo",
-            "mappings": [
-              {
-                "key": "left",
-                "value": "{{store.approvelyVenmo.isKycApproved}}"
-              },
-              {
-                "key": "right",
-                "value": "{{store.approvelyVenmo.isPhoneAlreadyLinked}}"
-              }
-            ],
+            "key": "kycStatus",
+            "value": "{{pspResponse0.withdrawer.verification.status}}",
             "operations": [
               {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              },
-              {
-                "name": "LOGICAL_OPERATION",
+                "name": "VALUE_MAPPER",
                 "params": {
-                  "operator": "AND"
+                  "mappings": [
+                    {
+                      "from": "approved",
+                      "to": "approved"
+                    },
+                    {
+                      "from": "APPROVED",
+                      "to": "approved"
+                    },
+                    {
+                      "from": "pending",
+                      "to": "pending"
+                    },
+                    {
+                      "from": "PENDING",
+                      "to": "pending"
+                    },
+                    {
+                      "from": "rejected",
+                      "to": "reject"
+                    },
+                    {
+                      "from": "reject",
+                      "to": "rejected"
+                    },
+                    {
+                      "from": "REJECTED",
+                      "to": "rejected"
+                    },
+                    {
+                      "from": "REJECT",
+                      "to": "rejected"
+                    }
+                  ],
+                  "defaultValue": "pending"
                 }
               }
             ]
@@ -692,7 +665,7 @@
             "key": "code",
             "mappings": [
               {
-                "value": "{{store.approvelyVenmo.canUseResolvedToken}}",
+                "value": "{{store.approvelyAch.isKycApproved}}",
                 "operations": [
                   {
                     "name": "VALUE_MAPPER",
@@ -709,7 +682,7 @@
                 ]
               },
               {
-                "value": "{{store.approvelyVenmo.isKycPending}}",
+                "value": "{{store.approvelyAch.isKycPending}}",
                 "operations": [
                   {
                     "name": "VALUE_MAPPER",
@@ -739,7 +712,7 @@
             "key": "status",
             "mappings": [
               {
-                "value": "{{store.approvelyVenmo.canUseResolvedToken}}",
+                "value": "{{store.approvelyAch.isKycApproved}}",
                 "operations": [
                   {
                     "name": "VALUE_MAPPER",
@@ -756,24 +729,7 @@
                 ]
               },
               {
-                "value": "{{store.approvelyVenmo.isKycApproved}}",
-                "operations": [
-                  {
-                    "name": "VALUE_MAPPER",
-                    "params": {
-                      "mappings": [
-                        {
-                          "from": true,
-                          "to": "payout_in_process"
-                        }
-                      ],
-                      "defaultValue": ""
-                    }
-                  }
-                ]
-              },
-              {
-                "value": "{{store.approvelyVenmo.isKycPending}}",
+                "value": "{{store.approvelyAch.isKycPending}}",
                 "operations": [
                   {
                     "name": "VALUE_MAPPER",
@@ -848,24 +804,7 @@
             "key": "skipPspCount",
             "mappings": [
               {
-                "value": "{{store.approvelyVenmo.canUseResolvedToken}}",
-                "operations": [
-                  {
-                    "name": "VALUE_MAPPER",
-                    "params": {
-                      "mappings": [
-                        {
-                          "from": true,
-                          "to": 3
-                        }
-                      ],
-                      "defaultValue": ""
-                    }
-                  }
-                ]
-              },
-              {
-                "value": "{{store.approvelyVenmo.isKycPending}}",
+                "value": "{{store.approvelyAch.isKycPending}}",
                 "operations": [
                   {
                     "name": "VALUE_MAPPER",
@@ -882,7 +821,7 @@
                 ]
               },
               {
-                "value": "{{store.approvelyVenmo.isKycApproved}}",
+                "value": "{{store.approvelyAch.isKycApproved}}",
                 "operations": [
                   {
                     "name": "VALUE_MAPPER",
@@ -890,7 +829,7 @@
                       "mappings": [
                         {
                           "from": true,
-                          "to": 1
+                          "to": 99
                         }
                       ],
                       "defaultValue": ""
@@ -905,6 +844,89 @@
             "operations": [
               {
                 "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "redirectUrl",
+            "mappings": [
+              {
+                "value": "{{extraParams.baseUrl}}",
+                "required": true
+              },
+              {
+                "value": "/cashier/kycstatus?merchantId="
+              },
+              {
+                "value": "{{payout.merchant_id}}"
+              },
+              {
+                "value": "&payoutId="
+              },
+              {
+                "value": "{{payout.payoutId}}"
+              },
+              {
+                "value": "&kycId="
+              },
+              {
+                "value": "kyc456"
+              },
+              {
+                "value": "&status="
+              },
+              {
+                "value": "{{pspResponse0.withdrawer.verification.status}}",
+                "operations": [
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": "approved",
+                          "to": "success"
+                        },
+                        {
+                          "from": "APPROVED",
+                          "to": "success"
+                        },
+                        {
+                          "from": "pending",
+                          "to": "pending"
+                        },
+                        {
+                          "from": "PENDING",
+                          "to": "pending"
+                        },
+                        {
+                          "from": "rejected",
+                          "to": "failed"
+                        },
+                        {
+                          "from": "reject",
+                          "to": "failed"
+                        },
+                        {
+                          "from": "REJECTED",
+                          "to": "failed"
+                        },
+                        {
+                          "from": "REJECT",
+                          "to": "failed"
+                        }
+                      ],
+                      "defaultValue": "pending"
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "&autoclosetab=true"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
               }
             ]
           }
@@ -966,7 +988,7 @@
           },
           {
             "key": "x-coinflow-auth-user-id",
-            "value": "{{store.approvelyVenmo.resolvedUserId}}",
+            "value": "{{store.approvelyAch.resolvedUserId}}",
             "required": true
           }
         ],
@@ -996,7 +1018,7 @@
           {
             "key": "isKycApproved",
             "hidden": true,
-            "storeIn": "approvelyVenmo",
+            "storeIn": "approvelyAch",
             "value": "{{pspResponse2.withdrawer.verification.status}}",
             "operations": [
               {
@@ -1020,7 +1042,7 @@
           {
             "key": "isKycPending",
             "hidden": true,
-            "storeIn": "approvelyVenmo",
+            "storeIn": "approvelyAch",
             "value": "{{pspResponse2.withdrawer.verification.status}}",
             "operations": [
               {
@@ -1042,27 +1064,47 @@
             ]
           },
           {
-            "key": "canUseResolvedToken",
-            "hidden": true,
-            "storeIn": "approvelyVenmo",
-            "mappings": [
-              {
-                "key": "left",
-                "value": "{{store.approvelyVenmo.isKycApproved}}"
-              },
-              {
-                "key": "right",
-                "value": "{{store.approvelyVenmo.isPhoneAlreadyLinked}}"
-              }
-            ],
+            "key": "kycStatus",
+            "value": "{{pspResponse0.withdrawer.verification.status}}",
             "operations": [
               {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              },
-              {
-                "name": "LOGICAL_OPERATION",
+                "name": "VALUE_MAPPER",
                 "params": {
-                  "operator": "AND"
+                  "mappings": [
+                    {
+                      "from": "approved",
+                      "to": "approved"
+                    },
+                    {
+                      "from": "APPROVED",
+                      "to": "approved"
+                    },
+                    {
+                      "from": "pending",
+                      "to": "pending"
+                    },
+                    {
+                      "from": "PENDING",
+                      "to": "pending"
+                    },
+                    {
+                      "from": "rejected",
+                      "to": "reject"
+                    },
+                    {
+                      "from": "reject",
+                      "to": "rejected"
+                    },
+                    {
+                      "from": "REJECTED",
+                      "to": "rejected"
+                    },
+                    {
+                      "from": "REJECT",
+                      "to": "rejected"
+                    }
+                  ],
+                  "defaultValue": "pending"
                 }
               }
             ]
@@ -1071,7 +1113,7 @@
             "key": "code",
             "mappings": [
               {
-                "value": "{{store.approvelyVenmo.canUseResolvedToken}}",
+                "value": "{{store.approvelyAch.isKycApproved}}",
                 "operations": [
                   {
                     "name": "VALUE_MAPPER",
@@ -1088,24 +1130,7 @@
                 ]
               },
               {
-                "value": "{{store.approvelyVenmo.isKycApproved}}",
-                "operations": [
-                  {
-                    "name": "VALUE_MAPPER",
-                    "params": {
-                      "mappings": [
-                        {
-                          "from": true,
-                          "to": "success"
-                        }
-                      ],
-                      "defaultValue": ""
-                    }
-                  }
-                ]
-              },
-              {
-                "value": "{{store.approvelyVenmo.isKycPending}}",
+                "value": "{{store.approvelyAch.isKycPending}}",
                 "operations": [
                   {
                     "name": "VALUE_MAPPER",
@@ -1132,14 +1157,10 @@
             ]
           },
           {
-            "key": "redirectUrl",
-            "value": ""
-          },
-          {
             "key": "status",
             "mappings": [
               {
-                "value": "{{store.approvelyVenmo.canUseResolvedToken}}",
+                "value": "{{store.approvelyAch.isKycApproved}}",
                 "operations": [
                   {
                     "name": "VALUE_MAPPER",
@@ -1156,24 +1177,7 @@
                 ]
               },
               {
-                "value": "{{store.approvelyVenmo.isKycApproved}}",
-                "operations": [
-                  {
-                    "name": "VALUE_MAPPER",
-                    "params": {
-                      "mappings": [
-                        {
-                          "from": true,
-                          "to": "payout_in_process"
-                        }
-                      ],
-                      "defaultValue": ""
-                    }
-                  }
-                ]
-              },
-              {
-                "value": "{{store.approvelyVenmo.isKycPending}}",
+                "value": "{{store.approvelyAch.isKycPending}}",
                 "operations": [
                   {
                     "name": "VALUE_MAPPER",
@@ -1248,24 +1252,7 @@
             "key": "skipPspCount",
             "mappings": [
               {
-                "value": "{{store.approvelyVenmo.canUseResolvedToken}}",
-                "operations": [
-                  {
-                    "name": "VALUE_MAPPER",
-                    "params": {
-                      "mappings": [
-                        {
-                          "from": true,
-                          "to": 2
-                        }
-                      ],
-                      "defaultValue": ""
-                    }
-                  }
-                ]
-              },
-              {
-                "value": "{{store.approvelyVenmo.isKycApproved}}",
+                "value": "{{store.approvelyAch.isKycApproved}}",
                 "operations": [
                   {
                     "name": "VALUE_MAPPER",
@@ -1290,795 +1277,6 @@
                 "name": "GET_FIRST_NON_EMPTY_STRING"
               }
             ]
-          }
-        ],
-        "operations": [
-          {
-            "name": "KEY_VALUE_LIST_TO_OBJECT"
-          }
-        ]
-      }
-    }
-  },
-  {
-    "requestMapping": {
-      "method": "POST",
-      "url": {
-        "mappings": [
-          {
-            "value": "https://api-sandbox.coinflow.cash/api/withdraw/venmo",
-            "required": true
-          }
-        ],
-        "operations": [
-          {
-            "name": "LIST_VALUE_JOIN"
-          }
-        ]
-      },
-      "headers": {
-        "mappings": [
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "required": true
-          },
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "required": true
-          },
-          {
-            "key": "Authorization",
-            "value": "{{bankTransaction.usedAuthKey}}",
-            "required": true,
-            "operations": [
-              {
-                "name": "SPLIT_STRING",
-                "params": {
-                  "delimiter": "##"
-                }
-              },
-              {
-                "name": "GET_ELEMENT_AT_INDEX",
-                "params": {
-                  "index": 1
-                }
-              }
-            ]
-          },
-          {
-            "key": "x-coinflow-auth-user-id",
-            "value": "{{store.approvelyVenmo.resolvedUserId}}",
-            "required": true
-          }
-        ],
-        "operations": [
-          {
-            "name": "KEY_VALUE_LIST_TO_OBJECT"
-          }
-        ]
-      },
-      "body": {
-        "mappings": [
-          {
-            "key": "phoneNumber",
-            "value": "{{payout.client.phone}}",
-            "required": true,
-            "operations": [
-              {
-                "name": "STRING_REPLACE",
-                "params": {
-                  "target": "[^0-9]",
-                  "replacement": "",
-                  "occurrence": "REGEX_ALL"
-                }
-              },
-              {
-                "name": "STRING_REPLACE",
-                "params": {
-                  "target": "^.*([0-9]{10})$",
-                  "replacement": "$1",
-                  "occurrence": "REGEX_FIRST"
-                }
-              }
-            ]
-          }
-        ],
-        "operations": [
-          {
-            "name": "KEY_VALUE_LIST_TO_OBJECT"
-          }
-        ]
-      }
-    },
-    "responseMapping": {
-      "body": {
-        "mappings": [
-          {
-            "key": "hasLinkError",
-            "hidden": true,
-            "storeIn": "approvelyVenmo",
-            "mappings": [
-              {
-                "value": "{{pspResponse3.message}}"
-              },
-              {
-                "value": "{{pspResponse3.error}}"
-              },
-              {
-                "value": "{{pspResponse3.debugId}}"
-              },
-              {
-                "value": ""
-              }
-            ],
-            "operations": [
-              {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
-              },
-              {
-                "name": "CHECK_IF_EMPTY"
-              },
-              {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "mappings": [
-                    {
-                      "from": false,
-                      "to": true
-                    }
-                  ],
-                  "defaultValue": false
-                }
-              }
-            ]
-          },
-          {
-            "key": "code",
-            "value": "{{store.approvelyVenmo.hasLinkError}}",
-            "operations": [
-              {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "mappings": [
-                    {
-                      "from": true,
-                      "to": "fail"
-                    }
-                  ],
-                  "defaultValue": "success"
-                }
-              }
-            ]
-          },
-          {
-            "key": "status",
-            "value": "{{store.approvelyVenmo.hasLinkError}}",
-            "operations": [
-              {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "mappings": [
-                    {
-                      "from": true,
-                      "to": "payment_failed"
-                    }
-                  ],
-                  "defaultValue": "payout_in_process"
-                }
-              }
-            ]
-          },
-          {
-            "key": "message",
-            "mappings": [
-              {
-                "value": "{{pspResponse3.details.body.phoneNumber.message}}"
-              },
-              {
-                "value": "{{pspResponse3.details}}"
-              },
-              {
-                "value": "{{pspResponse3.detailMessage}}"
-              },
-              {
-                "value": "{{pspResponse3.message}}"
-              },
-              {
-                "value": "{{pspResponse3}}",
-                "operations": [
-                  {
-                    "name": "STRINGIFY_JSON"
-                  },
-                  {
-                    "name": "STRING_PATTERN_MATCH",
-                    "params": {
-                      "regex": "^.*\"details\":\"[^\"]+\".*$",
-                      "defaultValue": ""
-                    }
-                  },
-                  {
-                    "name": "STRING_REPLACE",
-                    "params": {
-                      "target": "^.*\"details\":\"([^\"]+)\".*$",
-                      "replacement": "$1",
-                      "occurrence": "REGEX_FIRST"
-                    }
-                  }
-                ]
-              },
-              {
-                "value": "{{pspResponse3.status}}"
-              },
-              {
-                "value": ""
-              }
-            ],
-            "operations": [
-              {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
-              }
-            ]
-          }
-        ],
-        "operations": [
-          {
-            "name": "KEY_VALUE_LIST_TO_OBJECT"
-          }
-        ]
-      }
-    }
-  },
-  {
-    "requestMapping": {
-      "method": "GET",
-      "url": {
-        "mappings": [
-          {
-            "value": "https://api-sandbox.coinflow.cash/api/withdraw",
-            "required": true
-          }
-        ],
-        "operations": [
-          {
-            "name": "LIST_VALUE_JOIN"
-          }
-        ]
-      },
-      "headers": {
-        "mappings": [
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "required": true
-          },
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "required": true
-          },
-          {
-            "key": "Authorization",
-            "value": "{{bankTransaction.usedAuthKey}}",
-            "required": true,
-            "operations": [
-              {
-                "name": "SPLIT_STRING",
-                "params": {
-                  "delimiter": "##"
-                }
-              },
-              {
-                "name": "GET_ELEMENT_AT_INDEX",
-                "params": {
-                  "index": 1
-                }
-              }
-            ]
-          },
-          {
-            "key": "x-coinflow-auth-user-id",
-            "value": "{{store.approvelyVenmo.resolvedUserId}}",
-            "required": true
-          }
-        ],
-        "operations": [
-          {
-            "name": "KEY_VALUE_LIST_TO_OBJECT"
-          }
-        ]
-      },
-      "body": {
-        "mappings": [],
-        "operations": [
-          {
-            "name": "KEY_VALUE_LIST_TO_OBJECT"
-          }
-        ]
-      }
-    },
-    "responseMapping": {
-      "body": {
-        "mappings": [
-          {
-            "key": "resolvedResponseTokenAfterLink",
-            "hidden": true,
-            "storeIn": "approvelyVenmo",
-            "mappings": [
-              {
-                "value": "{{pspResponse4.withdrawer.venmo.token}}"
-              },
-              {
-                "value": ""
-              }
-            ],
-            "operations": [
-              {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
-              }
-            ]
-          },
-          {
-            "key": "pspToken",
-            "value": "{{store.approvelyVenmo.resolvedResponseTokenAfterLink}}"
-          },
-          {
-            "key": "code",
-            "value": "{{store.approvelyVenmo.resolvedResponseTokenAfterLink}}",
-            "operations": [
-              {
-                "name": "CHECK_IF_EMPTY"
-              },
-              {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "mappings": [
-                    {
-                      "from": false,
-                      "to": "success"
-                    }
-                  ],
-                  "defaultValue": "fail"
-                }
-              }
-            ]
-          },
-          {
-            "key": "status",
-            "value": "{{store.approvelyVenmo.resolvedResponseTokenAfterLink}}",
-            "operations": [
-              {
-                "name": "CHECK_IF_EMPTY"
-              },
-              {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "mappings": [
-                    {
-                      "from": false,
-                      "to": "payout_in_process"
-                    }
-                  ],
-                  "defaultValue": "payment_failed"
-                }
-              }
-            ]
-          },
-          {
-            "key": "message",
-            "mappings": [
-              {
-                "value": "{{pspResponse4.detailMessage}}"
-              },
-              {
-                "value": "{{pspResponse4}}",
-                "operations": [
-                  {
-                    "name": "STRINGIFY_JSON"
-                  },
-                  {
-                    "name": "STRING_PATTERN_MATCH",
-                    "params": {
-                      "regex": "^.*\"details\":\"[^\"]+\".*$",
-                      "defaultValue": ""
-                    }
-                  },
-                  {
-                    "name": "STRING_REPLACE",
-                    "params": {
-                      "target": "^.*\"details\":\"([^\"]+)\".*$",
-                      "replacement": "$1",
-                      "occurrence": "REGEX_FIRST"
-                    }
-                  }
-                ]
-              },
-              {
-                "value": "{{pspResponse4.message}}"
-              },
-              {
-                "value": "{{pspResponse4.status}}"
-              },
-              {
-                "value": ""
-              }
-            ],
-            "operations": [
-              {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
-              }
-            ]
-          }
-        ],
-        "operations": [
-          {
-            "name": "KEY_VALUE_LIST_TO_OBJECT"
-          }
-        ]
-      }
-    }
-  },
-  {
-    "requestMapping": {
-      "method": "POST",
-      "url": {
-        "mappings": [
-          {
-            "value": "https://api-sandbox.coinflow.cash/api/merchant/withdraws/payout/delegated",
-            "required": true
-          }
-        ],
-        "operations": [
-          {
-            "name": "LIST_VALUE_JOIN"
-          }
-        ]
-      },
-      "headers": {
-        "mappings": [
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "required": true
-          },
-          {
-            "key": "Accept",
-            "value": "application/json",
-            "required": true
-          },
-          {
-            "key": "Authorization",
-            "value": "{{bankTransaction.usedAuthKey}}",
-            "required": true,
-            "operations": [
-              {
-                "name": "SPLIT_STRING",
-                "params": {
-                  "delimiter": "##"
-                }
-              },
-              {
-                "name": "GET_ELEMENT_AT_INDEX",
-                "params": {
-                  "index": 1
-                }
-              }
-            ]
-          },
-          {
-            "key": "x-coinflow-auth-user-id",
-            "value": "{{store.approvelyVenmo.resolvedUserId}}",
-            "required": true
-          }
-        ],
-        "operations": [
-          {
-            "name": "KEY_VALUE_LIST_TO_OBJECT"
-          }
-        ]
-      },
-      "body": {
-        "mappings": [
-          {
-            "key": "resolvedVenmoToken",
-            "hidden": true,
-            "storeIn": "approvelyVenmo",
-            "mappings": [
-              {
-                "value": "{{store.approvelyVenmo.resolvedResponseTokenAfterLink}}"
-              },
-              {
-                "value": "{{pspResponse4.withdrawer.venmo.token}}"
-              },
-              {
-                "value": "{{store.approvelyVenmo.resolvedResponseToken}}"
-              },
-              {
-                "value": "{{pspResponse0.withdrawer.venmo.token}}"
-              }
-            ],
-            "operations": [
-              {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
-              }
-            ],
-            "required": true
-          },
-          {
-            "key": "amount",
-            "required": true,
-            "mappings": [
-              {
-                "key": "cents",
-                "mappings": [
-                  {
-                    "value": "{{payout.fx_Amount}}"
-                  },
-                  {
-                    "value": "100"
-                  }
-                ],
-                "operations": [
-                  {
-                    "name": "LIST_VALUE_MULTIPLY"
-                  },
-                  {
-                    "name": "DOUBLE_TO_FLOOR"
-                  }
-                ],
-                "required": true
-              }
-            ],
-            "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              }
-            ]
-          },
-          {
-            "key": "speed",
-            "value": "venmo",
-            "required": true
-          },
-          {
-            "key": "account",
-            "value": "{{store.approvelyVenmo.resolvedVenmoToken}}",
-            "required": true
-          },
-          {
-            "key": "userId",
-            "value": "{{store.approvelyVenmo.resolvedUserId}}",
-            "required": true
-          },
-          {
-            "key": "idempotencyKey",
-            "value": "{{payout.payoutId}}",
-            "required": true
-          },
-          {
-            "key": "merchantTokens",
-            "hidden": true,
-            "storeIn": "approvelyVenmo",
-            "mappings": [
-              {
-                "key": "map",
-                "value": "{{store.approvelyVenmo.previouslyUsedContext.customer.financialDetails.venmoTokens}}"
-              },
-              {
-                "key": "key",
-                "value": "{{bankTransaction.midName}}"
-              }
-            ],
-            "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              },
-              {
-                "name": "GET_MAP_VALUE"
-              }
-            ]
-          },
-          {
-            "key": "mergedMerchantTokens",
-            "hidden": true,
-            "storeIn": "approvelyVenmo",
-            "mappings": [
-              {
-                "key": "map",
-                "value": "{{store.approvelyVenmo.merchantTokens}}"
-              },
-              {
-                "key": "key",
-                "value": "{{store.approvelyVenmo.sanitizedPhone}}"
-              },
-              {
-                "key": "value",
-                "value": "{{store.approvelyVenmo.resolvedVenmoToken}}"
-              }
-            ],
-            "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              },
-              {
-                "name": "UPSERT_ENTRY"
-              }
-            ]
-          },
-          {
-            "key": "mergedAllVenmoTokens",
-            "hidden": true,
-            "storeIn": "approvelyVenmo",
-            "mappings": [
-              {
-                "key": "map",
-                "value": "{{store.approvelyVenmo.previouslyUsedContext.customer.financialDetails.venmoTokens}}"
-              },
-              {
-                "key": "key",
-                "value": "{{bankTransaction.midName}}"
-              },
-              {
-                "key": "value",
-                "value": "{{store.approvelyVenmo.mergedMerchantTokens}}"
-              }
-            ],
-            "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              },
-              {
-                "name": "UPSERT_ENTRY"
-              }
-            ]
-          },
-          {
-            "key": "saveCustomerData",
-            "hidden": true,
-            "storeIn": "approvelyVenmo",
-            "mappings": [
-              {
-                "key": "payoutId",
-                "value": "{{payout.payoutId}}",
-                "required": true
-              },
-              {
-                "key": "customer.financialDetails.venmoTokens",
-                "value": "{{store.approvelyVenmo.mergedAllVenmoTokens}}",
-                "required": true
-              }
-            ],
-            "operations": [
-              {
-                "name": "KEY_VALUE_LIST_TO_OBJECT"
-              },
-              {
-                "name": "UPDATE_CUSTOMER"
-              }
-            ]
-          }
-        ],
-        "operations": [
-          {
-            "name": "KEY_VALUE_LIST_TO_OBJECT"
-          }
-        ]
-      }
-    },
-    "responseMapping": {
-      "body": {
-        "mappings": [
-          {
-            "key": "code",
-            "mappings": [
-              {
-                "value": "{{pspResponse5.signature}}",
-                "operations": [
-                  {
-                    "name": "CHECK_IF_NULL"
-                  },
-                  {
-                    "name": "VALUE_MAPPER",
-                    "params": {
-                      "mappings": [
-                        {
-                          "from": false,
-                          "to": "success"
-                        }
-                      ],
-                      "defaultValue": ""
-                    }
-                  }
-                ]
-              },
-              {
-                "value": "fail"
-              }
-            ],
-            "operations": [
-              {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
-              }
-            ]
-          },
-          {
-            "key": "status",
-            "mappings": [
-              {
-                "value": "{{pspResponse5.signature}}",
-                "operations": [
-                  {
-                    "name": "CHECK_IF_NULL"
-                  },
-                  {
-                    "name": "VALUE_MAPPER",
-                    "params": {
-                      "mappings": [
-                        {
-                          "from": false,
-                          "to": "payout_in_process"
-                        }
-                      ],
-                      "defaultValue": ""
-                    }
-                  }
-                ]
-              },
-              {
-                "value": "payment_failed"
-              }
-            ],
-            "operations": [
-              {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
-              }
-            ]
-          },
-          {
-            "key": "message",
-            "mappings": [
-              {
-                "value": "{{pspResponse5.detailMessage}}"
-              },
-              {
-                "value": "{{pspResponse5}}",
-                "operations": [
-                  {
-                    "name": "STRINGIFY_JSON"
-                  },
-                  {
-                    "name": "STRING_PATTERN_MATCH",
-                    "params": {
-                      "regex": "^.*\"details\":\"[^\"]+\".*$",
-                      "defaultValue": ""
-                    }
-                  },
-                  {
-                    "name": "STRING_REPLACE",
-                    "params": {
-                      "target": "^.*\"details\":\"([^\"]+)\".*$",
-                      "replacement": "$1",
-                      "occurrence": "REGEX_FIRST"
-                    }
-                  }
-                ]
-              },
-              {
-                "value": "{{pspResponse5.message}}"
-              },
-              {
-                "value": "{{pspResponse5.status}}"
-              },
-              {
-                "value": ""
-              }
-            ],
-            "operations": [
-              {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
-              }
-            ]
           },
           {
             "key": "redirectUrl",
@@ -2088,24 +1286,80 @@
                 "required": true
               },
               {
-                "value": "/custRedirect/auto-close?seconds=5",
-                "required": true
+                "value": "/cashier/kycstatus?merchantId="
+              },
+              {
+                "value": "{{payout.merchant_id}}"
+              },
+              {
+                "value": "&payoutId="
+              },
+              {
+                "value": "{{payout.payoutId}}"
+              },
+              {
+                "value": "&kycId="
+              },
+              {
+                "value": "kyc456"
+              },
+              {
+                "value": "&status="
+              },
+              {
+                "value": "{{pspResponse0.withdrawer.verification.status}}",
+                "operations": [
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": "approved",
+                          "to": "success"
+                        },
+                        {
+                          "from": "APPROVED",
+                          "to": "success"
+                        },
+                        {
+                          "from": "pending",
+                          "to": "pending"
+                        },
+                        {
+                          "from": "PENDING",
+                          "to": "pending"
+                        },
+                        {
+                          "from": "rejected",
+                          "to": "failed"
+                        },
+                        {
+                          "from": "reject",
+                          "to": "failed"
+                        },
+                        {
+                          "from": "REJECTED",
+                          "to": "failed"
+                        },
+                        {
+                          "from": "REJECT",
+                          "to": "failed"
+                        }
+                      ],
+                      "defaultValue": "pending"
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "&autoclosetab=true"
               }
             ],
             "operations": [
               {
                 "name": "LIST_VALUE_JOIN"
               }
-            ],
-            "required": true
-          },
-          {
-            "key": "pspTransactionId",
-            "value": "{{pspResponse5.signature}}"
-          },
-          {
-            "key": "paysecureId",
-            "value": "{{payout.payoutId}}"
+            ]
           }
         ],
         "operations": [
