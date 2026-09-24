@@ -345,6 +345,27 @@
             ]
           },
           {
+            "_comment": "skipIf is hasVerificationLink, which CHECK_IF_NULL sets true when verificationLink is ABSENT -- so this node is emitted only when Coinflow actually returned a link, i.e. only when the payout is being sent for KYC. Skipped -> null -> child dropped -> CommonPayout leaves bankTransaction.tempObject untouched.",
+            "key": "tempObject",
+            "skipIf": "{{store.approvelyAch.hasVerificationLink}}",
+            "mappings": [
+              {
+                "key": "IsPayoutHoldForKyc",
+                "value": "true",
+                "operations": [
+                  {
+                    "name": "STRING_TO_BOOLEAN"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
             "key": "isKycApproved",
             "hidden": true,
             "storeIn": "approvelyAch",
@@ -464,7 +485,234 @@
           },
           {
             "key": "redirectUrl",
-            "value": "{{pspResponse0.verificationLink}}"
+            "mappings": [
+              {
+                "value": "/showProvider/details/payout/"
+              },
+              {
+                "value": "{{payout.payoutId}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LIST_VALUE_JOIN"
+              }
+            ]
+          },
+          {
+            "key": "tempObjectThird",
+            "mappings": [
+              {
+                "key": "page",
+                "mappings": [
+                  {
+                    "key": "title",
+                    "value": ""
+                  },
+                  {
+                    "key": "description",
+                    "value": ""
+                  },
+                  {
+                    "key": "layout",
+                    "mappings": [
+                      {
+                        "key": "bodyStyle",
+                        "value": "align-items:center;"
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }
+                    ]
+                  },
+                  {
+                    "key": "footer",
+                    "value": ""
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "KEY_VALUE_LIST_TO_OBJECT"
+                  }
+                ]
+              },
+              {
+                "key": "fields",
+                "mappings": [
+                  {
+                    "key": "value",
+                    "mappings": [
+                      {
+                        "key": "id",
+                        "value": "kycBtn"
+                      },
+                      {
+                        "key": "name",
+                        "value": "kycBtn"
+                      },
+                      {
+                        "key": "inputType",
+                        "value": "STATICHTML"
+                      },
+                      {
+                        "key": "dataType",
+                        "value": "STRING"
+                      },
+                      {
+                        "key": "content",
+                        "mappings": [
+                          {
+                            "value": "<style>\n.kyc-wrap{font-family:'DM Sans',sans-serif;width:100%;max-width:400px;background:#fff;border:1px solid #E4E0F0;border-radius:20px;padding:32px 26px 24px;box-shadow:0 1px 2px rgba(30,15,60,.06),0 24px 48px -20px rgba(30,15,60,.35);position:relative;overflow:hidden;text-align:center}\n.kyc-wrap:before{content:'';position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,#5B2DBF,#8452E0)}\n.kyc-icon{width:56px;height:56px;border-radius:16px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;background:#EFE8FC;color:#5B2DBF;position:relative}\n.kyc-icon svg{width:26px;height:26px}\n.kyc-ring{position:absolute;inset:-8px;border-radius:20px;border:1.5px solid #8452E0;opacity:0;animation:kycPulse 2.4s ease-out infinite}\n.kyc-ring.kyc-d2{animation-delay:.8s}\n@keyframes kycPulse{0%{transform:scale(.85);opacity:.55}100%{transform:scale(1.35);opacity:0}}\n.kyc-h1{font-size:19px;font-weight:700;color:#171226;margin:0 0 8px}\n.kyc-p{font-size:13.5px;line-height:1.6;color:#6C6680;margin:0 0 22px}\n.kyc-btn{width:100%;height:50px;border:none;border-radius:12px;background:linear-gradient(180deg,#8452E0,#5B2DBF);color:#fff;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}\n.kyc-btn svg{width:16px;height:16px}\n.kyc-trust{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:16px;color:#9A94AC;font-size:11px}\n.kyc-trust svg{width:12px;height:12px}\n.kyc-status{display:flex;align-items:center;justify-content:center;gap:7px;font-size:13px;font-weight:500;color:#6C6680;margin-bottom:2px}\n.kyc-blip{width:7px;height:7px;border-radius:50%;background:#5B2DBF;animation:kycBlip 1.4s ease-in-out infinite}\n@keyframes kycBlip{0%,100%{opacity:.35}50%{opacity:1}}\n.kyc-timer{font-family:'DM Mono','SFMono-Regular',monospace;font-size:38px;font-weight:600;color:#171226;margin:16px 0 2px;font-variant-numeric:tabular-nums}\n.kyc-timer-label{font-size:10.5px;color:#9A94AC;text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}\n.kyc-track{width:100%;height:6px;border-radius:999px;background:#EDEAF6;overflow:hidden;margin-bottom:18px;position:relative}\n.kyc-fill{position:absolute;inset:0;width:40%;border-radius:999px;background:linear-gradient(90deg,#5B2DBF,#8452E0);animation:kycSweep 1.6s ease-in-out infinite}\n@keyframes kycSweep{0%{left:-40%}100%{left:100%}}\n.kyc-links{display:flex;align-items:center;justify-content:center;gap:12px;font-size:12px;flex-wrap:wrap}\n.kyc-link{background:none;border:none;padding:0;cursor:pointer;color:#6C6680;font-weight:600;font-size:12px;display:inline-flex;align-items:center;gap:5px}\n.kyc-link svg{width:12px;height:12px}\n.kyc-sep{color:#E4E0F0}\n.kyc-fallback{margin-top:12px;font-size:12px;color:#B4700A;background:#FBF0DC;border-radius:10px;padding:10px 12px;display:none}\n.kyc-fallback a{color:#B4700A;font-weight:700}\n.kyc-info{background:#FBF0DC;border:1px solid rgba(180,112,10,.3);border-radius:12px;padding:10px 12px;font-size:12px;color:#171226;line-height:1.55;margin-bottom:18px;text-align:left}\n.kyc-info b{color:#B4700A}\n.kyc-info-danger{background:#FBE4E1;border:1px solid rgba(196,57,43,.3);border-radius:12px;padding:10px 12px;font-size:12px;color:#171226;line-height:1.55;margin-bottom:18px;text-align:left}\n.kyc-info-danger b{color:#C4392B}\n.kyc-mini-spin{width:14px;height:14px;border-radius:50%;border:2px solid #E4E0F0;border-top-color:#5B2DBF;display:inline-block;vertical-align:-2px;margin-right:6px;animation:kycSpin .7s linear infinite}\n@keyframes kycSpin{to{transform:rotate(360deg)}}\n.kyc-check-pop{animation:kycPop .5s cubic-bezier(.2,1.4,.4,1) both}\n@keyframes kycPop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}\n@media (prefers-reduced-motion: reduce){.kyc-ring,.kyc-blip,.kyc-fill,.kyc-mini-spin,.kyc-check-pop{animation:none!important}}\n</style><div class='kyc-wrap' id='kycWrap'><div id='kycStartView'>\n<div class='kyc-icon'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3l7 3v5c0 4.6-3 8.4-7 9.5-4-1.1-7-4.9-7-9.5V6l7-3z'/><path d='M8.5 12l2.3 2.3L15.5 9.5'/></svg></div>\n<div class='kyc-h1'>Verify your identity</div>\n<div class='kyc-p'>This payout needs a quick ID check. It takes about 2 minutes in a new secure tab &mdash; this page will pick up automatically once you're done.</div>\n<button type='button' class='kyc-btn' id='kycBtn' onclick=\"var startV=document.getElementById('kycStartView');var waitV=document.getElementById('kycWaitView');var pendingV=document.getElementById('kycPendingView');var rejectedV=document.getElementById('kycRejectedView');var verifiedV=document.getElementById('kycVerifiedView');var fb=document.getElementById('kycFallback');var kycRef='"
+                          },
+                          {
+                            "value": "{{pspResponse1.withdrawer.verification.reference}}"
+                          },
+                          {
+                            "value": "';var kycRedirectUrl='"
+                          },
+                          {
+                            "value": "{{extraParams.baseUrl}}"
+                          },
+                          {
+                            "value": "/custRedirect/payout/"
+                          },
+                          {
+                            "value": "{{bankTransaction.bankId}}"
+                          },
+                          {
+                            "value": "/"
+                          },
+                          {
+                            "value": "{{payout.payoutId}}"
+                          },
+                          {
+                            "value": "/?stage=after_kyc_paypal_link_redirect';var w=window.open('"
+                          },
+                          {
+                            "value": "{{pspResponse0.verificationLink}}"
+                          },
+                          {
+                            "value": "','_blank');startV.style.display='none';waitV.style.display='block';if(!w&&fb){fb.style.display='block';}var start=Date.now();var totalMs=300000;var timerEl=document.getElementById('kycTimerText');var statusEl=document.getElementById('kycStatusText');var tick=null,msgTick=null,poll=null;function fmt(ms){var s=Math.max(0,Math.floor(ms/1000));var m=Math.floor(s/60);var sec=s%60;return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');}function stopAll(){clearInterval(tick);clearInterval(msgTick);clearInterval(poll);}function showPending(){stopAll();waitV.style.display='none';rejectedV.style.display='none';verifiedV.style.display='none';pendingV.style.display='block';var refEl=document.getElementById('kycRefId');if(refEl){refEl.textContent=kycRef;}}function showRejected(){stopAll();waitV.style.display='none';pendingV.style.display='none';verifiedV.style.display='none';rejectedV.style.display='block';var refEl2=document.getElementById('kycRejectedRefId');if(refEl2){refEl2.textContent=kycRef;}}function showVerified(){stopAll();waitV.style.display='none';pendingV.style.display='none';rejectedV.style.display='none';verifiedV.style.display='block';setTimeout(function(){window.location.href=kycRedirectUrl;},1200);}function doPoll(){fetch('/api/v1/kycStatus/"
+                          },
+                          {
+                            "value": "{{store.approvelyAch.previouslyUsedContext.customer.customerId}}"
+                          },
+                          {
+                            "value": "/').then(function(r){return r.json();}).then(function(res){var code=(res.code||'').toLowerCase();if(code==='approved'){showVerified();}else if(code==='rejected'){showRejected();}else if(code==='error'||code==='unknown'){console.error('kycStatus returned',code,res.message);}}).catch(function(e){console.error('kycStatus poll failed',e);});}function startTimer(windowMs){start=Date.now();totalMs=windowMs;tick=setInterval(function(){var remaining=totalMs-(Date.now()-start);if(remaining<=0){clearInterval(tick);clearInterval(msgTick);clearInterval(poll);showPending();}else{timerEl.textContent=fmt(remaining);}},1000);}function startPolling(){poll=setInterval(function(){if(Date.now()-start>=totalMs){clearInterval(poll);clearInterval(tick);clearInterval(msgTick);showPending();return;}doPoll();},15000);}var msgs=['Waiting for verification\u2026','Checking status\u2026','Still waiting on the other tab\u2026'];var mi=0;msgTick=setInterval(function(){mi=(mi+1)%msgs.length;if(statusEl){statusEl.textContent=msgs[mi];}},4000);startTimer(totalMs);startPolling();document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'&&waitV.style.display!=='none'){doPoll();}});window.__kycReopen=function(){var w2=window.open('"
+                          },
+                          {
+                            "value": "{{pspResponse0.verificationLink}}"
+                          },
+                          {
+                            "value": "','_blank');if(w2&&fb){fb.style.display='none';}};\">Continue to verification <svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12h14'/><path d='M13 6l6 6-6 6'/></svg></button>\n</div><div id='kycWaitView' style='display:none'>\n<div class='kyc-icon'><span class='kyc-ring'></span><span class='kyc-ring kyc-d2'></span><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3l7 3v5c0 4.6-3 8.4-7 9.5-4-1.1-7-4.9-7-9.5V6l7-3z'/><path d='M8.5 12l2.3 2.3L15.5 9.5'/></svg></div>\n<div class='kyc-h1'>Verifying your identity</div>\n<div class='kyc-p'>Finish the steps in the tab we opened. Don't close this one &mdash; it updates on its own.</div>\n<div class='kyc-status'><span class='kyc-blip'></span><span id='kycStatusText'>Waiting for verification\u2026</span></div>\n<div class='kyc-timer' id='kycTimerText'>05:00</div>\n<div class='kyc-timer-label'>time left to complete</div>\n<div class='kyc-track'><div class='kyc-fill'></div></div>\n<div class='kyc-links'>\n<button type='button' class='kyc-link' onclick='window.__kycReopen()'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M14 4h6v6'/><path d='M20 4l-9 9'/><path d='M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5'/></svg>Reopen verification tab</button>\n</div>\n<div class='kyc-fallback' id='kycFallback'>Pop-up blocked? <a id='kycFallbackLink' href='"
+                          },
+                          {
+                            "value": "{{pspResponse0.verificationLink}}"
+                          },
+                          {
+                            "value": "' target='_blank' rel='noopener'>Open verification manually</a></div>\n</div><div id='kycPendingView' style='display:none'>\n<div class='kyc-icon' style='background:#FBF0DC;color:#B4700A'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M12 7v5l3.5 2'/></svg></div>\n<div class='kyc-h1'>Your verification is still under review</div>\n<div class='kyc-p'>Some checks need manual review, which can take up to 24 hours. You don't need to keep this page open &mdash; nothing more is needed from you right now.</div>\n<div class='kyc-info'><b>Reference:</b> <span id='kycRefId'></span><br/>If it's been longer than 24 hours, contact support with this reference.</div>\n</div><div id='kycRejectedView' style='display:none'>\n<div class='kyc-icon' style='background:#FBE4E1;color:#C4392B'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M9 9l6 6M15 9l-6 6'/></svg></div>\n<div class='kyc-h1'>Verification wasn't approved</div>\n<div class='kyc-p'>We weren't able to verify your identity with the details provided.</div>\n<div class='kyc-info-danger'><b>Reference:</b> <span id='kycRejectedRefId'></span><br/>Contact support with this reference for next steps.</div>\n</div><div id='kycVerifiedView' style='display:none'>\n<div class='kyc-icon kyc-check-pop' style='background:#E2F6EC;color:#158A5E'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M8 12.4l2.6 2.6L16.2 9'/></svg></div>\n<div class='kyc-h1'>Identity verified</div>\n<div class='kyc-p'><span class='kyc-mini-spin'></span>Redirecting you back\u2026</div>\n</div></div>"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "LIST_VALUE_JOIN"
+                          }
+                        ],
+                        "value": ""
+                      },
+                      {
+                        "key": "ui",
+                        "mappings": [
+                          {
+                            "key": "uiStyle",
+                            "value": "position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:90%; max-width:420px; z-index:10;"
+                          }
+                        ],
+                        "operations": [
+                          {
+                            "name": "KEY_VALUE_LIST_TO_OBJECT"
+                          }
+                        ]
+                      },
+                      {
+                        "key": "required",
+                        "value": "false",
+                        "operations": [
+                          {
+                            "name": "STRING_TO_BOOLEAN"
+                          }
+                        ]
+                      }
+                    ],
+                    "operations": [
+                      {
+                        "name": "KEY_VALUE_LIST_TO_OBJECT"
+                      }
+                    ]
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "LIST_OBJECT_VALUE_TO_LIST_VALUE"
+                  }
+                ]
+              }
+            ],
+            "operations": [
+              {
+                "name": "KEY_VALUE_LIST_TO_OBJECT"
+              }
+            ]
+          },
+          {
+            "key": "kycStatus",
+            "mappings": [
+              {
+                "value": "{{store.approvelyAch.hasVerificationLink}}",
+                "operations": [
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": false,
+                          "to": "pending"
+                        }
+                      ],
+                      "defaultValue": ""
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "{{store.approvelyAch.isKycApproved}}",
+                "operations": [
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": true,
+                          "to": "approved"
+                        }
+                      ],
+                      "defaultValue": ""
+                    }
+                  }
+                ]
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "_comment": "Trailing \"\" is the terminator, not a status: it keeps the GET_FIRST_NON_EMPTY_STRING list non-empty (an empty list throws) while resolving to null, so the key is dropped and the stored status is left alone. It replaces a literal \"rejected\", which also fired on 4xx/error responses. A genuine rejection comes from the KYC webhook (\"kyc failure\" -> \"rejected\")."
           },
           {
             "key": "message",

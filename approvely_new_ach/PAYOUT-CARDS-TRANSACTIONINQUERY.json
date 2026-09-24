@@ -1,0 +1,496 @@
+[
+  {
+    "requestMapping": {
+      "method": "GET",
+      "url": {
+        "mappings": [
+          {
+            "value": "https://api-sandbox.coinflow.cash/api/merchant/withdraws/",
+            "required": true
+          },
+          {
+            "value": "{{bankTransaction.paymentTransId}}",
+            "_comment": "required removed on purpose. A payout held at KYC never reached the payment API, so it has no paymentTransId -- and the bankTransaction context is snapshotted in createPayload, BEFORE transEnquiry backfills it. required:true made transformRequestUrl throw out of createRequest, killing the inquiry before resumePayoutAfterKyc could ever be read. Without it the child is simply dropped and the URL degrades to the list endpoint."
+          }
+        ],
+        "operations": [
+          {
+            "name": "LIST_VALUE_JOIN"
+          }
+        ]
+      },
+      "headers": {
+        "mappings": [
+          {
+            "key": "Authorization",
+            "value": "{{bankTransaction.usedAuthKey}}",
+            "required": true,
+            "operations": [
+              {
+                "name": "SPLIT_STRING",
+                "params": {
+                  "delimiter": "##"
+                }
+              },
+              {
+                "name": "GET_ELEMENT_AT_INDEX",
+                "params": {
+                  "index": 1
+                }
+              }
+            ]
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      },
+      "body": {
+        "mappings": [],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    },
+    "responseMapping": {
+      "body": {
+        "mappings": [
+          {
+            "key": "customerContext",
+            "hidden": true,
+            "storeIn": "approvelyVenmoInquiry",
+            "value": "{{payout.payoutId}}",
+            "operations": [
+              {
+                "name": "GET_OR_CREATE_CUSTOMER"
+              }
+            ]
+          },
+          {
+            "key": "isCustomerKycApproved",
+            "storeIn": "approvelyVenmoInquiry",
+            "mappings": [
+              {
+                "value": "{{store.approvelyVenmoInquiry.customerContext.customer.customerKycStatus}}"
+              },
+              {
+                "value": "none"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              },
+              {
+                "name": "STRING_TO_LOWERCASE"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": "approved",
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "isPayoutHoldForKyc",
+            "storeIn": "approvelyVenmoInquiry",
+            "value": "{{bankTransaction.tempObject.IsPayoutHoldForKyc}}",
+            "operations": [
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": true,
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "resumePayoutAfterKyc",
+            "mappings": [
+              {
+                "key": "left",
+                "value": "{{store.approvelyVenmoInquiry.isPayoutHoldForKyc}}"
+              },
+              {
+                "key": "right",
+                "value": "{{store.approvelyVenmoInquiry.isCustomerKycApproved}}"
+              }
+            ],
+            "operations": [
+              {
+                "name": "LOGICAL_OPERATION",
+                "params": {
+                  "operator": "AND"
+                }
+              }
+            ]
+          },
+          {
+            "_comment": "TEMPORARY DIAGNOSTIC - remove once the resume path is confirmed. Shows WHICH customer document GET_OR_CREATE_CUSTOMER actually loaded; it keys on merchantCustomerId/email+brandId, not on payout.client.customerId, so it can resolve a different record than the kycStatus writer does - or create a new one.",
+            "key": "dbgCustomerId",
+            "mappings": [
+              {
+                "value": "{{store.approvelyVenmoInquiry.customerContext.customer.customerId}}"
+              },
+              {
+                "value": "NO_CUSTOMER"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "_comment": "TEMPORARY DIAGNOSTIC - the raw stored status this config reads. Deliberately NOT named kycStatus: that key would make CommonPayout write it back onto the customer.",
+            "key": "dbgCustomerKycStatus",
+            "mappings": [
+              {
+                "value": "{{store.approvelyVenmoInquiry.customerContext.customer.customerKycStatus}}"
+              },
+              {
+                "value": "NO_STATUS"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "hasWithdrawal",
+            "hidden": true,
+            "storeIn": "approvelyVenmoInquiry",
+            "value": "{{pspResponse0.withdrawal}}",
+            "operations": [
+              {
+                "name": "CHECK_IF_NULL"
+              },
+              {
+                "name": "VALUE_MAPPER",
+                "params": {
+                  "mappings": [
+                    {
+                      "from": false,
+                      "to": true
+                    }
+                  ],
+                  "defaultValue": false
+                }
+              }
+            ]
+          },
+          {
+            "key": "code",
+            "mappings": [
+              {
+                "_comment": "Nested so the lowercasing is null-safe. After KYC there is no withdrawal yet, so withdrawal.status is null -- and STRING_TO_LOWERCASE throws on null, which aborted the whole response transform before resumePayoutAfterKyc could be read. The inner GET_FIRST_NON_EMPTY_STRING ends in a non-empty \"none\" so the lowercasing always gets a string, and \"none\" falls through to the VALUE_MAPPER defaultValue.",
+                "mappings": [
+                  {
+                    "value": "{{pspResponse0.withdrawal.status}}"
+                  },
+                  {
+                    "value": "none"
+                  }
+                ],
+                "operations": [
+                  {
+                    "name": "GET_FIRST_NON_EMPTY_STRING"
+                  },
+                  {
+                    "name": "STRING_TO_LOWERCASE"
+                  },
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "defaultValue": "",
+                      "mappings": [
+                        {
+                          "from": "Pending",
+                          "to": "success"
+                        },
+                        {
+                          "from": "pending",
+                          "to": "success"
+                        },
+                        {
+                          "from": "processing",
+                          "to": "success"
+                        },
+                        {
+                          "from": "initiated",
+                          "to": "success"
+                        },
+                        {
+                          "from": "settled",
+                          "to": "success"
+                        },
+                        {
+                          "from": "Success",
+                          "to": "success"
+                        },
+                        {
+                          "from": "success",
+                          "to": "success"
+                        },
+                        {
+                          "from": "completed",
+                          "to": "success"
+                        },
+                        {
+                          "from": "failed",
+                          "to": "fail"
+                        },
+                        {
+                          "from": "failure",
+                          "to": "fail"
+                        },
+                        {
+                          "from": "returned",
+                          "to": "fail"
+                        },
+                        {
+                          "from": "rejected",
+                          "to": "fail"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "{{store.approvelyVenmoInquiry.hasWithdrawal}}",
+                "operations": [
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": true,
+                          "to": "success"
+                        }
+                      ],
+                      "defaultValue": "success"
+                    }
+                  }
+                ],
+                "_comment": "STRING_TO_LOWERCASE removed: hasWithdrawal is a Boolean, and lowercasing coerced it to the String \"true\", which VALUE_MAPPER then compared against the Boolean from:true via equals() -- never a match, so this branch always fell through to \"fail\"."
+              },
+              {
+                "value": "success"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "_comment": "Skipped while the payout is held for KYC. Such a payout was never submitted, so there is no withdrawal to read and this mapping would otherwise resolve to payment_failed and kill a payout whose customer simply has not opened the KYC link yet. Omitting the key leaves lastAction null in executeWebhook, which records lastStatus and returns without touching the payout status. The held-and-approved case never gets here -- resumePayoutAfterKyc returns first.",
+            "key": "status",
+            "skipIf": "{{store.approvelyVenmoInquiry.isPayoutHoldForKyc}}",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.withdrawal.status}}",
+                "operations": [
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "defaultValue": "",
+                      "mappings": [
+                        {
+                          "from": "Pending",
+                          "to": "payout_in_process"
+                        },
+                        {
+                          "from": "pending",
+                          "to": "payout_in_process"
+                        },
+                        {
+                          "from": "processing",
+                          "to": "payout_in_process"
+                        },
+                        {
+                          "from": "initiated",
+                          "to": "payout_in_process"
+                        },
+                        {
+                          "from": "settled",
+                          "to": "paid"
+                        },
+                        {
+                          "from": "Success",
+                          "to": "paid"
+                        },
+                        {
+                          "from": "success",
+                          "to": "paid"
+                        },
+                        {
+                          "from": "completed",
+                          "to": "paid"
+                        },
+                        {
+                          "from": "completed",
+                          "to": "paid"
+                        },
+                        {
+                          "from": "failed",
+                          "to": "payment_failed"
+                        },
+                        {
+                          "from": "failure",
+                          "to": "payment_failed"
+                        },
+                        {
+                          "from": "returned",
+                          "to": "payment_failed"
+                        },
+                        {
+                          "from": "rejected",
+                          "to": "payment_failed"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "{{store.approvelyVenmoInquiry.hasWithdrawal}}",
+                "operations": [
+                  {
+                    "name": "VALUE_MAPPER",
+                    "params": {
+                      "mappings": [
+                        {
+                          "from": true,
+                          "to": "payout_in_process"
+                        }
+                      ],
+                      "defaultValue": ""
+                    }
+                  }
+                ]
+              },
+              {
+                "value": "payout_in_process"
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ]
+          },
+          {
+            "key": "message",
+            "mappings": [
+              {
+                "value": "{{pspResponse0.detailMessage}}"
+              },
+              {
+                "value": "{{pspResponse0.withdrawal.detailMessage}}"
+              },
+              {
+                "value": "{{pspResponse0.withdrawal.returnStatus}}"
+              },
+              {
+                "value": "{{pspResponse0.withdrawal.status}}"
+              },
+              {
+                "_comment": "pspResponse0 itself is always a non-null map, so STRINGIFY_JSON never sees the null it throws on.",
+                "value": "{{pspResponse0}}",
+                "operations": [
+                  {
+                    "name": "STRINGIFY_JSON"
+                  },
+                  {
+                    "name": "STRING_PATTERN_MATCH",
+                    "params": {
+                      "regex": "^.*\"message\":\"[^\"]+\".*$",
+                      "defaultValue": ""
+                    }
+                  },
+                  {
+                    "name": "STRING_REPLACE",
+                    "params": {
+                      "target": "^.*\"message\":\"([^\"]+)\".*$",
+                      "replacement": "$1",
+                      "occurrence": "REGEX_FIRST"
+                    }
+                  }
+                ]
+              },
+              {
+                "_comment": "Same, for the details field when Coinflow sends it as a plain string.",
+                "value": "{{pspResponse0}}",
+                "operations": [
+                  {
+                    "name": "STRINGIFY_JSON"
+                  },
+                  {
+                    "name": "STRING_PATTERN_MATCH",
+                    "params": {
+                      "regex": "^.*\"details\":\"[^\"]+\".*$",
+                      "defaultValue": ""
+                    }
+                  },
+                  {
+                    "name": "STRING_REPLACE",
+                    "params": {
+                      "target": "^.*\"details\":\"([^\"]+)\".*$",
+                      "replacement": "$1",
+                      "occurrence": "REGEX_FIRST"
+                    }
+                  }
+                ]
+              },
+              {
+                "value": ""
+              }
+            ],
+            "operations": [
+              {
+                "name": "GET_FIRST_NON_EMPTY_STRING"
+              }
+            ],
+            "_comment": "Every entry here must resolve to a scalar: GET_FIRST_NON_EMPTY_STRING takes List<StringValueParam> and StringValueParam.value is a String, so an object-valued entry throws and aborts the WHOLE response transform -- taking resumePayoutAfterKyc with it. pspResponse0.details is an object on Coinflow errors, so it is read via STRINGIFY_JSON on the whole body instead, the same idiom PAYOUT-VENMO uses."
+          },
+          {
+            "key": "pspTransactionId",
+            "value": "{{pspResponse0.withdrawal.transferId}}"
+          },
+          {
+            "key": "paysecureId",
+            "value": "{{pspResponse0.withdrawal.idempotencyKey}}"
+          }
+        ],
+        "operations": [
+          {
+            "name": "KEY_VALUE_LIST_TO_OBJECT"
+          }
+        ]
+      }
+    }
+  }
+]
