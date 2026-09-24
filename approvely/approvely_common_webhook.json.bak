@@ -272,7 +272,6 @@
             "value": "{{store.approvelyWebhook.resolvedOrderId}}"
           },
           {
-            "_comment": "The trailing literal is required, not cosmetic: a KYC event has none of these three keys, every child resolves to null and is dropped, and GET_FIRST_NON_EMPTY_STRING throws \"Input list cannot be null.\" on an empty list -- killing the whole transform before kycStatus is built.",
             "key": "hasPspTxnId",
             "hidden": true,
             "storeIn": "approvelyWebhook",
@@ -285,9 +284,6 @@
               },
               {
                 "value": "{{webhookRequest.data.signature}}"
-              },
-              {
-                "value": ""
               }
             ],
             "operations": [
@@ -338,36 +334,6 @@
             ]
           },
           {
-            "_comment": "Coinflow KYC events. No defaultValue on purpose: every other eventType maps to null, null children are dropped, and CommonPayout only reads kycStatus when the key is present -- so no other webhook touches the customer.",
-            "key": "kycStatus",
-            "value": "{{store.approvelyWebhook.eventTypeSafe}}",
-            "operations": [
-              {
-                "_comment": "VALUE_MAPPER matches with equals(), so the eventType is lowercased first and every \"from\" below is lowercase. eventTypeSafe always resolves (GFNES ends in \"UNKNOWN\"), so STRING_TO_LOWERCASE never sees the null it would throw on.",
-                "name": "STRING_TO_LOWERCASE"
-              },
-              {
-                "name": "VALUE_MAPPER",
-                "params": {
-                  "mappings": [
-                    {
-                      "from": "kyc created",
-                      "to": "pending"
-                    },
-                    {
-                      "from": "kyc success",
-                      "to": "approved"
-                    },
-                    {
-                      "from": "kyc failure",
-                      "to": "rejected"
-                    }
-                  ]
-                }
-              }
-            ]
-          },
-          {
             "key": "defaultStatus",
             "hidden": true,
             "storeIn": "approvelyWebhook",
@@ -392,53 +358,6 @@
                   ],
                   "defaultValue": "payment_in_process"
                 }
-              }
-            ]
-          },
-          {
-            "_comment": "The signature scheme for the KYC branch in Main, which has no transaction to read a scheme off. Group 1 of the pattern is the timestamp, group 2 the signature, and the signed payload is the two joined by a dot -- the same thing signedPayload builds above. kycSecretIndex is the ## segment of mid_auth_key holding webhookValidationKey. Optional kycSignatureAlgorithm defaults to HmacSHA256.",
-            "key": "kycSignatureHeader",
-            "value": "coinflow-signature"
-          },
-          {
-            "key": "kycSignaturePattern",
-            "value": "^t=([^,]+),v1=(.+)$"
-          },
-          {
-            "key": "kycSecretIndex",
-            "value": "4"
-          },
-          {
-            "_comment": "The only link a KYC event has to us: for blockchain \"user\", data.wallet is the value we send as x-coinflow-auth-user-id. Read by Main only inside the kycStatus branch, so it is inert on payin and payout events, where wallet is a chain address.",
-            "key": "kycCustomerId",
-            "mappings": [
-              {
-                "value": "{{webhookRequest.data.wallet}}"
-              },
-              {
-                "value": ""
-              }
-            ],
-            "operations": [
-              {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
-              }
-            ]
-          },
-          {
-            "_comment": "Fallback lookup key when the wallet matches no merchantCustomerId. Arrives unmasked -- the masking in our logs is SensitiveDataMaskingConverter, not Coinflow.",
-            "key": "kycEmail",
-            "mappings": [
-              {
-                "value": "{{webhookRequest.data.email}}"
-              },
-              {
-                "value": ""
-              }
-            ],
-            "operations": [
-              {
-                "name": "GET_FIRST_NON_EMPTY_STRING"
               }
             ]
           },
